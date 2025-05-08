@@ -31,7 +31,7 @@ public class PlayerAim : MonoBehaviour
     [Range(.5f, 1f)][SerializeField] private float minCameraDistance;
     [Range(3f, 10f)][SerializeField] private float cameraSensitivity;
     [Range(0.2f, 2f)][SerializeField] private float cameraZoomPace;
-    float CameraDistance = 0f;
+    float CameraDistance;
 
     [Space]
     [SerializeField] private LayerMask aimLayerMask;         // Layers hit by aiming raycasts
