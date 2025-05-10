@@ -5,7 +5,9 @@ public class PlayerWeaponController : MonoBehaviour
     private const float REFERENCE_BULLET_SPEED = 20f;       //this is the default speed from which the mass of the bullet is calculated
 
     private Player player;
+    [SerializeField] private Weapon currentWeapon;
 
+    [Header("Bullet options")]
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private float bulletSpeed;
     [SerializeField] private Transform gunPoint;
@@ -17,10 +19,25 @@ public class PlayerWeaponController : MonoBehaviour
     {
         player = GetComponent<Player>();
 
+        ShootInput();
+
+        currentWeapon.ammo = currentWeapon.maxAmmo;
+    }
+
+    private void ShootInput()
+    {
         player.controls.Character.Fire.performed += context => Shoot();
     }
+
     private void Shoot()
     {
+        if (currentWeapon.ammo <= 0)
+        {
+            Debug.Log("No more bullets");
+            return;
+        }
+
+        currentWeapon.ammo--;
 
         GameObject newBullet = 
             Instantiate(bulletPrefab, gunPoint.position, Quaternion.LookRotation(gunPoint.forward));
