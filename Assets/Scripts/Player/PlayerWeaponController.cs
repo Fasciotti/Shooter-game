@@ -16,6 +16,7 @@ public class PlayerWeaponController : MonoBehaviour
 
     [Header("Inventory")]
     [SerializeField] private List<Weapon> weaponSlots;
+    [SerializeField] private int maxSlots;
 
 
 
@@ -77,6 +78,18 @@ public class PlayerWeaponController : MonoBehaviour
             return;
 
         weaponSlots.Remove(currentWeapon);
+        currentWeapon = weaponSlots[0];
+    }
+
+    public void PickUpWeapon(Weapon newWeapon)
+    {
+        if (weaponSlots.Count >= 2)
+        {
+            Debug.Log("Cannot drop weapon");
+            return;
+        }
+
+        weaponSlots.Add(newWeapon);
     }
 
     public Transform GunPoint() => gunPoint;
