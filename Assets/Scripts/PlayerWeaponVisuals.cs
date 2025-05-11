@@ -64,7 +64,7 @@ public class PlayerWeaponVisuals : MonoBehaviour
     private void AssingWeaponControlEvents()
     {
         // Weapon switching
-        player.controls.Character.SwitchWeapons.performed += context => CheckWeaponSwitch(context);
+        //player.controls.Character.EquipWeapon.performed += context => CheckWeaponSwitch(context);
 
         // Reload action
         player.controls.Character.Reload.performed += context =>

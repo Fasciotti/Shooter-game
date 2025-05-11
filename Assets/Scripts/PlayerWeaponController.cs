@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerWeaponController : MonoBehaviour
@@ -11,23 +12,22 @@ public class PlayerWeaponController : MonoBehaviour
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private float bulletSpeed;
     [SerializeField] private Transform gunPoint;
-
     [SerializeField] private Transform weaponHolder;
+
+    [Header("Inventory")]
+    [SerializeField] private List<Weapon> weaponSlots;
+
 
 
     private void Start()
     {
         player = GetComponent<Player>();
 
-        ShootInput();
+        AssignInputEvents();
 
         currentWeapon.ammo = currentWeapon.maxAmmo;
     }
 
-    private void ShootInput()
-    {
-        player.controls.Character.Fire.performed += context => Shoot();
-    }
 
     private void Shoot()
     {
@@ -66,7 +66,32 @@ public class PlayerWeaponController : MonoBehaviour
         return direction;
     }
 
+    private void EquipWeapon(int i)
+    {
+        currentWeapon = weaponSlots[i];
+    }
+
+    private void DropWeapon()
+    {
+        if (weaponSlots.Count <= 1)
+            return;
+
+        weaponSlots.Remove(currentWeapon);
+    }
+
     public Transform GunPoint() => gunPoint;
+
+    private void AssignInputEvents()
+    {
+        PlayerControls controls = player.controls;
+
+        controls.Character.Fire.performed += context => Shoot();
+
+        controls.Character.EquipWeapon1.performed += context => EquipWeapon(0);
+        controls.Character.EquipWeapon2.performed += context => EquipWeapon(1);
+
+        controls.Character.DropCurrentWeapon.performed += context => DropWeapon();
+    }
 
     private void OnDrawGizmos()
     {

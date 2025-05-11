@@ -42,9 +42,27 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "SwitchWeapons",
+                    "name": "EquipWeapon1",
                     "type": "Button",
                     "id": "562f0e5e-7c07-4031-8ab7-24ce376e476e",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "EquipWeapon2",
+                    "type": "Button",
+                    "id": "4ed9c390-a9b9-4592-80fc-d09164830023",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "DropCurrentWeapon",
+                    "type": "Button",
+                    "id": "43f38db3-c9b4-4d35-a535-df91eff02da7",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -183,51 +201,18 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "SwitchWeapons",
+                    "action": "EquipWeapon1",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "d69341cb-2356-4002-8c17-255a53f3126a",
+                    "id": "80590da1-4f51-46d0-90d3-4a51b3fb4df2",
                     "path": "<Keyboard>/2",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "SwitchWeapons",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "48d51a45-98c9-4edb-9a05-05b89faf5c0a",
-                    "path": "<Keyboard>/3",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "SwitchWeapons",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "9677f626-e485-48c6-ae6d-544cde5ff42b",
-                    "path": "<Keyboard>/4",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "SwitchWeapons",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "90e99617-4cba-424c-acd9-998a76708a38",
-                    "path": "<Keyboard>/5",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "SwitchWeapons",
+                    "action": "EquipWeapon2",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -296,6 +281,17 @@
                     "action": "Zoom",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "f20d9c52-753d-4c43-8e16-d0e2cdb44bf9",
+                    "path": "<Keyboard>/g",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "DropCurrentWeapon",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         }
