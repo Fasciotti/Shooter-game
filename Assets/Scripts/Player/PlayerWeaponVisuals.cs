@@ -48,7 +48,6 @@ public class PlayerWeaponVisuals : MonoBehaviour
         anim = GetComponentInChildren<Animator>();
         player = GetComponent<Player>();
         rig = GetComponentInChildren<Rig>();
-        AssingWeaponControlEvents();
     }
 
     private void Update()
@@ -57,29 +56,18 @@ public class PlayerWeaponVisuals : MonoBehaviour
         MaximizeLeftHandIKWeight();
     }
 
-    /* =====================
-     *   Input / Events
-     * ===================== */
-
-    private void AssingWeaponControlEvents()
+    public void PlayAnimationReload()
     {
-        // Weapon switching
-        //player.controls.Character.EquipWeapon.performed += context => CheckWeaponSwitch(context);
-
-        // Reload action
-        player.controls.Character.Reload.performed += context =>
+        if (!(anim.GetBool("BusyGrabbingWeapon")) && !(anim.GetBool("Reload")))
         {
-            if (!(anim.GetBool("BusyGrabbingWeapon")) && !(anim.GetBool("Reload")))
-            {
-                Debug.Log("Reloading");
-                anim.SetTrigger("Reload");
-                ReduceRigWeight();
-            }
-            else
-            {
-                anim.ResetTrigger("Reload");
-            }
-        };
+            Debug.Log("Reloading");
+            anim.SetTrigger("Reload");
+            ReduceRigWeight();
+        }
+        else
+        {
+            anim.ResetTrigger("Reload");
+        }
     }
 
     private void CheckWeaponSwitch(InputAction.CallbackContext context)

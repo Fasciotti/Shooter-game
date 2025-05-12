@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Net;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerWeaponController : MonoBehaviour
@@ -16,7 +18,7 @@ public class PlayerWeaponController : MonoBehaviour
 
     [Header("Inventory")]
     [SerializeField] private List<Weapon> weaponSlots;
-    [SerializeField] private int maxSlots;
+    [SerializeField] private int maxSlots = 2;
 
 
 
@@ -26,19 +28,19 @@ public class PlayerWeaponController : MonoBehaviour
 
         AssignInputEvents();
 
-        currentWeapon.ammo = currentWeapon.maxAmmo;
+        currentWeapon = weaponSlots[0];
+        currentWeapon.bulletsInMagazine = currentWeapon.maganizeCapacity;
     }
 
 
     private void Shoot()
     {
-        if (currentWeapon.ammo <= 0)
+        Animator anim = GetComponentInChildren<Animator>();
+
+        if (!currentWeapon.canShoot())
         {
-            Debug.Log("No more bullets");
             return;
         }
-
-        currentWeapon.ammo--;
 
         GameObject newBullet = 
             Instantiate(bulletPrefab, gunPoint.position, Quaternion.LookRotation(gunPoint.forward));
@@ -69,7 +71,8 @@ public class PlayerWeaponController : MonoBehaviour
 
     private void EquipWeapon(int i)
     {
-        currentWeapon = weaponSlots[i];
+        if (i <= weaponSlots.Count - 1)
+            currentWeapon = weaponSlots[i];
     }
 
     private void DropWeapon()
@@ -83,7 +86,7 @@ public class PlayerWeaponController : MonoBehaviour
 
     public void PickUpWeapon(Weapon newWeapon)
     {
-        if (weaponSlots.Count >= 2)
+        if (weaponSlots.Count >= maxSlots)
         {
             Debug.Log("Cannot drop weapon");
             return;
@@ -93,17 +96,24 @@ public class PlayerWeaponController : MonoBehaviour
     }
 
     public Transform GunPoint() => gunPoint;
+    public Weapon CurrentWeapon() => currentWeapon;
 
     private void AssignInputEvents()
     {
         PlayerControls controls = player.controls;
 
-        controls.Character.Fire.performed += context => Shoot();
+        controls.Character.Fire.performed += _ => Shoot();
 
-        controls.Character.EquipWeapon1.performed += context => EquipWeapon(0);
-        controls.Character.EquipWeapon2.performed += context => EquipWeapon(1);
+        controls.Character.EquipWeapon1.performed += _ => EquipWeapon(0);
+        controls.Character.EquipWeapon2.performed += _ => EquipWeapon(1);
 
-        controls.Character.DropCurrentWeapon.performed += context => DropWeapon();
+        controls.Character.DropCurrentWeapon.performed += _ => DropWeapon();
+
+        controls.Character.Reload.performed += _ =>
+        {
+            if(currentWeapon.canReload())
+                player.weaponVisuals.PlayAnimationReload();
+        };       
     }
 
     private void OnDrawGizmos()

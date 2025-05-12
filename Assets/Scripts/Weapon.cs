@@ -7,10 +7,56 @@ public enum WeaponType
     rifle
 }
 
-[System.Serializable]
+[System.Serializable] // Makes class visible on inspector
 public class Weapon
 {
     public WeaponType weaponType;
-    public int ammo;
-    public int maxAmmo;
+
+    public int bulletsInMagazine;
+    public int maganizeCapacity;
+    public int totalReserveAmmo;
+
+    public bool canShoot()
+    {
+        return HaveEnoughBullets();
+    }
+
+    private bool HaveEnoughBullets()
+    {
+        if (bulletsInMagazine > 0)
+        {
+            bulletsInMagazine--;
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool canReload()
+    {
+        if (bulletsInMagazine == maganizeCapacity)
+            return false;
+
+        if (totalReserveAmmo > 0)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public void refillBullets()
+    {
+        //totalReserveAmmo += bulletsInMagazine; This can be used to maintain the bullets in the magazine after reloading
+
+        int bulletsToReload = maganizeCapacity;
+
+        if (bulletsToReload > totalReserveAmmo)
+            bulletsToReload = totalReserveAmmo;
+
+        totalReserveAmmo -= bulletsToReload;
+        bulletsInMagazine = bulletsToReload;
+
+        if (totalReserveAmmo < 0)
+            totalReserveAmmo = 0;
+    }
 }
