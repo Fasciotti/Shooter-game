@@ -8,8 +8,8 @@ public class PlayerWeaponVisuals : MonoBehaviour
      *   Inspector Fields
      * ===================== */
 
-    // Weapon transforms (0‑4 match enum in comment)
-    [SerializeField] private Transform[] gunTransforms;
+    // WeaponModels (0‑4 match enum in comment)
+    [SerializeField] private WeaponModel[] weaponModels;
 
     /* 0 = pistol (layer1)
      * 1 = autoRifle (layer1)
@@ -18,20 +18,20 @@ public class PlayerWeaponVisuals : MonoBehaviour
      * 4 = rifle    (layer3)
      */
 
+
     [Header("Rig")]
     [SerializeField] private float rigWeightChangeRate;   // Speed of rig weight fade
 
     [Header("LeftHandIK")]
     [SerializeField] private TwoBoneIKConstraint leftHandIKConstraint;
 
-    [SerializeField] private Transform leftHandTarget;    
+    [SerializeField] private Transform leftHandTarget;
     [SerializeField] private float LHandIKWeightChangeRate;    // Speed of LeftHand IK weight fade
 
     /* =====================
      *   Private State
      * ===================== */
 
-    private Transform currentGun;        // Currently active weapon
     private Animator anim;
     private Player player;
 
@@ -48,12 +48,18 @@ public class PlayerWeaponVisuals : MonoBehaviour
         anim = GetComponentInChildren<Animator>();
         player = GetComponent<Player>();
         rig = GetComponentInChildren<Rig>();
+        weaponModels = GetComponentsInChildren<WeaponModel>(true);
     }
 
     private void Update()
     {
         MaximizeRigWeight();
         MaximizeLeftHandIKWeight();
+
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+            CheckWeaponSwitch(1);
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+            CheckWeaponSwitch(2);
     }
 
     public void PlayAnimationReload()
@@ -70,37 +76,33 @@ public class PlayerWeaponVisuals : MonoBehaviour
         }
     }
 
-    private void CheckWeaponSwitch(InputAction.CallbackContext context)
+    public WeaponModel currentWeaponModel()
     {
-        switch (context.control.displayName)
+        WeaponModel weaponModel = null;
+        WeaponType weaponType = player.weapon.CurrentWeapon().weaponType;
+
+        foreach (var i in weaponModels)
         {
-            case "1": // pistol
-                SwitchOn(gunTransforms[0]);
+            if (i.weaponType == weaponType)
+                weaponModel =  i;
+        }
+
+        return weaponModel;
+    }
+
+    private void CheckWeaponSwitch(int weaponIndex)
+    {
+        switch (weaponIndex)
+        {
+            case 1: // pistol
+                SwitchOn() ;
                 SwitchAnimationLayer(1);
                 WeaponGrabAnimation(GrabType.sideGrab);
                 break;
 
-            case "2": // autoRifle
-                SwitchOn(gunTransforms[1]);
+            case 2: // autoRifle
+                SwitchOn();
                 SwitchAnimationLayer(1);
-                WeaponGrabAnimation(GrabType.sideGrab);
-                break;
-
-            case "3": // shotgun
-                SwitchOn(gunTransforms[2]);
-                SwitchAnimationLayer(2);
-                WeaponGrabAnimation(GrabType.backGrab);
-                break;
-
-            case "4": // revolver
-                SwitchOn(gunTransforms[3]);
-                SwitchAnimationLayer(1);
-                WeaponGrabAnimation(GrabType.sideGrab);
-                break;
-
-            case "5": // rifle
-                SwitchOn(gunTransforms[4]);
-                SwitchAnimationLayer(3);
                 WeaponGrabAnimation(GrabType.backGrab);
                 break;
 
@@ -143,26 +145,25 @@ public class PlayerWeaponVisuals : MonoBehaviour
      *   Weapon Handling
      * ===================== */
 
-    private void SwitchOn(Transform gunTransform)
+    private void SwitchOn()
     {
-        SwitchOffGuns();
-        gunTransform.gameObject.SetActive(true);
-        currentGun = gunTransform;
+        SwitchOffWeaponModels();
+        currentWeaponModel().gameObject.SetActive(true);
         AttachLeftHand();
     }
 
-    private void SwitchOffGuns()
+    private void SwitchOffWeaponModels()
     {
-        for (int i = 0; i < gunTransforms.Length; i++)
+        for (int i = 0; i < weaponModels.Length; i++)
         {
-            gunTransforms[i].gameObject.SetActive(false);
+            weaponModels[i].gameObject.SetActive(false);
         }
     }
 
     private void AttachLeftHand()
     {
         // Align left‑hand target to weapon‑specific anchor
-        Transform targetTransform = currentGun.GetComponentInChildren<LeftHandTargetTransform>().transform;
+        Transform targetTransform = currentWeaponModel().holdPoint;
 
         leftHandTarget.localPosition = targetTransform.localPosition;
         leftHandTarget.localRotation = targetTransform.localRotation;
@@ -188,6 +189,4 @@ public class PlayerWeaponVisuals : MonoBehaviour
         anim.SetLayerWeight(layerIndex, 1);
     }
 
-    public enum GrabType
-    { sideGrab, backGrab };
 }

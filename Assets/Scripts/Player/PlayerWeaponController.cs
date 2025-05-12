@@ -35,8 +35,6 @@ public class PlayerWeaponController : MonoBehaviour
 
     private void Shoot()
     {
-        Animator anim = GetComponentInChildren<Animator>();
-
         if (!currentWeapon.canShoot())
         {
             return;

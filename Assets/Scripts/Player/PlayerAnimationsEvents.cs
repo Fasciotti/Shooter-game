@@ -16,7 +16,6 @@ public class PlayerAnimationsEvents : MonoBehaviour
 
     public void GrabWeaponIsOver()
     {
-        Debug.Log("test");
         visualController.NotBusyGrabbingWeapon();
     }
 
