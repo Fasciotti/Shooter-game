@@ -69,8 +69,12 @@ public class PlayerWeaponController : MonoBehaviour
 
     private void EquipWeapon(int i)
     {
+        // This prevents outofscope error
         if (i <= weaponSlots.Count - 1)
             currentWeapon = weaponSlots[i];
+
+        player.weaponVisuals.SwitchOffWeaponModels();
+        player.weaponVisuals.PlayWeaponEquipAnimation();
     }
 
     private void DropWeapon()

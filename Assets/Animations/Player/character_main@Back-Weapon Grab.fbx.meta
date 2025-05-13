@@ -55,14 +55,14 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0.7422916
-        functionName: GrabWeaponFinishAnimation
+      - time: 0.44508672
+        functionName: SwitchOnWeaponModel
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.83219177
+      - time: 0.7899383
         functionName: GrabWeaponIsOver
         data: 
         objectReferenceParameter: {instanceID: 0}

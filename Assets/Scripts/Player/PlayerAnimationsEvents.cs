@@ -2,26 +2,23 @@ using UnityEngine;
 
 public class PlayerAnimationsEvents : MonoBehaviour
 {
-    private PlayerWeaponVisuals visualController;
     private Player player => GetComponentInParent<Player>();
-    private void Start()
-    {
-        visualController = GetComponentInParent<PlayerWeaponVisuals>();
-    }
     public void ReloadIsOver()
     {
-        visualController.RigWeightReset();
+        player.weaponVisuals.RigWeightReset();
         player.weapon.CurrentWeapon().refillBullets();
     }
 
     public void GrabWeaponIsOver()
     {
-        visualController.NotBusyGrabbingWeapon();
+        player.weaponVisuals.SetBusyGrabWeaponTo(false);
+        player.weaponVisuals.LHandIKWeightReset();
+        player.weaponVisuals.RigWeightReset();
     }
 
     public void GrabWeaponFinishAnimation()
     {
-        visualController.LHandIKWeightReset();
-        visualController.RigWeightReset();
     }
+
+    public void SwitchOnWeaponModel() => player.weaponVisuals.SwitchOnCurrentWeaponModel();
 }

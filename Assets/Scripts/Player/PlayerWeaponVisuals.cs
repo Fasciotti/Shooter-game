@@ -38,6 +38,7 @@ public class PlayerWeaponVisuals : MonoBehaviour
     private bool shouldRigWeightIncrease;
     private bool shouldLHandIKWeightIncrease;
     private Rig rig;
+    private bool isGrabbingWeapon;
 
     /* =====================
      *   Unity Messages
@@ -55,11 +56,6 @@ public class PlayerWeaponVisuals : MonoBehaviour
     {
         MaximizeRigWeight();
         MaximizeLeftHandIKWeight();
-
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-            CheckWeaponSwitch(1);
-        else if (Input.GetKeyDown(KeyCode.Alpha2))
-            CheckWeaponSwitch(2);
     }
 
     public void PlayAnimationReload()
@@ -76,6 +72,7 @@ public class PlayerWeaponVisuals : MonoBehaviour
         }
     }
 
+
     public WeaponModel currentWeaponModel()
     {
         WeaponModel weaponModel = null;
@@ -90,32 +87,9 @@ public class PlayerWeaponVisuals : MonoBehaviour
         return weaponModel;
     }
 
-    private void CheckWeaponSwitch(int weaponIndex)
-    {
-        switch (weaponIndex)
-        {
-            case 1: // pistol
-                SwitchOn() ;
-                SwitchAnimationLayer(1);
-                WeaponGrabAnimation(GrabType.sideGrab);
-                break;
 
-            case 2: // autoRifle
-                SwitchOn();
-                SwitchAnimationLayer(1);
-                WeaponGrabAnimation(GrabType.backGrab);
-                break;
-
-            default:
-                break;
-        }
-    }
-
-    /* =====================
-     *   Rig & IK Control
-     * ===================== */
-
-    private void ReduceRigWeight() => rig.weight = 0.15f;          // Briefly lower rig during transitions
+    #region Rig Animations Methods
+    private void ReduceRigWeight() => rig.weight = 0.1f;          // Briefly lower rig during transitions
 
     private void MaximizeRigWeight()
     {
@@ -140,26 +114,6 @@ public class PlayerWeaponVisuals : MonoBehaviour
     }
 
     public void LHandIKWeightReset() => shouldLHandIKWeightIncrease = true;
-
-    /* =====================
-     *   Weapon Handling
-     * ===================== */
-
-    private void SwitchOn()
-    {
-        SwitchOffWeaponModels();
-        currentWeaponModel().gameObject.SetActive(true);
-        AttachLeftHand();
-    }
-
-    private void SwitchOffWeaponModels()
-    {
-        for (int i = 0; i < weaponModels.Length; i++)
-        {
-            weaponModels[i].gameObject.SetActive(false);
-        }
-    }
-
     private void AttachLeftHand()
     {
         // Align left‑hand target to weapon‑specific anchor
@@ -170,16 +124,42 @@ public class PlayerWeaponVisuals : MonoBehaviour
         leftHandTarget.localScale = targetTransform.localScale;
     }
 
-    private void WeaponGrabAnimation(GrabType grabType)
+    #endregion
+
+    public void SwitchOnCurrentWeaponModel()
     {
+        int animationLayerIndex = ((int)currentWeaponModel().holdType);
+
+        SwitchAnimationLayer(animationLayerIndex);
+        currentWeaponModel().gameObject.SetActive(true);
+        AttachLeftHand();
+    }
+
+    public void SwitchOffWeaponModels()
+    {
+        for (int i = 0; i < weaponModels.Length; i++)
+        {
+            weaponModels[i].gameObject.SetActive(false);
+        }
+    }
+
+
+    public void PlayWeaponEquipAnimation()
+    {
+        GrabType grabType = currentWeaponModel().grabType;
+
         ReduceRigWeight();
         ReduceLHandIKWeight();
         anim.SetFloat("WeaponGrabType", (float)grabType);
         anim.SetTrigger("WeaponGrab");
-        anim.SetBool("BusyGrabbingWeapon", true);
+        SetBusyGrabWeaponTo(true);
     }
 
-    public void NotBusyGrabbingWeapon() => anim.SetBool("BusyGrabbingWeapon", false);
+    public void SetBusyGrabWeaponTo(bool busy)
+    {
+        isGrabbingWeapon = busy;
+        anim.SetBool("BusyGrabbingWeapon", isGrabbingWeapon);
+    }
 
     private void SwitchAnimationLayer(int layerIndex)
     {
