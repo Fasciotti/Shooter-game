@@ -21,6 +21,7 @@ public class Weapon
         return HaveEnoughBullets();
     }
 
+    // This also removes one bullet from the weapon, is called when shooting.
     private bool HaveEnoughBullets()
     {
         if (bulletsInMagazine > 0)

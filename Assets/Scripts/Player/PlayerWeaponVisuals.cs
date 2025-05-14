@@ -8,16 +8,8 @@ public class PlayerWeaponVisuals : MonoBehaviour
      *   Inspector Fields
      * ===================== */
 
-    // WeaponModels (0‑4 match enum in comment)
     [SerializeField] private WeaponModel[] weaponModels;
-
-    /* 0 = pistol (layer1)
-     * 1 = autoRifle (layer1)
-     * 2 = shotgun  (layer2)
-     * 3 = revolver (layer1)
-     * 4 = rifle    (layer3)
-     */
-
+    [SerializeField] private BackupWeaponModel[] backupWeaponModels;
 
     [Header("Rig")]
     [SerializeField] private float rigWeightChangeRate;   // Speed of rig weight fade
@@ -50,6 +42,7 @@ public class PlayerWeaponVisuals : MonoBehaviour
         player = GetComponent<Player>();
         rig = GetComponentInChildren<Rig>();
         weaponModels = GetComponentsInChildren<WeaponModel>(true);
+        backupWeaponModels = GetComponentsInChildren<BackupWeaponModel>(true);
     }
 
     private void Update()
@@ -68,6 +61,7 @@ public class PlayerWeaponVisuals : MonoBehaviour
         }
         else
         {
+            // This prevents the reload animation to play after the current animation ends if the button is clicked while doing so.
             anim.ResetTrigger("Reload");
         }
     }
@@ -89,7 +83,7 @@ public class PlayerWeaponVisuals : MonoBehaviour
 
 
     #region Rig Animations Methods
-    private void ReduceRigWeight() => rig.weight = 0.1f;          // Briefly lower rig during transitions
+    private void ReduceRigWeight() => rig.weight = 0.2f;          // Briefly lower rig during transitions
 
     private void MaximizeRigWeight()
     {
@@ -130,17 +124,47 @@ public class PlayerWeaponVisuals : MonoBehaviour
     {
         int animationLayerIndex = ((int)currentWeaponModel().holdType);
 
+        SwitchOffBackupWeaponModels();
+        SwitchOffWeaponModels();
+
+        currentWeaponModel().gameObject.SetActive(true); // <-- Main purpose of this method
+        if (!player.weapon.HasOnlyOneWeapon())
+            SwitchOnBackupWeaponModel();
+
         SwitchAnimationLayer(animationLayerIndex);
-        currentWeaponModel().gameObject.SetActive(true);
         AttachLeftHand();
     }
-
     public void SwitchOffWeaponModels()
     {
-        for (int i = 0; i < weaponModels.Length; i++)
+        foreach (WeaponModel weaponModel in weaponModels)
         {
-            weaponModels[i].gameObject.SetActive(false);
+            weaponModel.gameObject.SetActive(false);
         }
+    }
+
+    public void SwitchOffBackupWeaponModels()
+    {
+        // Every backup weapon model has a BackupWeaponModel script, we search for it and turn all of them off.
+        foreach (BackupWeaponModel backupWeaponModel in backupWeaponModels)
+        {
+            backupWeaponModel.gameObject.SetActive(false);
+        }
+
+    }
+    public void SwitchOnBackupWeaponModel()
+    {
+        // We compare the backupWeaponType (defined in PlayerWeaponController) with all of the models to decide which to turn on.
+        // The backupWeapon is defined as the weapon the player doesn't currently have in the weaponSlots.
+        WeaponType backupWeaponType = player.weapon.BackupWeaponModel().weaponType;
+
+        foreach (BackupWeaponModel backupModel in backupWeaponModels)
+        {
+            if(backupModel.weaponType == backupWeaponType)
+            {
+                backupModel.gameObject.SetActive(true);
+            }
+        }
+
     }
 
 
@@ -151,7 +175,7 @@ public class PlayerWeaponVisuals : MonoBehaviour
         ReduceRigWeight();
         ReduceLHandIKWeight();
         anim.SetFloat("WeaponGrabType", (float)grabType);
-        anim.SetTrigger("WeaponGrab");
+        anim.SetTrigger("WeaponGrab"); // calls SwitchOnWeaponModel in PlayerAnimationsEvents
         SetBusyGrabWeaponTo(true);
     }
 

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Net;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Android;
 
 public class PlayerWeaponController : MonoBehaviour
 {
@@ -12,15 +13,15 @@ public class PlayerWeaponController : MonoBehaviour
 
     [Header("Bullet options")]
     [SerializeField] private GameObject bulletPrefab;
+
     [SerializeField] private float bulletSpeed;
     [SerializeField] private Transform gunPoint;
     [SerializeField] private Transform weaponHolder;
 
     [Header("Inventory")]
     [SerializeField] private List<Weapon> weaponSlots;
+
     [SerializeField] private int maxSlots = 2;
-
-
 
     private void Start()
     {
@@ -32,7 +33,6 @@ public class PlayerWeaponController : MonoBehaviour
         currentWeapon.bulletsInMagazine = currentWeapon.maganizeCapacity;
     }
 
-
     private void Shoot()
     {
         if (!currentWeapon.canShoot())
@@ -40,7 +40,7 @@ public class PlayerWeaponController : MonoBehaviour
             return;
         }
 
-        GameObject newBullet = 
+        GameObject newBullet =
             Instantiate(bulletPrefab, gunPoint.position, Quaternion.LookRotation(gunPoint.forward));
 
         Rigidbody newBulletRb = newBullet.GetComponent<Rigidbody>();
@@ -52,6 +52,8 @@ public class PlayerWeaponController : MonoBehaviour
 
         GetComponentInChildren<Animator>().SetTrigger("Fire");
     }
+
+    //TODO: find a better place for the commented code lines
     public Vector3 BulletDirection()
     {
         Transform aim = player.aim.AimTransform();
@@ -62,28 +64,34 @@ public class PlayerWeaponController : MonoBehaviour
             direction.y = 0;
 
         //gunPoint.LookAt(aim);
-        //weaponHolder.LookAt(aim); TODO: find a better place for this;
+        //weaponHolder.LookAt(aim);
 
         return direction;
     }
 
     private void EquipWeapon(int i)
     {
-        // This prevents outofscope error
-        if (i <= weaponSlots.Count - 1)
-            currentWeapon = weaponSlots[i];
+        // This prevents outofscope exception
+        if (i > weaponSlots.Count - 1)
+            return;
 
-        player.weaponVisuals.SwitchOffWeaponModels();
+        // This prevents the player from getting the same weapon
+        if (currentWeapon == weaponSlots[i])
+            return;
+        
+        
+        currentWeapon = weaponSlots[i];
+
         player.weaponVisuals.PlayWeaponEquipAnimation();
     }
 
     private void DropWeapon()
     {
-        if (weaponSlots.Count <= 1)
+        if (HasOnlyOneWeapon())
             return;
 
         weaponSlots.Remove(currentWeapon);
-        currentWeapon = weaponSlots[0];
+        EquipWeapon(0);
     }
 
     public void PickUpWeapon(Weapon newWeapon)
@@ -94,11 +102,31 @@ public class PlayerWeaponController : MonoBehaviour
             return;
         }
 
+        // This verifies if the player already has this weapon in the inventory
+        if (weaponSlots[0] == newWeapon)
+            return;
+
         weaponSlots.Add(newWeapon);
+        player.weaponVisuals.SwitchOnBackupWeaponModel(); // Makes the picked weapon appear 
     }
 
     public Transform GunPoint() => gunPoint;
+
     public Weapon CurrentWeapon() => currentWeapon;
+
+    public Weapon BackupWeaponModel()
+    {
+        // The backupWeapon is defined as the weapon the player doesn't currently have in the weaponSlots.
+        foreach (Weapon weapon in weaponSlots)
+        {
+            if (weapon != currentWeapon)
+                return weapon;
+        }
+        Debug.Log("Backup model not available");
+        return null;
+    }
+
+    public bool HasOnlyOneWeapon() => weaponSlots.Count <= 1;
 
     private void AssignInputEvents()
     {
@@ -113,9 +141,9 @@ public class PlayerWeaponController : MonoBehaviour
 
         controls.Character.Reload.performed += _ =>
         {
-            if(currentWeapon.canReload())
+            if (currentWeapon.canReload())
                 player.weaponVisuals.PlayAnimationReload();
-        };       
+        };
     }
 
     private void OnDrawGizmos()
