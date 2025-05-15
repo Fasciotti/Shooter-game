@@ -39,21 +39,6 @@ public class PlayerWeaponVisuals : MonoBehaviour
         MaximizeLeftHandIKWeight();
     }
 
-    public void PlayAnimationReload()
-    {
-        if (!(anim.GetBool("BusyEquippingWeapon")) && !(anim.GetBool("Reload")))
-        {
-            Debug.Log("Reloading");
-            anim.SetTrigger("Reload");
-            ReduceRigWeight();
-        }
-        else
-        {
-            // This prevents the reload animation to play after the current animation ends if the button is clicked while doing so.
-            // FIXME: However, this doesn't work if the animation playing is the reload animation itself.
-            anim.ResetTrigger("Reload");
-        }
-    }
 
 
     public WeaponModel currentWeaponModel()
@@ -109,6 +94,13 @@ public class PlayerWeaponVisuals : MonoBehaviour
 
     #endregion
 
+    public void SwitchOffWeaponModels()
+    {
+        foreach (WeaponModel weaponModel in weaponModels)
+        {
+            weaponModel.gameObject.SetActive(false);
+        }
+    }
     public void SwitchOnCurrentWeaponModel()
     {
         int animationLayerIndex = ((int)currentWeaponModel().holdType);
@@ -122,13 +114,6 @@ public class PlayerWeaponVisuals : MonoBehaviour
 
         SwitchAnimationLayer(animationLayerIndex);
         AttachLeftHand();
-    }
-    public void SwitchOffWeaponModels()
-    {
-        foreach (WeaponModel weaponModel in weaponModels)
-        {
-            weaponModel.gameObject.SetActive(false);
-        }
     }
 
     public void SwitchOffBackupWeaponModels()
@@ -163,9 +148,31 @@ public class PlayerWeaponVisuals : MonoBehaviour
 
         ReduceRigWeight();
         ReduceLHandIKWeight();
+
+        float equipSpeed = player.weapon.CurrentWeapon().equipSpeed;
+
         anim.SetFloat("EquipType", (float)equipType);
+        anim.SetFloat("EquipSpeed", equipSpeed);
         anim.SetTrigger("EquipWeapon"); // calls SwitchOnWeaponModel in PlayerAnimationsEvents
         SetBusyEquippingWeaponTo(true);
+    }
+    public void PlayAnimationReload()
+    {
+        if (!(anim.GetBool("BusyEquippingWeapon")) && !(anim.GetBool("Reload")))
+        {
+            float reloadSpeed = player.weapon.CurrentWeapon().reloadSpeed;
+
+            Debug.Log("Reloading");
+            anim.SetFloat("ReloadSpeed", reloadSpeed);
+            anim.SetTrigger("Reload");
+            ReduceRigWeight();
+        }
+        else
+        {
+            // This prevents the reload animation to play after the current animation ends if the button is clicked while doing so.
+            // FIXME: However, this doesn't work if it's the reload animation itself playing. 
+            anim.ResetTrigger("Reload");
+        }
     }
 
     public void SetBusyEquippingWeaponTo(bool busy)

@@ -12,7 +12,7 @@ public class Bullet : MonoBehaviour
     {
         CreateImpactFX(collision);
         TrailHandler(collision);
-        Destroy(gameObject);
+        ObjectPool.instance.ReturnBullet(gameObject);
 
     }
 

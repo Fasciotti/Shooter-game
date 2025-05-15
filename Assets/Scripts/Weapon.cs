@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public enum WeaponType
 {
     pistol,
@@ -15,6 +17,13 @@ public class Weapon
     public int bulletsInMagazine;
     public int maganizeCapacity;
     public int totalReserveAmmo;
+
+
+    // Controls reload and equip animation speeds
+    [Range(1, 2)]
+    public float equipSpeed = 1;
+    [Range(1, 2)]
+    public float reloadSpeed = 1;
 
     public bool canShoot()
     {
