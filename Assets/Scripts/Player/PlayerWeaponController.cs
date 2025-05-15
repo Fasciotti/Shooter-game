@@ -103,7 +103,7 @@ public class PlayerWeaponController : MonoBehaviour
         }
 
         // This verifies if the player already has this weapon in the inventory
-        if (weaponSlots[0] == newWeapon)
+        if (weaponSlots[0].weaponType == newWeapon.weaponType)
             return;
 
         weaponSlots.Add(newWeapon);

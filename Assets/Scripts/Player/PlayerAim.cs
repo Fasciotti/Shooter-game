@@ -6,7 +6,6 @@ public class PlayerAim : MonoBehaviour
 {
     #region ─── Runtime References ────────────────────────────────────────────────
     private Player player;          // Cached reference to the Player component
-    private PlayerControls controls;        // Cached reference to the input actions
     #endregion
 
     #region ─── Input ─────────────────────────────────────────────────────────────
@@ -46,7 +45,7 @@ public class PlayerAim : MonoBehaviour
     private void Start()
     {
         player = GetComponent<Player>();
-        AssingInputEvents();                 // (typo preserved) Subscribes to input-action callbacks
+        AssignInputEvents();                 // Subscribes to input-action callbacks
     }
 
     private void Update()
@@ -167,9 +166,9 @@ public class PlayerAim : MonoBehaviour
 
 
     #region ─── Input Bindings ───────────────────────────────────────────────────
-    private void AssingInputEvents()
+    private void AssignInputEvents()
     {
-        controls = player.controls;
+        PlayerControls controls = player.controls;
 
         // Cursor position
         controls.Character.Aim.performed += context => mouseInput = context.ReadValue<Vector2>();

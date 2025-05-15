@@ -4,10 +4,6 @@ using UnityEngine.InputSystem;
 
 public class PlayerWeaponVisuals : MonoBehaviour
 {
-    /* =====================
-     *   Inspector Fields
-     * ===================== */
-
     [SerializeField] private WeaponModel[] weaponModels;
     [SerializeField] private BackupWeaponModel[] backupWeaponModels;
 
@@ -20,21 +16,13 @@ public class PlayerWeaponVisuals : MonoBehaviour
     [SerializeField] private Transform leftHandTarget;
     [SerializeField] private float LHandIKWeightChangeRate;    // Speed of LeftHand IK weight fade
 
-    /* =====================
-     *   Private State
-     * ===================== */
-
     private Animator anim;
     private Player player;
 
     private bool shouldRigWeightIncrease;
     private bool shouldLHandIKWeightIncrease;
     private Rig rig;
-    private bool isGrabbingWeapon;
-
-    /* =====================
-     *   Unity Messages
-     * ===================== */
+    private bool isEquippingWeapon;
 
     private void Start()
     {
@@ -53,7 +41,7 @@ public class PlayerWeaponVisuals : MonoBehaviour
 
     public void PlayAnimationReload()
     {
-        if (!(anim.GetBool("BusyGrabbingWeapon")) && !(anim.GetBool("Reload")))
+        if (!(anim.GetBool("BusyEquippingWeapon")) && !(anim.GetBool("Reload")))
         {
             Debug.Log("Reloading");
             anim.SetTrigger("Reload");
@@ -62,6 +50,7 @@ public class PlayerWeaponVisuals : MonoBehaviour
         else
         {
             // This prevents the reload animation to play after the current animation ends if the button is clicked while doing so.
+            // FIXME: However, this doesn't work if the animation playing is the reload animation itself.
             anim.ResetTrigger("Reload");
         }
     }
@@ -170,19 +159,19 @@ public class PlayerWeaponVisuals : MonoBehaviour
 
     public void PlayWeaponEquipAnimation()
     {
-        GrabType grabType = currentWeaponModel().grabType;
+        EquipType equipType = currentWeaponModel().equipType;
 
         ReduceRigWeight();
         ReduceLHandIKWeight();
-        anim.SetFloat("WeaponGrabType", (float)grabType);
-        anim.SetTrigger("WeaponGrab"); // calls SwitchOnWeaponModel in PlayerAnimationsEvents
-        SetBusyGrabWeaponTo(true);
+        anim.SetFloat("EquipType", (float)equipType);
+        anim.SetTrigger("EquipWeapon"); // calls SwitchOnWeaponModel in PlayerAnimationsEvents
+        SetBusyEquippingWeaponTo(true);
     }
 
-    public void SetBusyGrabWeaponTo(bool busy)
+    public void SetBusyEquippingWeaponTo(bool busy)
     {
-        isGrabbingWeapon = busy;
-        anim.SetBool("BusyGrabbingWeapon", isGrabbingWeapon);
+        isEquippingWeapon = busy;
+        anim.SetBool("BusyEquippingWeapon", isEquippingWeapon);
     }
 
     private void SwitchAnimationLayer(int layerIndex)

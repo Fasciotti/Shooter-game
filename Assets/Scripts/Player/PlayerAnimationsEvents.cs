@@ -9,15 +9,11 @@ public class PlayerAnimationsEvents : MonoBehaviour
         player.weapon.CurrentWeapon().refillBullets();
     }
 
-    public void GrabWeaponIsOver()
+    public void EquipWeaponIsOver()
     {
-        player.weaponVisuals.SetBusyGrabWeaponTo(false);
+        player.weaponVisuals.SetBusyEquippingWeaponTo(false);
         player.weaponVisuals.LHandIKWeightReset();
         player.weaponVisuals.RigWeightReset();
-    }
-
-    public void GrabWeaponFinishAnimation()
-    {
     }
 
     public void SwitchOnWeaponModel() => player.weaponVisuals.SwitchOnCurrentWeaponModel();
