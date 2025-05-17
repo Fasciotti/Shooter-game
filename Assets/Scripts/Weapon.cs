@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public enum WeaponType
@@ -25,15 +26,14 @@ public class Weapon
     [Range(1, 2)]
     public float reloadSpeed = 1;
 
-    public bool canShoot()
-    {
-        return HaveEnoughBullets();
-    }
+    [Space]
+    public float fireRate = 1; // Bullets per second
 
-    // This also removes one bullet from the weapon, is called when shooting.
-    private bool HaveEnoughBullets()
+    private float lastShootTime;
+
+    public bool CanShoot()
     {
-        if (bulletsInMagazine > 0)
+        if(HaveEnoughBulletsToShoot() && IsReadyToShot())
         {
             bulletsInMagazine--;
             return true;
@@ -41,8 +41,20 @@ public class Weapon
 
         return false;
     }
+    private bool IsReadyToShot()
+    {
+        if (Time.time >= lastShootTime + (1 / fireRate))
+        {
+            lastShootTime = Time.time;
+            return true;
 
-    public bool canReload()
+        }
+
+        return false;
+    }
+
+    #region Reload methods
+    public bool CanReload()
     {
         if (bulletsInMagazine == maganizeCapacity)
             return false;
@@ -53,8 +65,10 @@ public class Weapon
         }
         return false;
     }
+    private bool HaveEnoughBulletsToShoot() => bulletsInMagazine > 0;
 
-    public void refillBullets()
+    // It's called to refill at the end of the reload animation
+    public void RefillBullets()
     {
         //totalReserveAmmo += bulletsInMagazine; This can be used to maintain the bullets in the magazine after reloading
 
@@ -69,4 +83,6 @@ public class Weapon
         if (totalReserveAmmo < 0)
             totalReserveAmmo = 0;
     }
+
+    #endregion
 }

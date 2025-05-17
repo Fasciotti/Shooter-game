@@ -62,7 +62,14 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.7899383
+      - time: 0.82042265
+        functionName: ResetRigConstraints
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 1
         functionName: EquipWeaponIsOver
         data: 
         objectReferenceParameter: {instanceID: 0}

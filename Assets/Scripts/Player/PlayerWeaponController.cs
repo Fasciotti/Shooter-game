@@ -6,21 +6,20 @@ using UnityEngine.Android;
 
 public class PlayerWeaponController : MonoBehaviour
 {
-    private const float REFERENCE_BULLET_SPEED = 20f;       //this is the default speed from which the mass of the bullet is calculated
+    private const float REFERENCE_BULLET_SPEED = 20f;       // This is the default speed from which the mass of the bullet is calculated
 
     private Player player;
     [SerializeField] private Weapon currentWeapon;
+    private bool weaponReady;
 
     [Header("Bullet options")]
     [SerializeField] private GameObject bulletPrefab;
 
     [SerializeField] private float bulletSpeed;
-    [SerializeField] private Transform gunPoint;
     [SerializeField] private Transform weaponHolder;
 
     [Header("Inventory")]
     [SerializeField] private List<Weapon> weaponSlots;
-
     [SerializeField] private int maxSlots = 2;
 
     private void Start()
@@ -33,43 +32,21 @@ public class PlayerWeaponController : MonoBehaviour
         currentWeapon.bulletsInMagazine = currentWeapon.maganizeCapacity;
     }
 
-    private void Shoot()
-    {
-        if (!currentWeapon.canShoot())
-        {
-            return;
-        }
 
-        GameObject newBullet = ObjectPool.instance.GetBullet();
-
-        newBullet.transform.position = gunPoint.position;
-        newBullet.transform.rotation = Quaternion.LookRotation(gunPoint.forward);
-
-        Rigidbody newBulletRb = newBullet.GetComponent<Rigidbody>();
-
-        newBulletRb.mass = REFERENCE_BULLET_SPEED / bulletSpeed;
-        newBulletRb.linearVelocity = BulletDirection() * bulletSpeed;
-
-        GetComponentInChildren<Animator>().SetTrigger("Fire");
-    }
-
-
-    //TODO: find a better place for the commented code lines
     public Vector3 BulletDirection()
     {
         Transform aim = player.aim.AimTransform();
 
-        Vector3 direction = (aim.position - gunPoint.position).normalized;
+        Vector3 direction = (aim.position - CurrentWeaponGunPoint().position).normalized;
 
         if (!player.aim.CanAimPrecisely() && player.aim.Target() == null)
             direction.y = 0;
 
-        //gunPoint.LookAt(aim);
-        //weaponHolder.LookAt(aim);
-
         return direction;
     }
 
+
+    #region ============ Slot Management ==============
     private void EquipWeapon(int i)
     {
         // This prevents outofscope exception
@@ -79,13 +56,15 @@ public class PlayerWeaponController : MonoBehaviour
         // This prevents the player from getting the same weapon
         if (currentWeapon == weaponSlots[i])
             return;
-        
+
+        SetWeaponReady(false);
         
         currentWeapon = weaponSlots[i];
 
         player.weaponVisuals.PlayWeaponEquipAnimation();
     }
 
+    // Assumes maximum of 2 slots
     private void DropWeapon()
     {
         if (HasOnlyOneWeapon())
@@ -95,6 +74,7 @@ public class PlayerWeaponController : MonoBehaviour
         EquipWeapon(0);
     }
 
+    // Called by the pickup object
     public void PickUpWeapon(Weapon newWeapon)
     {
         if (weaponSlots.Count >= maxSlots)
@@ -111,13 +91,51 @@ public class PlayerWeaponController : MonoBehaviour
         player.weaponVisuals.SwitchOnBackupWeaponModel(); // Makes the picked weapon appear 
     }
 
-    public Transform GunPoint() => gunPoint;
 
-    public Weapon CurrentWeapon() => currentWeapon;
+    #region Lambda Methods
+    public void SetWeaponReady(bool ready) => weaponReady = ready;
+
+    public bool IsWeaponReady() => weaponReady;
+
+    public bool HasOnlyOneWeapon() => weaponSlots.Count <= 1;
+
+    #endregion
+    #endregion
+    private void Reload()
+    {
+        if (!IsWeaponReady())
+            return;
+
+        if (!currentWeapon.CanReload())
+            return;
+        
+        SetWeaponReady(false);
+        player.weaponVisuals.PlayAnimationReload();
+    }
+    private void Shoot()
+    {
+        if (!IsWeaponReady())
+            return;
+
+        if (!currentWeapon.CanShoot())
+            return;
+
+        GameObject newBullet = ObjectPool.instance.GetBullet();
+
+        newBullet.transform.SetPositionAndRotation
+            (CurrentWeaponGunPoint().position, Quaternion.LookRotation(CurrentWeaponGunPoint().forward));
+
+        Rigidbody newBulletRb = newBullet.GetComponent<Rigidbody>();
+
+        newBulletRb.mass = REFERENCE_BULLET_SPEED / bulletSpeed; // This makes sure the mass of the bullet is always the same
+        newBulletRb.linearVelocity = BulletDirection() * bulletSpeed;
+
+        player.weaponVisuals.PlayFireAnimation();
+    }
 
     public Weapon BackupWeaponModel()
     {
-        // The backupWeapon is defined as the weapon the player doesn't currently have in the weaponSlots.
+        // The backupWeapon is defined as the weapon the player doesn't currently have equipped, but it's in the weaponSlots.
         foreach (Weapon weapon in weaponSlots)
         {
             if (weapon != currentWeapon)
@@ -126,9 +144,14 @@ public class PlayerWeaponController : MonoBehaviour
         Debug.Log("Backup model not available");
         return null;
     }
+    #region Lambda Methods
+    public Transform CurrentWeaponGunPoint() => player.weaponVisuals.currentWeaponModel().gunPoint;
 
-    public bool HasOnlyOneWeapon() => weaponSlots.Count <= 1;
+    public Weapon CurrentWeapon() => currentWeapon;
 
+    #endregion
+
+    #region Input Events
     private void AssignInputEvents()
     {
         PlayerControls controls = player.controls;
@@ -140,18 +163,8 @@ public class PlayerWeaponController : MonoBehaviour
 
         controls.Character.DropCurrentWeapon.performed += _ => DropWeapon();
 
-        controls.Character.Reload.performed += _ =>
-        {
-            if (currentWeapon.canReload())
-                player.weaponVisuals.PlayAnimationReload();
-        };
+        controls.Character.Reload.performed += _ => Reload();
     }
 
-    private void OnDrawGizmos()
-    {
-        Gizmos.DrawLine(weaponHolder.position, weaponHolder.position + weaponHolder.forward * 25);
-        Gizmos.color = Color.yellow;
-
-        //Gizmos.DrawLine(gunPoint.position, gunPoint.position + BulletDirection() * 25);
-    }
+    #endregion
 }

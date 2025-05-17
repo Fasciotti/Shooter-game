@@ -18,7 +18,6 @@ public class PlayerMovement : MonoBehaviour
     private PlayerControls controls;
     private Player player;
     private CharacterController characterController;
-    private Animator playerAnimator;
 
     private float speed;            // Current move speed
     private float verticalVelocity; // Gravity accumulator
@@ -36,7 +35,6 @@ public class PlayerMovement : MonoBehaviour
     {
         player = GetComponent<Player>();
         characterController = GetComponent<CharacterController>();
-        playerAnimator = GetComponentInChildren<Animator>();
 
         speed = walkSpeed;
         AssignInputEvents();
@@ -46,6 +44,8 @@ public class PlayerMovement : MonoBehaviour
     {
         ApplyMovement();
         ApplyRotation();
+        ApplyGravity();
+
         AnimatorControllers();
     }
 
@@ -56,7 +56,6 @@ public class PlayerMovement : MonoBehaviour
     private void ApplyMovement()
     {
         movementDirection = new Vector3(moveInput.x, 0, moveInput.y);
-        ApplyGravity();
         characterController.Move(movementDirection * Time.deltaTime * speed);
     }
 
@@ -95,6 +94,7 @@ public class PlayerMovement : MonoBehaviour
     private void AnimatorControllers()
     {
         Vector3 animationMovementDirection = new Vector3(movementDirection.x, 0, movementDirection.z);
+        Animator playerAnimator = player.weaponVisuals.anim;
 
         float zVelocity = Vector3.Dot(animationMovementDirection.normalized, transform.forward);
         float xVelocity = Vector3.Dot(animationMovementDirection.normalized, transform.right);

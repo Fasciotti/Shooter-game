@@ -108,22 +108,31 @@ public class PlayerAim : MonoBehaviour
 
     private void UpdateAimVisuals()
     {
+        aimLaser.enabled = player.weapon.IsWeaponReady();
+
+        if (!aimLaser.enabled)
+            return;
+
         float tipLength = 0.5f;          // Extra segment to show “laser light fading” beyond the hit
         float laserDistance = 4f;            // Maximum laser range
 
-        Transform gunPoint = player.weapon.GunPoint();
         Vector3 laserDirection = player.weapon.BulletDirection();
-        Vector3 endPoint = gunPoint.position + laserDirection * laserDistance;
+        Vector3 endPoint = player.weapon.CurrentWeaponGunPoint().position + laserDirection * laserDistance;
+
+        WeaponModel weaponModel = player.weaponVisuals.currentWeaponModel();
+
+        weaponModel.gunPoint.LookAt(aim);
+        weaponModel.transform.LookAt(aim);
 
         // Shorten the beam if we hit something
-        if (Physics.Raycast(gunPoint.position, laserDirection, out RaycastHit hitInfo, laserDistance, aimLayerMask))
+        if (Physics.Raycast(player.weapon.CurrentWeaponGunPoint().position, laserDirection, out RaycastHit hitInfo, laserDistance, aimLayerMask))
         {
             endPoint = hitInfo.point;
             tipLength = 0f;
         }
 
         // Set the three points used by the LineRenderer
-        aimLaser.SetPosition(0, gunPoint.position);
+        aimLaser.SetPosition(0, player.weapon.CurrentWeaponGunPoint().position);
         aimLaser.SetPosition(1, endPoint);
         aimLaser.SetPosition(2, endPoint + laserDirection * tipLength);
     }

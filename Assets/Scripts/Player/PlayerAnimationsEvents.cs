@@ -1,19 +1,29 @@
 using UnityEngine;
+using UnityEngine.Android;
 
 public class PlayerAnimationsEvents : MonoBehaviour
 {
+    // TODO: Separate the rigging and IK resets in methods
+
     private Player player => GetComponentInParent<Player>();
     public void ReloadIsOver()
     {
-        player.weaponVisuals.RigWeightReset();
-        player.weapon.CurrentWeapon().refillBullets();
+        player.weapon.CurrentWeapon().RefillBullets();
+        player.weapon.SetWeaponReady(true);
+        Debug.Log("ready");
+
     }
 
+    public void ResetRigConstraints()
+    {
+        player.weaponVisuals.RigWeightReset();
+        player.weaponVisuals.LHandIKWeightReset();
+        Debug.Log("reset");
+    }
     public void EquipWeaponIsOver()
     {
-        player.weaponVisuals.SetBusyEquippingWeaponTo(false);
-        player.weaponVisuals.LHandIKWeightReset();
-        player.weaponVisuals.RigWeightReset();
+        player.weapon.SetWeaponReady(true);
+        Debug.Log("ready");
     }
 
     public void SwitchOnWeaponModel() => player.weaponVisuals.SwitchOnCurrentWeaponModel();

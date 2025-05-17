@@ -16,7 +16,7 @@ public class PlayerWeaponVisuals : MonoBehaviour
     [SerializeField] private Transform leftHandTarget;
     [SerializeField] private float LHandIKWeightChangeRate;    // Speed of LeftHand IK weight fade
 
-    private Animator anim;
+    public Animator anim { get; private set; }
     private Player player;
 
     private bool shouldRigWeightIncrease;
@@ -58,7 +58,9 @@ public class PlayerWeaponVisuals : MonoBehaviour
 
     #region Rig Animations Methods
     private void ReduceRigWeight() => rig.weight = 0.2f;          // Briefly lower rig during transitions
+    private void ReduceLHandIKWeight() => leftHandIKConstraint.weight = 0f;
 
+    // TODO: Merge rig and IK weight-changing methods. Make methods stops increasing weight.
     private void MaximizeRigWeight()
     {
         if (shouldRigWeightIncrease)
@@ -67,10 +69,6 @@ public class PlayerWeaponVisuals : MonoBehaviour
             if (rig.weight >= 1) shouldRigWeightIncrease = false;
         }
     }
-
-    public void RigWeightReset() => shouldRigWeightIncrease = true;
-
-    private void ReduceLHandIKWeight() => leftHandIKConstraint.weight = 0f;
 
     private void MaximizeLeftHandIKWeight()
     {
@@ -81,6 +79,8 @@ public class PlayerWeaponVisuals : MonoBehaviour
         }
     }
 
+
+    public void RigWeightReset() => shouldRigWeightIncrease = true;
     public void LHandIKWeightReset() => shouldLHandIKWeightIncrease = true;
     private void AttachLeftHand()
     {
@@ -118,7 +118,7 @@ public class PlayerWeaponVisuals : MonoBehaviour
 
     public void SwitchOffBackupWeaponModels()
     {
-        // Every backup weapon model has a BackupWeaponModel script, we search for it and turn all of them off.
+        // Every backup weapon model has a BackupWeaponModel script, we search for it and turn them all off.
         foreach (BackupWeaponModel backupWeaponModel in backupWeaponModels)
         {
             backupWeaponModel.gameObject.SetActive(false);
@@ -128,7 +128,7 @@ public class PlayerWeaponVisuals : MonoBehaviour
     public void SwitchOnBackupWeaponModel()
     {
         // We compare the backupWeaponType (defined in PlayerWeaponController) with all of the models to decide which to turn on.
-        // The backupWeapon is defined as the weapon the player doesn't currently have in the weaponSlots.
+        // The backupWeapon is defined as the weapon the player does have in the weaponSlots, but it's not equipped.
         WeaponType backupWeaponType = player.weapon.BackupWeaponModel().weaponType;
 
         foreach (BackupWeaponModel backupModel in backupWeaponModels)
@@ -141,6 +141,10 @@ public class PlayerWeaponVisuals : MonoBehaviour
 
     }
 
+    public void PlayFireAnimation()
+    {
+        anim.SetTrigger("Fire");
+    }
 
     public void PlayWeaponEquipAnimation()
     {
@@ -154,31 +158,16 @@ public class PlayerWeaponVisuals : MonoBehaviour
         anim.SetFloat("EquipType", (float)equipType);
         anim.SetFloat("EquipSpeed", equipSpeed);
         anim.SetTrigger("EquipWeapon"); // calls SwitchOnWeaponModel in PlayerAnimationsEvents
-        SetBusyEquippingWeaponTo(true);
+        player.weapon.SetWeaponReady(false);
     }
     public void PlayAnimationReload()
     {
-        if (!(anim.GetBool("BusyEquippingWeapon")) && !(anim.GetBool("Reload")))
-        {
-            float reloadSpeed = player.weapon.CurrentWeapon().reloadSpeed;
+        float reloadSpeed = player.weapon.CurrentWeapon().reloadSpeed;
 
-            Debug.Log("Reloading");
-            anim.SetFloat("ReloadSpeed", reloadSpeed);
-            anim.SetTrigger("Reload");
-            ReduceRigWeight();
-        }
-        else
-        {
-            // This prevents the reload animation to play after the current animation ends if the button is clicked while doing so.
-            // FIXME: However, this doesn't work if it's the reload animation itself playing. 
-            anim.ResetTrigger("Reload");
-        }
-    }
-
-    public void SetBusyEquippingWeaponTo(bool busy)
-    {
-        isEquippingWeapon = busy;
-        anim.SetBool("BusyEquippingWeapon", isEquippingWeapon);
+        Debug.Log("Reloading");
+        anim.SetFloat("ReloadSpeed", reloadSpeed);
+        anim.SetTrigger("Reload");
+        ReduceRigWeight();
     }
 
     private void SwitchAnimationLayer(int layerIndex)

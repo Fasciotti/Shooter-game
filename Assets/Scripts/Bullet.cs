@@ -1,3 +1,4 @@
+using Unity.Collections;
 using UnityEngine;
 
 public class Bullet : MonoBehaviour
@@ -16,6 +17,7 @@ public class Bullet : MonoBehaviour
 
     }
 
+    // FIXME: The trail is ejected out of the bullet gameObject, it doesn't return to the ObjectPool
     private void TrailHandler(Collision collision)
     {
         if (!doubleCollision)
