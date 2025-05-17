@@ -10,6 +10,7 @@ public class WeaponModel : MonoBehaviour
     public WeaponType weaponType;
     public HoldType holdType;
     public EquipType equipType;
+    public ShootType shootType;
 
     public Transform gunPoint;
     public Transform holdPoint;

@@ -12,6 +12,7 @@ public class ObjectPool : MonoBehaviour
     [SerializeField] private int poolSize;
 
     private Queue<GameObject> bulletPool;
+
     private void Start()
     {
         bulletPool = new Queue<GameObject>();

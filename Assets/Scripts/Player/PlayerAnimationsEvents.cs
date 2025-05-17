@@ -10,20 +10,16 @@ public class PlayerAnimationsEvents : MonoBehaviour
     {
         player.weapon.CurrentWeapon().RefillBullets();
         player.weapon.SetWeaponReady(true);
-        Debug.Log("ready");
-
     }
 
     public void ResetRigConstraints()
     {
         player.weaponVisuals.RigWeightReset();
         player.weaponVisuals.LHandIKWeightReset();
-        Debug.Log("reset");
     }
     public void EquipWeaponIsOver()
     {
         player.weapon.SetWeaponReady(true);
-        Debug.Log("ready");
     }
 
     public void SwitchOnWeaponModel() => player.weaponVisuals.SwitchOnCurrentWeaponModel();

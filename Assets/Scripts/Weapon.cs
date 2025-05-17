@@ -10,27 +10,39 @@ public enum WeaponType
     rifle
 }
 
+public enum ShootType
+{
+    Single,
+    Auto
+}
+
 [System.Serializable] // Makes class visible on inspector
 public class Weapon
 {
     public WeaponType weaponType;
 
+    [Header("Magazine Details")]
     public int bulletsInMagazine;
     public int maganizeCapacity;
     public int totalReserveAmmo;
 
+    [Header("Shooting specifics")]
+    public float fireRate = 1; // Bullets per second
+    private float lastShootTime;
+    public ShootType shootType;
 
+
+    [Header("Animation Details")]
     // Controls reload and equip animation speeds
     [Range(1, 2)]
     public float equipSpeed = 1;
     [Range(1, 2)]
     public float reloadSpeed = 1;
 
-    [Space]
-    public float fireRate = 1; // Bullets per second
 
-    private float lastShootTime;
 
+
+    #region Shoot methods
     public bool CanShoot()
     {
         if(HaveEnoughBulletsToShoot() && IsReadyToShot())
@@ -52,6 +64,8 @@ public class Weapon
 
         return false;
     }
+
+    #endregion
 
     #region Reload methods
     public bool CanReload()

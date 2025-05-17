@@ -11,6 +11,7 @@ public class PlayerWeaponController : MonoBehaviour
     private Player player;
     [SerializeField] private Weapon currentWeapon;
     private bool weaponReady;
+    private bool isShooting;
 
     [Header("Bullet options")]
     [SerializeField] private GameObject bulletPrefab;
@@ -30,6 +31,12 @@ public class PlayerWeaponController : MonoBehaviour
 
         currentWeapon = weaponSlots[0];
         currentWeapon.bulletsInMagazine = currentWeapon.maganizeCapacity;
+    }
+
+    private void Update()
+    {
+        if (isShooting)
+            Shoot();
     }
 
 
@@ -120,6 +127,10 @@ public class PlayerWeaponController : MonoBehaviour
         if (!currentWeapon.CanShoot())
             return;
 
+        // Assigning false to isShooting variable makes the chain of calls of Shoot methods stop (see Update)
+        if (currentWeapon.shootType == ShootType.Single)
+            isShooting = false;
+
         GameObject newBullet = ObjectPool.instance.GetBullet();
 
         newBullet.transform.SetPositionAndRotation
@@ -156,7 +167,8 @@ public class PlayerWeaponController : MonoBehaviour
     {
         PlayerControls controls = player.controls;
 
-        controls.Character.Fire.performed += _ => Shoot();
+        controls.Character.Fire.performed += _ => isShooting = true;
+        controls.Character.Fire.canceled += _ => isShooting = false;
 
         controls.Character.EquipWeapon1.performed += _ => EquipWeapon(0);
         controls.Character.EquipWeapon2.performed += _ => EquipWeapon(1);
