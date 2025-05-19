@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using Unity.VisualScripting;
@@ -30,22 +31,24 @@ public class PlayerWeaponController : MonoBehaviour
         AssignInputEvents();
 
         currentWeapon = weaponSlots[0];
-        currentWeapon.bulletsInMagazine = currentWeapon.maganizeCapacity;
+        currentWeapon.bulletsInMagazine = currentWeapon.magazineCapacity;
     }
 
     private void Update()
     {
         if (isShooting)
             Shoot();
-    }
 
+        if (Input.GetKeyDown(KeyCode.T))
+            currentWeapon.ToogleBurst();
+    }
 
     public Vector3 BulletDirection()
     {
         Transform aim = player.aim.AimTransform();
 
         Vector3 direction = (aim.position - CurrentWeaponGunPoint().position).normalized;
-
+        
         if (!player.aim.CanAimPrecisely() && player.aim.Target() == null)
             direction.y = 0;
 
@@ -121,27 +124,61 @@ public class PlayerWeaponController : MonoBehaviour
     }
     private void Shoot()
     {
-        if (!IsWeaponReady())
-            return;
-
-        if (!currentWeapon.CanShoot())
+        if (!IsWeaponReady() || !currentWeapon.CanShoot())
             return;
 
         // Assigning false to isShooting variable makes the chain of calls of Shoot methods stop (see Update)
         if (currentWeapon.shootType == ShootType.Single)
             isShooting = false;
 
+        player.weaponVisuals.PlayFireAnimation();
+
+        if (currentWeapon.IsBurstActivated())
+        {
+            StartCoroutine(BurstFire());
+            return;
+        }
+
+        FireSingleBullet();
+    }
+    
+    // FIXME: Because of the weaponReady variable, the laser is disabled when shooting with burst mode on
+    private IEnumerator BurstFire()
+    {
+        SetWeaponReady(false);
+
+        for (int i = 1; i <= currentWeapon.bulletsPerShoot; i++)
+        {
+            FireSingleBullet();
+
+            yield return new WaitForSeconds(currentWeapon.burstFireDelay);
+
+            if (i >= currentWeapon.bulletsPerShoot)
+            {
+                SetWeaponReady(true);
+            }
+
+        }
+    }
+
+    private void FireSingleBullet()
+    {
         GameObject newBullet = ObjectPool.instance.GetBullet();
 
+        // Makes the bullet face aim
         newBullet.transform.SetPositionAndRotation
             (CurrentWeaponGunPoint().position, Quaternion.LookRotation(CurrentWeaponGunPoint().forward));
 
+
+        Vector3 bulletDirection = currentWeapon.ApplySpread(BulletDirection());
+
+
         Rigidbody newBulletRb = newBullet.GetComponent<Rigidbody>();
-
         newBulletRb.mass = REFERENCE_BULLET_SPEED / bulletSpeed; // This makes sure the mass of the bullet is always the same
-        newBulletRb.linearVelocity = BulletDirection() * bulletSpeed;
+        newBulletRb.linearVelocity = bulletDirection * bulletSpeed;
 
-        player.weaponVisuals.PlayFireAnimation();
+
+        currentWeapon.bulletsInMagazine--;
     }
 
     public Weapon BackupWeaponModel()

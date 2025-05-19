@@ -1,13 +1,14 @@
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 
 public enum WeaponType
 {
-    pistol,
-    autoRifle,
-    shotgun,
-    revolver,
-    rifle
+    Pistol,
+    AutoRifle,
+    Shotgun,
+    Revolver,
+    Rifle
 }
 
 public enum ShootType
@@ -23,14 +24,23 @@ public class Weapon
 
     [Header("Magazine Details")]
     public int bulletsInMagazine;
-    public int maganizeCapacity;
     public int totalReserveAmmo;
+    public int magazineCapacity;
 
     [Header("Shooting specifics")]
-    public float fireRate = 1; // Bullets per second
-    private float lastShootTime;
+    public float fireRate = 1; // Interval in seconds per bullet
+    public float defaultFireRate = 1f;
+    public int bulletsPerShoot;
     public ShootType shootType;
+    private float lastShootTime;
 
+    [Header("Burst Fire")]
+    public int burstBulletsPerShot;
+    public float burstFireRate;
+    public float burstFireDelay;
+
+    [SerializeField] private bool isBurstAvailable;
+    [SerializeField] private bool isBurstActivated;
 
     [Header("Animation Details")]
     // Controls reload and equip animation speeds
@@ -39,22 +49,90 @@ public class Weapon
     [Range(1, 2)]
     public float reloadSpeed = 1;
 
+    [Header("Spread")]
+    private float currentSpread = 1;
+    private float lastSpreadTimeUpdate;
 
+    public float baseSpread = 1;
+    public float maximumSpread = 3;
+    public float spreadCooldown = 1; // In seconds
+    public float spreadIncreaseRate = 0.15f; // Per shot
 
-
-    #region Shoot methods
-    public bool CanShoot()
+    #region BurstMode methods
+    public void ToogleBurst()
     {
-        if(HaveEnoughBulletsToShoot() && IsReadyToShot())
+        if (!isBurstAvailable)
+            return;
+
+        isBurstActivated = !isBurstActivated;
+
+        UpdateShootSpecifics();
+    }
+
+    private void UpdateShootSpecifics()
+    {
+        if (isBurstActivated)
         {
-            bulletsInMagazine--;
-            return true;
+            bulletsPerShoot = burstBulletsPerShot;
+            fireRate = burstFireRate;
+
+        }
+        else
+        {
+            bulletsPerShoot = 1;
+            fireRate = defaultFireRate;
+        }
+    }
+    public bool IsBurstActivated() => isBurstActivated;
+
+    #endregion
+
+    #region Spread methods
+
+    public Vector3 ApplySpread(Vector3 currentBulletDirection)
+    {
+        UpdateSpread();
+
+        // Changing the direction of the bullet within the currentSpread min-max range.
+        Quaternion spreadDirection = Quaternion.Euler(
+            Random.Range(-currentSpread, currentSpread),
+            Random.Range(-currentSpread, currentSpread),
+            Random.Range(-currentSpread, currentSpread)
+            );
+
+        // This applies the euler rotation to the vector position.
+        // (It's important to remember that this is not a multiplication operation,
+        // but rather a custom operator to apply euler rotation. The order (Quaternion) & (Vector) is mandatory)
+        return spreadDirection * currentBulletDirection;
+    }
+
+
+    public void IncreaseSpread()
+    {
+        currentSpread = Mathf.Clamp(currentSpread + spreadIncreaseRate, baseSpread, maximumSpread);
+    }
+
+    public void UpdateSpread()
+    {
+        // This checks if the required time (spreadCooldown) has passed since the last time the player shot. If so, the spread is reset.
+        if (Time.time >  lastSpreadTimeUpdate + spreadCooldown)
+        {
+            currentSpread = baseSpread;
+        } else
+        {
+            IncreaseSpread();
         }
 
-        return false;
+        lastSpreadTimeUpdate = Time.time;
     }
+
+    #endregion
+
+    #region Shoot methods
+    public bool CanShoot() => HaveEnoughBulletsToShoot() && IsReadyToShot();
     private bool IsReadyToShot()
     {
+        // Player can only shoot when the minimum time has passed. (fireRate is in interval in seconds per bullet)
         if (Time.time >= lastShootTime + (1 / fireRate))
         {
             lastShootTime = Time.time;
@@ -68,9 +146,11 @@ public class Weapon
     #endregion
 
     #region Reload methods
+
+    // Can only reload if it has ammo and it's not full.
     public bool CanReload()
     {
-        if (bulletsInMagazine == maganizeCapacity)
+        if (bulletsInMagazine == magazineCapacity)
             return false;
 
         if (totalReserveAmmo > 0)
@@ -81,13 +161,15 @@ public class Weapon
     }
     private bool HaveEnoughBulletsToShoot() => bulletsInMagazine > 0;
 
-    // It's called to refill at the end of the reload animation
+    // It's called to refill at the end of the reload animation in PlayerAnimationsEvents.
     public void RefillBullets()
     {
-        //totalReserveAmmo += bulletsInMagazine; This can be used to maintain the bullets in the magazine after reloading
+        // This can be used to maintain the bullets in the magazine after reloading.
+        // totalReserveAmmo += bulletsInMagazine;
 
-        int bulletsToReload = maganizeCapacity;
+        int bulletsToReload = magazineCapacity;
 
+        // Fill up the magazine with the remaining reserve
         if (bulletsToReload > totalReserveAmmo)
             bulletsToReload = totalReserveAmmo;
 
