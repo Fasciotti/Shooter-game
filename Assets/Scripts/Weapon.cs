@@ -27,6 +27,14 @@ public class Weapon
     public int totalReserveAmmo;
     public int magazineCapacity;
 
+    // Controls reload and equip animation speeds
+    [Range(1, 2)]
+    public float equipSpeed = 1;
+    [Range(1, 2)]
+    public float reloadSpeed = 1;
+    [Range(2, 12)]
+    public float gunDistance = 4;
+
     [Header("Shooting specifics")]
     public float fireRate = 1; // Interval in seconds per bullet
     public float defaultFireRate = 1f;
@@ -42,13 +50,6 @@ public class Weapon
     [SerializeField] private bool isBurstAvailable;
     [SerializeField] private bool isBurstActivated;
 
-    [Header("Animation Details")]
-    // Controls reload and equip animation speeds
-    [Range(1, 2)]
-    public float equipSpeed = 1;
-    [Range(1, 2)]
-    public float reloadSpeed = 1;
-
     [Header("Spread")]
     private float currentSpread = 1;
     private float lastSpreadTimeUpdate;
@@ -57,6 +58,7 @@ public class Weapon
     public float maximumSpread = 3;
     public float spreadCooldown = 1; // In seconds
     public float spreadIncreaseRate = 0.15f; // Per shot
+
 
     #region BurstMode methods
     public void ToogleBurst()
@@ -71,6 +73,11 @@ public class Weapon
 
     private void UpdateShootSpecifics()
     {
+        if (weaponType == WeaponType.Shotgun)
+        {
+            isBurstActivated = true;
+        }
+
         if (isBurstActivated)
         {
             bulletsPerShoot = burstBulletsPerShot;

@@ -174,6 +174,12 @@ public class PlayerWeaponController : MonoBehaviour
 
 
         Rigidbody newBulletRb = newBullet.GetComponent<Rigidbody>();
+        Bullet bullet = newBullet.GetComponent<Bullet>();
+
+
+        bullet.BulletSetup(currentWeapon.gunDistance);
+
+
         newBulletRb.mass = REFERENCE_BULLET_SPEED / bulletSpeed; // This makes sure the mass of the bullet is always the same
         newBulletRb.linearVelocity = bulletDirection * bulletSpeed;
 
