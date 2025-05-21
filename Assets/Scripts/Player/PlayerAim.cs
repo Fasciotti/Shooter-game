@@ -128,7 +128,7 @@ public class PlayerAim : MonoBehaviour
         if (Physics.Raycast(player.weapon.CurrentWeaponGunPoint().position, laserDirection, out RaycastHit hitInfo, gunDistance, aimLayerMask))
         {
             endPoint = hitInfo.point;
-            tipLength = 0f;
+            tipLength = 0f; // Temporary
         }
 
         // Set the three points used by the LineRenderer

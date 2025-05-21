@@ -8,7 +8,7 @@ public class ObjectPool : MonoBehaviour
     public static ObjectPool instance;
 
 
-    [SerializeField] private GameObject bulletPrefab;
+    [SerializeField] private GameObject bulletPrefab; // bulletRoot
     [SerializeField] private int poolSize;
 
     private Queue<GameObject> bulletPool;
@@ -26,8 +26,8 @@ public class ObjectPool : MonoBehaviour
             CreateNewBullet();
         
         GameObject bulletToGet = bulletPool.Dequeue();
-        bulletToGet.SetActive(true);
-        bulletToGet.transform.parent = null;
+        bulletToGet.GetComponent<Bullet>().EnableBullet();
+        bulletToGet.transform.parent = null; // Throw out of the pool
 
         return bulletToGet;
     }
@@ -35,9 +35,8 @@ public class ObjectPool : MonoBehaviour
     public void ReturnBullet(GameObject bullet)
     {
         bulletPool.Enqueue(bullet);
-        bullet.gameObject.SetActive(false);
+        bullet.GetComponent<Bullet>().DisableBullet(); // Disables the physicalBullet
         bullet.transform.parent = this.transform;
-        
     }
 
     private void CreateInitialPool()
@@ -48,8 +47,8 @@ public class ObjectPool : MonoBehaviour
 
     private void CreateNewBullet()
     {
-        GameObject newBullet = Instantiate(bulletPrefab, this.transform);
-        newBullet.SetActive(false);
+        // The physicalBullet (children of bulletPrefab) is disabled by default.
+        GameObject newBullet = Instantiate(bulletPrefab, this.transform); 
         bulletPool.Enqueue(newBullet);
     }
 

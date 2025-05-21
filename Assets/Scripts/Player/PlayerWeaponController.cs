@@ -1,9 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Net;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Android;
 
 public class PlayerWeaponController : MonoBehaviour
 {
@@ -48,7 +45,7 @@ public class PlayerWeaponController : MonoBehaviour
         Transform aim = player.aim.AimTransform();
 
         Vector3 direction = (aim.position - CurrentWeaponGunPoint().position).normalized;
-        
+
         if (!player.aim.CanAimPrecisely() && player.aim.Target() == null)
             direction.y = 0;
 
@@ -68,7 +65,7 @@ public class PlayerWeaponController : MonoBehaviour
             return;
 
         SetWeaponReady(false);
-        
+
         currentWeapon = weaponSlots[i];
 
         player.weaponVisuals.PlayWeaponEquipAnimation();
@@ -118,7 +115,7 @@ public class PlayerWeaponController : MonoBehaviour
 
         if (!currentWeapon.CanReload())
             return;
-        
+
         SetWeaponReady(false);
         player.weaponVisuals.PlayAnimationReload();
     }
@@ -141,7 +138,7 @@ public class PlayerWeaponController : MonoBehaviour
 
         FireSingleBullet();
     }
-    
+
     // FIXME: Because of the weaponReady variable, the laser is disabled when shooting with burst mode on
     private IEnumerator BurstFire()
     {
@@ -161,6 +158,7 @@ public class PlayerWeaponController : MonoBehaviour
         }
     }
 
+
     private void FireSingleBullet()
     {
         GameObject newBullet = ObjectPool.instance.GetBullet();
@@ -169,6 +167,7 @@ public class PlayerWeaponController : MonoBehaviour
         newBullet.transform.SetPositionAndRotation
             (CurrentWeaponGunPoint().position, Quaternion.LookRotation(CurrentWeaponGunPoint().forward));
 
+    
 
         Vector3 bulletDirection = currentWeapon.ApplySpread(BulletDirection());
 
@@ -178,13 +177,14 @@ public class PlayerWeaponController : MonoBehaviour
 
 
         bullet.BulletSetup(currentWeapon.gunDistance);
-
+        bullet.ClearTrail();
 
         newBulletRb.mass = REFERENCE_BULLET_SPEED / bulletSpeed; // This makes sure the mass of the bullet is always the same
         newBulletRb.linearVelocity = bulletDirection * bulletSpeed;
 
-
+        // Decreases ammo
         currentWeapon.bulletsInMagazine--;
+
     }
 
     public Weapon BackupWeaponModel()
