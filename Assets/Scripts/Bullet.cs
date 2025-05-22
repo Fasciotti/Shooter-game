@@ -1,13 +1,9 @@
-using System;
-using System.Collections;
-using Unity.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 
-// FIXME: Some bullets are ricocheting, i don't know why.
 public class Bullet : MonoBehaviour
 {
     private Rigidbody rb => GetComponent<Rigidbody>();
+
     [SerializeField] private TrailRenderer trail;
     [SerializeField] private GameObject bulletImpactFX;
 
@@ -19,13 +15,16 @@ public class Bullet : MonoBehaviour
     // physicalBullet is the children of this.gameObject (bulletRoot), it's the object where the collider and the meshrender are stored.
     [SerializeField] private GameObject physicalBullet;
 
-    // It's called when the bullet is shot.
+    // It's called when the bullet is shot. (After the positioning)
     public void BulletSetup(float flyDistance)
     {
         startPosition = transform.position;
 
         // Determined when shooting. Different weapons, different ranges.
         this.flyDistance = flyDistance;
+
+        // It's used to prevent visual artefacts that occurs when moving the bullet to gunPoint.
+        trail.Clear();
     }
 
     private void Update()
@@ -47,41 +46,28 @@ public class Bullet : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         CreateImpactFX(collision);
+
         ObjectPool.instance.ReturnBullet(gameObject);
     }
-
-    public void EnableTrail()
-    {
-        // TODO: Find a better way to do this. (The frame skipping seems obligatory, don't work without it)
-        //IEnumerator WaitToActivateTrail()
-        //{
-            // Wait one frame after initiating the trail.
-            // This prevents it of showing up when moving bullet in and out of the pool, and when repositioning it.
-            //yield return new WaitForNextFrameUnit();
-            trail.emitting = true;
-            trail.Clear();
-        //}
-
-        //StartCoroutine(WaitToActivateTrail());
-    }
-    public void ClearTrail()
-    {
-        trail.Clear();
-    }
-
-    private void DisableTrail() => trail.emitting = false;
 
     public void EnableBullet()
     {
         physicalBullet.SetActive(true);
-        EnableTrail();
+
+        // Activates trail.
+        trail.emitting = true;
     }
 
     public void DisableBullet()
     {
         // Root stays active.
         physicalBullet.SetActive(false);
-        DisableTrail();
+
+        // Disables trail smoothly.
+        trail.emitting = false;
+
+        // Disables rigidbody.
+        rb.linearVelocity = Vector3.zero;
     }
 
     public GameObject PhysicalBullet() => physicalBullet;

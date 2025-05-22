@@ -43,8 +43,8 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         ApplyMovement();
-        ApplyRotation();
         ApplyGravity();
+        ApplyRotation();
 
         AnimatorControllers();
     }
@@ -55,12 +55,14 @@ public class PlayerMovement : MonoBehaviour
 
     private void ApplyMovement()
     {
-        movementDirection = new Vector3(moveInput.x, 0, moveInput.y);
+        movementDirection = new Vector3(moveInput.x, movementDirection.y, moveInput.y);
         characterController.Move(movementDirection * Time.deltaTime * speed);
     }
 
     private void ApplyGravity()
     {
+        Debug.Log(characterController.isGrounded);
+
         if (!characterController.isGrounded)
         {
             verticalVelocity += Physics.gravity.y * Time.deltaTime;

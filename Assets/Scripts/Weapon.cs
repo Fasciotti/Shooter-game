@@ -36,7 +36,7 @@ public class Weapon
     public float gunDistance = 4;
 
     [Header("Shooting specifics")]
-    public float fireRate = 1; // Interval in seconds per bullet
+    public float fireRate = 1; // fireRate represents shots per second
     public float defaultFireRate = 1f;
     public int bulletsPerShoot;
     public ShootType shootType;
@@ -139,7 +139,8 @@ public class Weapon
     public bool CanShoot() => HaveEnoughBulletsToShoot() && IsReadyToShot();
     private bool IsReadyToShot()
     {
-        // Player can only shoot when the minimum time has passed. (fireRate is in interval in seconds per bullet)
+        // Player can only shoot when the minimum time has passed. (fireRate represents shots per second.
+        // The time between bullets is 1 / fireRate seconds.)
         if (Time.time >= lastShootTime + (1 / fireRate))
         {
             lastShootTime = Time.time;

@@ -177,7 +177,6 @@ public class PlayerWeaponController : MonoBehaviour
 
 
         bullet.BulletSetup(currentWeapon.gunDistance);
-        bullet.ClearTrail();
 
         newBulletRb.mass = REFERENCE_BULLET_SPEED / bulletSpeed; // This makes sure the mass of the bullet is always the same
         newBulletRb.linearVelocity = bulletDirection * bulletSpeed;
