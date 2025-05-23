@@ -4,24 +4,15 @@ public class Bullet : MonoBehaviour
 {
     private Rigidbody rb => GetComponent<Rigidbody>();
     private TrailRenderer trail => GetComponentInChildren<TrailRenderer>();
-    private bool doubleCollision;
 
     [SerializeField] private GameObject bulletImpactFX;
 
     private void OnCollisionEnter(Collision collision)
     {
         CreateImpactFX(collision);
-        TrailHandler(collision);
+        trail.transform.parent = null;
         Destroy(gameObject);
 
-    }
-
-    private void TrailHandler(Collision collision)
-    {
-        if (!doubleCollision)
-            trail.transform.parent = null;
-        
-        doubleCollision = true;
     }
 
     private void CreateImpactFX(Collision collision)
