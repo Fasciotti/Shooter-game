@@ -121,23 +121,50 @@ public class PlayerWeaponVisuals : MonoBehaviour
         // Every backup weapon model has a BackupWeaponModel script, we search for it and turn them all off.
         foreach (BackupWeaponModel backupWeaponModel in backupWeaponModels)
         {
-            backupWeaponModel.gameObject.SetActive(false);
+            backupWeaponModel.ActivateModel(false);
         }
 
     }
+
+    // The backup weapon is defined as the weapon the player does have in the weaponSlots, but it's not equipped.
     public void SwitchOnBackupWeaponModel()
     {
-        // We compare the backupWeaponType (defined in PlayerWeaponController) with all of the models to decide which to turn on.
-        // The backupWeapon is defined as the weapon the player does have in the weaponSlots, but it's not equipped.
-        WeaponType backupWeaponType = player.weapon.BackupWeaponModel().weaponType;
+
+        SwitchOffBackupWeaponModels();
+
+        BackupWeaponModel lowHangWeapon = null, backHangWeapon = null, sideHangWeapon = null;
+
 
         foreach (BackupWeaponModel backupModel in backupWeaponModels)
         {
-            if(backupModel.weaponType == backupWeaponType)
+            if (player.weapon.CurrentWeapon().weaponType == backupModel.weaponType)
+                continue;
+
+            if (player.weapon.WeaponInSlots(backupModel.weaponType) != null)
             {
-                backupModel.gameObject.SetActive(true);
+                if (backupModel.HangTypeEquals(HangType.LowBackHang))
+                {
+                    lowHangWeapon = backupModel;
+                }
+
+                if (backupModel.HangTypeEquals(HangType.BackHang))
+                {
+                    backHangWeapon = backupModel;
+                }
+
+                if (backupModel.HangTypeEquals(HangType.SideHang))
+                {
+                    sideHangWeapon= backupModel;
+                }
+
             }
+
+
         }
+
+        lowHangWeapon?.ActivateModel(true);
+        backHangWeapon?.ActivateModel(true);
+        sideHangWeapon?.ActivateModel(true);
 
     }
 

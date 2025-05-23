@@ -35,7 +35,7 @@ public class Bullet : MonoBehaviour
     private void ReturnToPoolIfNotCollided()
     {
         // If the bullet doesn't collide with anything, it's "destroyed" after some running distance.
-        // startPosition is set as gunPoint, and flyDistance is set as gunDistance.
+        // startPosition is set as gunPoint, and flyDistance is set as weaponMaximumDistance.
         // Both determined when shooting (see FireSingleBullet() in PlayerWeaponController).
         if (Vector3.Distance(startPosition, transform.position) > flyDistance && physicalBullet.activeSelf)
         {

@@ -25,11 +25,9 @@ public class PlayerAim : MonoBehaviour
 
     [Header("Camera control")]
     [SerializeField] private Transform cameraTarget;         // Follow target for the camera rig
-    [SerializeField] private CinemachinePositionComposer positionComposer;
     [Range(1f, 3f)][SerializeField] private float maxCameraDistance;
     [Range(.5f, 1f)][SerializeField] private float minCameraDistance;
     [Range(3f, 10f)][SerializeField] private float cameraSensitivity;
-    [Range(0.2f, 2f)][SerializeField] private float cameraZoomPace;
     float CameraDistance;
 
     [Space]
@@ -114,7 +112,7 @@ public class PlayerAim : MonoBehaviour
             return;
 
         float tipLength = 0.5f;          // Extra segment to show “laser light fading” beyond the hit
-        float gunDistance = player.weapon.CurrentWeapon().gunDistance;            // Maximum laser range
+        float gunDistance = player.weapon.CurrentWeapon().weaponMaximumDistance;            // Maximum laser range
 
         Vector3 laserDirection = player.weapon.BulletDirection();
         Vector3 endPoint = player.weapon.CurrentWeaponGunPoint().position + laserDirection * gunDistance;
@@ -190,16 +188,6 @@ public class PlayerAim : MonoBehaviour
         // Lock-on toggle (C)
         controls.Character.LockIntoTarget.performed += context => isLockingToTarget = true;
         controls.Character.LockIntoTarget.canceled += context => isLockingToTarget = false;
-
-        // Zoom camera (Scroll) *Temporary*
-        controls.Character.Zoom.performed += context => 
-        {
-            cameraZoom = context.ReadValue<float>();
-            CameraDistance = cameraZoom * cameraZoomPace;
-            positionComposer.CameraDistance = Mathf.Clamp(positionComposer.CameraDistance + CameraDistance, 3, 6);
-
-        };
-        controls.Character.Zoom.canceled += context => cameraZoom = 0;
     }
     #endregion
 }

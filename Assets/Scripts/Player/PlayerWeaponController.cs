@@ -12,10 +12,7 @@ public class PlayerWeaponController : MonoBehaviour
     private bool isShooting;
 
     [Header("Bullet options")]
-    [SerializeField] private GameObject bulletPrefab;
-
     [SerializeField] private float bulletSpeed;
-    [SerializeField] private Transform weaponHolder;
 
     [Header("Inventory")]
     [SerializeField] private List<Weapon> weaponSlots;
@@ -28,16 +25,15 @@ public class PlayerWeaponController : MonoBehaviour
         AssignInputEvents();
 
         currentWeapon = weaponSlots[0];
-        currentWeapon.bulletsInMagazine = currentWeapon.magazineCapacity;
+
     }
+
+
 
     private void Update()
     {
         if (isShooting)
             Shoot();
-
-        if (Input.GetKeyDown(KeyCode.T))
-            currentWeapon.ToogleBurst();
     }
 
     public Vector3 BulletDirection()
@@ -57,7 +53,7 @@ public class PlayerWeaponController : MonoBehaviour
     private void EquipWeapon(int i)
     {
         // This prevents outofscope exception
-        if (i > weaponSlots.Count - 1)
+        if (i >= weaponSlots.Count)
             return;
 
         // This prevents the player from getting the same weapon
@@ -66,9 +62,12 @@ public class PlayerWeaponController : MonoBehaviour
 
         SetWeaponReady(false);
 
-        currentWeapon = weaponSlots[i];
+        currentWeapon = weaponSlots[i]; // Main purpose
+
+        CameraManager.instance.ChangeCameraDistance(currentWeapon.cameraDistance);
 
         player.weaponVisuals.PlayWeaponEquipAnimation();
+
     }
 
     // Assumes maximum of 2 slots
@@ -105,6 +104,17 @@ public class PlayerWeaponController : MonoBehaviour
     public bool IsWeaponReady() => weaponReady;
 
     public bool HasOnlyOneWeapon() => weaponSlots.Count <= 1;
+
+    public Weapon WeaponInSlots(WeaponType weaponType)
+    {
+        foreach (var weapon in weaponSlots)
+        {
+            if (weaponType == weapon.weaponType)
+                return weapon;
+        }
+
+        return null;
+    }
 
     #endregion
     #endregion
@@ -167,7 +177,7 @@ public class PlayerWeaponController : MonoBehaviour
         newBullet.transform.SetPositionAndRotation
             (CurrentWeaponGunPoint().position, Quaternion.LookRotation(CurrentWeaponGunPoint().forward));
 
-    
+
 
         Vector3 bulletDirection = currentWeapon.ApplySpread(BulletDirection());
 
@@ -176,7 +186,7 @@ public class PlayerWeaponController : MonoBehaviour
         Bullet bullet = newBullet.GetComponent<Bullet>();
 
 
-        bullet.BulletSetup(currentWeapon.gunDistance);
+        bullet.BulletSetup(currentWeapon.weaponMaximumDistance);
 
         newBulletRb.mass = REFERENCE_BULLET_SPEED / bulletSpeed; // This makes sure the mass of the bullet is always the same
         newBulletRb.linearVelocity = bulletDirection * bulletSpeed;
@@ -214,6 +224,11 @@ public class PlayerWeaponController : MonoBehaviour
 
         controls.Character.EquipWeapon1.performed += _ => EquipWeapon(0);
         controls.Character.EquipWeapon2.performed += _ => EquipWeapon(1);
+        controls.Character.EquipWeapon3.performed += _ => EquipWeapon(2);
+        controls.Character.EquipWeapon4.performed += _ => EquipWeapon(3);
+        controls.Character.EquipWeapon5.performed += _ => EquipWeapon(4);
+
+        controls.Character.ToogleBurst.performed += _ => currentWeapon.ToogleBurst();
 
         controls.Character.DropCurrentWeapon.performed += _ => DropWeapon();
 

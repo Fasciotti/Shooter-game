@@ -33,7 +33,9 @@ public class Weapon
     [Range(1, 2)]
     public float reloadSpeed = 1;
     [Range(2, 12)]
-    public float gunDistance = 4;
+    public float weaponMaximumDistance = 4;
+    [Range(3, 8)]
+    public float cameraDistance = 6;
 
     [Header("Shooting specifics")]
     public float fireRate = 1; // fireRate represents shots per second
@@ -75,6 +77,7 @@ public class Weapon
     {
         if (weaponType == WeaponType.Shotgun)
         {
+            isBurstAvailable = true;
             isBurstActivated = true;
         }
 
