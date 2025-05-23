@@ -31,10 +31,10 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Back-Weapon Grab
+      name: Back-Weapon Equip
       takeName: mixamo.com
       internalID: -203655887218126122
-      firstFrame: 0
+      firstFrame: 10
       lastFrame: 50
       wrapMode: 0
       orientationOffsetY: 0
@@ -55,15 +55,22 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0.7422916
-        functionName: GrabWeaponFinishAnimation
+      - time: 0.3535374
+        functionName: SwitchOnWeaponModel
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.83219177
-        functionName: GrabWeaponIsOver
+      - time: 0.82042265
+        functionName: ResetRigConstraints
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 1
+        functionName: EquipWeaponIsOver
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0

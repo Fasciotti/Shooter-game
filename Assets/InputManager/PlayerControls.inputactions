@@ -42,9 +42,54 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "SwitchWeapons",
+                    "name": "EquipWeapon1",
                     "type": "Button",
                     "id": "562f0e5e-7c07-4031-8ab7-24ce376e476e",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "EquipWeapon2",
+                    "type": "Button",
+                    "id": "4ed9c390-a9b9-4592-80fc-d09164830023",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "EquipWeapon3",
+                    "type": "Button",
+                    "id": "77cb8418-c67c-45aa-a54b-9dfa50dfaba7",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "EquipWeapon4",
+                    "type": "Button",
+                    "id": "8dd7c6c4-084e-4d14-944e-eb97127a7d83",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "EquipWeapon5",
+                    "type": "Button",
+                    "id": "d01a149b-2288-43ce-a2f6-aa6053139a1a",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "DropCurrentWeapon",
+                    "type": "Button",
+                    "id": "43f38db3-c9b4-4d35-a535-df91eff02da7",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -78,13 +123,13 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Zoom",
-                    "type": "Value",
-                    "id": "15d7af0d-8533-4a14-815e-39371b28d3cb",
-                    "expectedControlType": "Axis",
+                    "name": "ToogleBurst",
+                    "type": "Button",
+                    "id": "6f9494f9-d34d-4103-9919-1a7f15451416",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": true
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -183,51 +228,51 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "SwitchWeapons",
+                    "action": "EquipWeapon1",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "d69341cb-2356-4002-8c17-255a53f3126a",
+                    "id": "80590da1-4f51-46d0-90d3-4a51b3fb4df2",
                     "path": "<Keyboard>/2",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "SwitchWeapons",
+                    "action": "EquipWeapon2",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "48d51a45-98c9-4edb-9a05-05b89faf5c0a",
+                    "id": "7fbd2a2a-c7b1-4291-abd6-61ffc677826c",
                     "path": "<Keyboard>/3",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "SwitchWeapons",
+                    "action": "EquipWeapon3",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "9677f626-e485-48c6-ae6d-544cde5ff42b",
+                    "id": "3ac8b4cf-6ae2-48cc-9296-f153d246bb7a",
                     "path": "<Keyboard>/4",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "SwitchWeapons",
+                    "action": "EquipWeapon4",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "90e99617-4cba-424c-acd9-998a76708a38",
+                    "id": "3aba73cb-5537-4112-a3ba-928785634f53",
                     "path": "<Keyboard>/5",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "SwitchWeapons",
+                    "action": "EquipWeapon5",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -265,37 +310,26 @@
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "1D Axis",
-                    "id": "d3772861-e157-4f9d-bc77-18964ee132a5",
-                    "path": "1DAxis",
+                    "name": "",
+                    "id": "f20d9c52-753d-4c43-8e16-d0e2cdb44bf9",
+                    "path": "<Keyboard>/g",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Zoom",
-                    "isComposite": true,
+                    "action": "DropCurrentWeapon",
+                    "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "Positive",
-                    "id": "7b169d99-f2f8-46b6-9b4f-3e381b1638e2",
-                    "path": "<Mouse>/scroll/down",
+                    "name": "",
+                    "id": "429777ac-89ab-4cc6-b7a9-5ce3ab4a5082",
+                    "path": "<Keyboard>/t",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Zoom",
+                    "action": "ToogleBurst",
                     "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "Negative",
-                    "id": "12e3dd84-1a75-40b8-bd26-9efd61b96b84",
-                    "path": "<Mouse>/scroll/up",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Zoom",
-                    "isComposite": false,
-                    "isPartOfComposite": true
+                    "isPartOfComposite": false
                 }
             ]
         }

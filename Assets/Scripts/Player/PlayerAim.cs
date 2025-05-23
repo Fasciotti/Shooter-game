@@ -6,7 +6,6 @@ public class PlayerAim : MonoBehaviour
 {
     #region ─── Runtime References ────────────────────────────────────────────────
     private Player player;          // Cached reference to the Player component
-    private PlayerControls controls;        // Cached reference to the input actions
     #endregion
 
     #region ─── Input ─────────────────────────────────────────────────────────────
@@ -26,11 +25,9 @@ public class PlayerAim : MonoBehaviour
 
     [Header("Camera control")]
     [SerializeField] private Transform cameraTarget;         // Follow target for the camera rig
-    [SerializeField] private CinemachinePositionComposer positionComposer;
     [Range(1f, 3f)][SerializeField] private float maxCameraDistance;
     [Range(.5f, 1f)][SerializeField] private float minCameraDistance;
     [Range(3f, 10f)][SerializeField] private float cameraSensitivity;
-    [Range(0.2f, 2f)][SerializeField] private float cameraZoomPace;
     float CameraDistance;
 
     [Space]
@@ -46,7 +43,7 @@ public class PlayerAim : MonoBehaviour
     private void Start()
     {
         player = GetComponent<Player>();
-        AssingInputEvents();                 // (typo preserved) Subscribes to input-action callbacks
+        AssignInputEvents();                 // Subscribes to input-action callbacks
     }
 
     private void Update()
@@ -109,24 +106,33 @@ public class PlayerAim : MonoBehaviour
 
     private void UpdateAimVisuals()
     {
-        float tipLength = 0.5f;          // Extra segment to show “laser light fading” beyond the hit
-        float laserDistance = 4f;            // Maximum laser range
+        aimLaser.enabled = player.weapon.IsWeaponReady();
 
-        Transform gunPoint = player.weapon.GunPoint();
+        if (!aimLaser.enabled)
+            return;
+
+        float tipLength = 0.5f;          // Extra segment to show “laser light fading” beyond the hit
+        float gunDistance = player.weapon.CurrentWeapon().weaponMaximumDistance;            // Maximum laser range
+
         Vector3 laserDirection = player.weapon.BulletDirection();
-        Vector3 endPoint = gunPoint.position + laserDirection * laserDistance;
+        Vector3 endPoint = player.weapon.CurrentWeaponGunPoint().position + laserDirection * gunDistance;
+
+        WeaponModel weaponModel = player.weaponVisuals.currentWeaponModel();
+
+        weaponModel.gunPoint.LookAt(aim);
+        weaponModel.transform.LookAt(aim);
 
         // Shorten the beam if we hit something
-        if (Physics.Raycast(gunPoint.position, laserDirection, out RaycastHit hitInfo, laserDistance, aimLayerMask))
+        if (Physics.Raycast(player.weapon.CurrentWeaponGunPoint().position, laserDirection, out RaycastHit hitInfo, gunDistance, aimLayerMask))
         {
             endPoint = hitInfo.point;
-            tipLength = 0f;
+            tipLength = 0f; // Temporary
         }
 
         // Set the three points used by the LineRenderer
-        aimLaser.SetPosition(0, gunPoint.position);
+        aimLaser.SetPosition(0, player.weapon.CurrentWeaponGunPoint().position);
         aimLaser.SetPosition(1, endPoint);
-        aimLaser.SetPosition(2, endPoint + laserDirection * tipLength);
+        aimLaser.SetPosition(2, endPoint + (laserDirection * tipLength));
     }
     #endregion
 
@@ -164,12 +170,12 @@ public class PlayerAim : MonoBehaviour
         return lastKnownMouseHit;
     }
     #endregion
-
+    
 
     #region ─── Input Bindings ───────────────────────────────────────────────────
-    private void AssingInputEvents()
+    private void AssignInputEvents()
     {
-        controls = player.controls;
+        PlayerControls controls = player.controls;
 
         // Cursor position
         controls.Character.Aim.performed += context => mouseInput = context.ReadValue<Vector2>();
@@ -182,16 +188,6 @@ public class PlayerAim : MonoBehaviour
         // Lock-on toggle (C)
         controls.Character.LockIntoTarget.performed += context => isLockingToTarget = true;
         controls.Character.LockIntoTarget.canceled += context => isLockingToTarget = false;
-
-        // Zoom camera (Scroll) *Temporary*
-        controls.Character.Zoom.performed += context => 
-        {
-            cameraZoom = context.ReadValue<float>();
-            CameraDistance = cameraZoom * cameraZoomPace;
-            positionComposer.CameraDistance = Mathf.Clamp(positionComposer.CameraDistance + CameraDistance, 3, 6);
-
-        };
-        controls.Character.Zoom.canceled += context => cameraZoom = 0;
     }
     #endregion
 }
