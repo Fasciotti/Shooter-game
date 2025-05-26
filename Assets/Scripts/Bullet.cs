@@ -80,7 +80,7 @@ public class Bullet : MonoBehaviour
 
             GameObject newImpactFX = Instantiate(bulletImpactFX, contact.point, Quaternion.LookRotation(contact.normal));
 
-            Destroy(newImpactFX, 1f);
+            Destroy(newImpactFX, 0.9f);
         }
     }
 }
