@@ -1,55 +1,67 @@
+using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class ObjectPool : MonoBehaviour
 {
     public static ObjectPool instance;
 
-
-    [SerializeField] private GameObject bulletPrefab; // bulletRoot
     [SerializeField] private int poolSize;
 
-    private Queue<GameObject> bulletPool;
+    private Dictionary<GameObject, Queue<GameObject>> poolDictionary
+        = new Dictionary<GameObject, Queue<GameObject>>();
 
-    private void Start()
+    public GameObject GetObject(GameObject prefab)
     {
-        bulletPool = new Queue<GameObject>();
+        if (!poolDictionary.ContainsKey(prefab))
+            InitializeNewPool(prefab);
 
-        CreateInitialPool();
-    }
-
-    public GameObject GetBullet()
-    {
-        if (bulletPool.Count == 0)
-            CreateNewBullet();
+        if (poolDictionary[prefab].Count == 0)
+            CreateNewObject(prefab);
         
-        GameObject bulletToGet = bulletPool.Dequeue();
-        bulletToGet.GetComponent<Bullet>().EnableBullet();
-        bulletToGet.transform.parent = null; // Throw out of the pool
+        GameObject objectToGet = poolDictionary[prefab].Dequeue();
+        objectToGet.SetActive(true);
+        objectToGet.transform.parent = null; // Throw out of the pool
 
-        return bulletToGet;
+        return objectToGet;
     }
 
-    public void ReturnBullet(GameObject bullet)
+    private IEnumerator DelayReturn(float delay, GameObject objectToReturn)
     {
-        bulletPool.Enqueue(bullet);
-        bullet.GetComponent<Bullet>().DisableBullet(); // Disables the physicalBullet
-        bullet.transform.parent = this.transform;
+        yield return new WaitForSeconds(delay);
+
+        ReturnObject(objectToReturn);
+    }
+    public void ReturnObject(float delay, GameObject objectToReturn)
+        => StartCoroutine(DelayReturn(delay, objectToReturn));
+
+    public void ReturnObject(GameObject objectToReturn)
+    {
+        objectToReturn.SetActive(false);
+
+        GameObject objectOrigin =  objectToReturn.GetComponent<PooledObject>().originalPrefab;
+
+        poolDictionary[objectOrigin].Enqueue(objectToReturn);
+
+        objectToReturn.transform.parent = this.transform;
     }
 
-    private void CreateInitialPool()
+    private void InitializeNewPool(GameObject prefab)
     {
+        poolDictionary[prefab] = new Queue<GameObject>();
+
         for (int i = 0; i < poolSize; i++)
-            CreateNewBullet();
+            CreateNewObject(prefab);
     }
 
-    private void CreateNewBullet()
+    private void CreateNewObject(GameObject prefab)
     {
-        // The physicalBullet (children of bulletPrefab) is disabled by default.
-        GameObject newBullet = Instantiate(bulletPrefab, this.transform); 
-        bulletPool.Enqueue(newBullet);
+        GameObject newObject = Instantiate(prefab, this.transform);
+        newObject.AddComponent<PooledObject>().originalPrefab = prefab;
+
+        newObject.SetActive(false);
+
+        poolDictionary[prefab].Enqueue(newObject);
     }
 
 
@@ -61,6 +73,7 @@ public class ObjectPool : MonoBehaviour
             instance = this;
         else
             Destroy(gameObject);
+
     }
 
     #endregion

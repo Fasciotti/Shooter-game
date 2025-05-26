@@ -2,18 +2,18 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    private Rigidbody rb => GetComponent<Rigidbody>();
 
-    [SerializeField] private TrailRenderer trail;
     [SerializeField] private GameObject bulletImpactFX;
+    private Rigidbody rb => GetComponent<Rigidbody>();
+    private MeshRenderer meshRenderer => GetComponent<MeshRenderer>();
+    private BoxCollider boxCollider => GetComponent<BoxCollider>();
+    private TrailRenderer trail => GetComponent<TrailRenderer>();
 
 
     private float flyDistance;
     private Vector3 startPosition;
 
-
-    // physicalBullet is the children of this.gameObject (bulletRoot), it's the object where the collider and the meshrender are stored.
-    [SerializeField] private GameObject physicalBullet;
+    private bool returnCalled = false;
 
     // It's called when the bullet is shot. (After the positioning)
     public void BulletSetup(float flyDistance)
@@ -23,8 +23,7 @@ public class Bullet : MonoBehaviour
         // Determined when shooting. Different weapons, different ranges.
         this.flyDistance = flyDistance;
 
-        // It's used to prevent visual artefacts that occurs when moving the bullet to gunPoint.
-        trail.Clear();
+        ResetBullet();
     }
 
     private void Update()
@@ -37,9 +36,9 @@ public class Bullet : MonoBehaviour
         // If the bullet doesn't collide with anything, it's "destroyed" after some running distance.
         // startPosition is set as gunPoint, and flyDistance is set as weaponMaximumDistance.
         // Both determined when shooting (see FireSingleBullet() in PlayerWeaponController).
-        if (Vector3.Distance(startPosition, transform.position) > flyDistance && physicalBullet.activeSelf)
+        if (Vector3.Distance(startPosition, transform.position) > flyDistance && gameObject.activeSelf)
         {
-            ObjectPool.instance.ReturnBullet(gameObject);
+            ReturnBullet();
         }
     }
 
@@ -47,30 +46,35 @@ public class Bullet : MonoBehaviour
     {
         CreateImpactFX(collision);
 
-        ObjectPool.instance.ReturnBullet(gameObject);
+        ReturnBullet();
     }
 
-    public void EnableBullet()
+    private void ResetBullet()
     {
-        physicalBullet.SetActive(true);
-
-        // Activates trail.
+        meshRenderer.enabled = true;
+        boxCollider.enabled = true;
         trail.emitting = true;
+        returnCalled = false;
+        trail.Clear();
     }
 
-    public void DisableBullet()
+    private void ReturnBullet()
     {
-        // Root stays active.
-        physicalBullet.SetActive(false);
+        if (returnCalled)
+            return;
 
-        // Disables trail smoothly.
-        trail.emitting = false;
+        DisableBulletVisually();
+        returnCalled = true;
 
-        // Disables rigidbody.
-        rb.linearVelocity = Vector3.zero;
+        ObjectPool.instance.ReturnObject(trail.time, gameObject);
     }
 
-    public GameObject PhysicalBullet() => physicalBullet;
+    private void DisableBulletVisually()
+    {
+        trail.emitting = false;
+        meshRenderer.enabled = false;
+        boxCollider.enabled = false;
+    }
 
     private void CreateImpactFX(Collision collision)
     {
@@ -78,9 +82,12 @@ public class Bullet : MonoBehaviour
         {
             ContactPoint contact = collision.GetContact(0);
 
-            GameObject newImpactFX = Instantiate(bulletImpactFX, contact.point, Quaternion.LookRotation(contact.normal));
+            GameObject newImpactFX = ObjectPool.instance.GetObject(bulletImpactFX);
+                // Instantiate(bulletImpactFX, contact.point, Quaternion.LookRotation(contact.normal));
 
-            Destroy(newImpactFX, 0.9f);
+            newImpactFX.transform.SetPositionAndRotation(contact.point, Quaternion.LookRotation(contact.normal));
+
+            ObjectPool.instance.ReturnObject(0.8f, newImpactFX);
         }
     }
 }

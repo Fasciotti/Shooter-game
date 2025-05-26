@@ -13,6 +13,7 @@ public class PlayerWeaponController : MonoBehaviour
 
     [Header("Bullet options")]
     [SerializeField] private float bulletSpeed;
+    [SerializeField] private GameObject bulletPrefab;
 
     [Header("Inventory")]
     [SerializeField] private List<Weapon> weaponSlots;
@@ -27,8 +28,6 @@ public class PlayerWeaponController : MonoBehaviour
         currentWeapon = weaponSlots[0];
 
     }
-
-
 
     private void Update()
     {
@@ -171,12 +170,11 @@ public class PlayerWeaponController : MonoBehaviour
 
     private void FireSingleBullet()
     {
-        GameObject newBullet = ObjectPool.instance.GetBullet();
+        GameObject newBullet = ObjectPool.instance.GetObject(bulletPrefab);
 
         // Makes the bullet face aim
         newBullet.transform.SetPositionAndRotation
             (CurrentWeaponGunPoint().position, Quaternion.LookRotation(CurrentWeaponGunPoint().forward));
-
 
 
         Vector3 bulletDirection = currentWeapon.ApplySpread(BulletDirection());
