@@ -184,6 +184,9 @@ public class PlayerWeaponVisuals : MonoBehaviour
 
         anim.SetFloat("EquipType", (float)equipType);
         anim.SetFloat("EquipSpeed", equipSpeed);
+
+        Debug.Log(equipSpeed);
+
         anim.SetTrigger("EquipWeapon"); // calls SwitchOnWeaponModel in PlayerAnimationsEvents
         player.weapon.SetWeaponReady(false);
     }

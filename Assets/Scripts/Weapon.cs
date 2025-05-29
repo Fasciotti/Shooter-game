@@ -20,68 +20,106 @@ public enum ShootType
 [System.Serializable] // Makes class visible on inspector
 public class Weapon
 {
+
     public WeaponType weaponType;
+
 
     [Header("Magazine Details")]
     public int bulletsInMagazine;
-    public int totalReserveAmmo;
     public int magazineCapacity;
+    public int totalReserveAmmo;
 
-    // Controls reload and equip animation speeds
-    [Range(1, 2)]
-    public float equipSpeed = 1;
-    [Range(1, 2)]
-    public float reloadSpeed = 1;
-    [Range(2, 12)]
-    public float weaponMaximumDistance = 4;
-    [Range(3, 8)]
-    public float cameraDistance = 6;
 
-    [Header("Shooting specifics")]
-    public float fireRate = 1; // fireRate represents shots per second
-    public float defaultFireRate = 1f;
-    public int bulletsPerShoot;
+    #region Regular Mode Variables
+    [Header("Regular Shot")]
+
     public ShootType shootType;
+
+    public float fireRate; // fireRate represents shots per second
+    private float defaultFireRate;
     private float lastShootTime;
+    public int bulletsPerShoot { get; private set; }
+    #endregion
 
-    [Header("Burst Fire")]
-    public int burstBulletsPerShot;
-    public float burstFireRate;
-    public float burstFireDelay;
+    #region Burst Mode Variables
+    [Header("Burst")]
+    public bool burstActive;
+    private bool burstAvailable;
 
-    [SerializeField] private bool isBurstAvailable;
-    [SerializeField] private bool isBurstActivated;
+    private int burstBulletsPerShot;
+    private float burstFireRate;
+    public float burstFireDelay { get; private set; }
+    #endregion
 
+    #region Spread Variables
     [Header("Spread")]
     private float currentSpread = 1;
     private float lastSpreadTimeUpdate;
 
-    public float baseSpread = 1;
-    public float maximumSpread = 3;
-    public float spreadCooldown = 1; // In seconds
-    public float spreadIncreaseRate = 0.15f; // Per shot
+    private float baseSpread;
+    private float maximumSpread;
+    private float spreadCooldown; // In seconds
+    private float spreadIncreaseRate; // Per shot
+    #endregion
+
+    #region Weapon Generic Variables
+    // Controls reload and equip animation speeds
+    public float equipSpeed {  get; private set; }
+    public float reloadSpeed { get; private set; }
+    public float weaponMaximumDistance {  get; private set; }
+    public float cameraDistance {  get; private set; }
+    #endregion
+    
+
+    public Weapon(Weapon_Data weaponData)
+    {
+
+        // Magazine Details
+        bulletsInMagazine = weaponData.bulletsInMagazine;
+        magazineCapacity = weaponData.magazineCapacity;
+        totalReserveAmmo = weaponData.totalReserveAmmo;
+
+
+        // Regular
+        shootType = weaponData.shootType;
+        fireRate = weaponData.fireRate;
+        bulletsPerShoot = weaponData.bulletsPerShoot;
+
+        defaultFireRate = fireRate;
+
+
+        // Burst
+        burstAvailable = weaponData.burstAvailable;
+        burstActive = weaponData.burstActive;
+
+        burstBulletsPerShot = weaponData.burstBulletsPerShot;
+        burstFireRate = weaponData.burstFireRate;
+        burstFireDelay = weaponData.burstFireDelay;
+
+
+        // Spread
+        baseSpread = weaponData.baseSpread;
+        maximumSpread = weaponData.maxSpread;
+        spreadIncreaseRate = weaponData.spreadIncreaseRate;
+
+        // Generics
+        weaponType = weaponData.weaponType;
+        reloadSpeed = weaponData.reloadSpeed;
+        equipSpeed = weaponData.equipSpeed;
+        weaponMaximumDistance = weaponData.weaponMaximumDistance;
+        cameraDistance = weaponData.cameraDistance;
+    }
 
 
     #region BurstMode methods
     public void ToogleBurst()
     {
-        if (!isBurstAvailable)
+        if (!burstAvailable)
             return;
 
-        isBurstActivated = !isBurstActivated;
+        burstActive = !burstActive;
 
-        UpdateShootSpecifics();
-    }
-
-    private void UpdateShootSpecifics()
-    {
-        if (weaponType == WeaponType.Shotgun)
-        {
-            isBurstAvailable = true;
-            isBurstActivated = true;
-        }
-
-        if (isBurstActivated)
+        if (burstActive)
         {
             bulletsPerShoot = burstBulletsPerShot;
             fireRate = burstFireRate;
@@ -93,7 +131,16 @@ public class Weapon
             fireRate = defaultFireRate;
         }
     }
-    public bool IsBurstActivated() => isBurstActivated;
+    public bool BurstActivated()
+    {
+        if (weaponType == WeaponType.Shotgun)
+        {
+            burstFireDelay = 0;
+            return true;
+        }
+
+        return burstActive;
+    }
 
     #endregion
 

@@ -11,13 +11,15 @@ public class PlayerWeaponController : MonoBehaviour
     private bool weaponReady;
     private bool isShooting;
 
+    [SerializeField] Weapon_Data defaultWeaponData;
+
     [Header("Bullet options")]
     [SerializeField] private float bulletSpeed;
     [SerializeField] private GameObject bulletPrefab;
 
     [Header("Inventory")]
-    [SerializeField] private List<Weapon> weaponSlots;
     [SerializeField] private int maxSlots = 2;
+    [SerializeField] private List<Weapon> weaponSlots;
 
     private void Start()
     {
@@ -25,7 +27,7 @@ public class PlayerWeaponController : MonoBehaviour
 
         AssignInputEvents();
 
-        currentWeapon = weaponSlots[0];
+        Invoke("EquipStartingWeapon", 0.1f);
 
     }
 
@@ -33,6 +35,15 @@ public class PlayerWeaponController : MonoBehaviour
     {
         if (isShooting)
             Shoot();
+
+    }
+
+
+    private void EquipStartingWeapon()
+    {
+        weaponSlots[0] = new Weapon(defaultWeaponData);
+
+        EquipWeapon(0);
     }
 
     public Vector3 BulletDirection()
@@ -55,7 +66,7 @@ public class PlayerWeaponController : MonoBehaviour
         if (i >= weaponSlots.Count)
             return;
 
-        // This prevents the player from getting the same weapon
+        // This prevents the player from getting the same newWeapon
         if (currentWeapon == weaponSlots[i])
             return;
 
@@ -80,20 +91,25 @@ public class PlayerWeaponController : MonoBehaviour
     }
 
     // Called by the pickup object
-    public void PickUpWeapon(Weapon newWeapon)
+    public void PickUpWeapon(Weapon_Data newWeaponData)
     {
         if (weaponSlots.Count >= maxSlots)
         {
-            Debug.Log("Cannot drop weapon");
+            Debug.Log("Inventory is full");
             return;
         }
 
-        // This verifies if the player already has this weapon in the inventory
-        if (weaponSlots[0].weaponType == newWeapon.weaponType)
+        // This verifies if the player already has this newWeapon in the inventory
+        if (weaponSlots[0].weaponType == newWeaponData.weaponType)
+        {
+            Debug.Log("You already have this weapon equipped");
             return;
+        }
+
+        Weapon newWeapon = new Weapon(newWeaponData);
 
         weaponSlots.Add(newWeapon);
-        player.weaponVisuals.SwitchOnBackupWeaponModel(); // Makes the picked weapon appear 
+        player.weaponVisuals.SwitchOnBackupWeaponModel(); // Makes the picked newWeapon appear 
     }
 
 
@@ -139,7 +155,7 @@ public class PlayerWeaponController : MonoBehaviour
 
         player.weaponVisuals.PlayFireAnimation();
 
-        if (currentWeapon.IsBurstActivated())
+        if (currentWeapon.BurstActivated())
         {
             StartCoroutine(BurstFire());
             return;
@@ -196,7 +212,7 @@ public class PlayerWeaponController : MonoBehaviour
 
     public Weapon BackupWeaponModel()
     {
-        // The backupWeapon is defined as the weapon the player doesn't currently have equipped, but it's in the weaponSlots.
+        // The backupWeapon is defined as the newWeapon the player doesn't currently have equipped, but it's in the weaponSlots.
         foreach (Weapon weapon in weaponSlots)
         {
             if (weapon != currentWeapon)

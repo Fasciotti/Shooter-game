@@ -21,7 +21,7 @@ public class ObjectPool : MonoBehaviour
         
         GameObject objectToGet = poolDictionary[prefab].Dequeue();
         objectToGet.SetActive(true);
-        objectToGet.transform.parent = null; // Throw out of the pool
+        //objectToGet.transform.parent = null; // Throw out of the pool
 
         return objectToGet;
     }
@@ -43,7 +43,7 @@ public class ObjectPool : MonoBehaviour
 
         poolDictionary[objectOrigin].Enqueue(objectToReturn);
 
-        objectToReturn.transform.parent = this.transform;
+        //objectToReturn.transform.parent = this.transform;
     }
 
     private void InitializeNewPool(GameObject prefab)
