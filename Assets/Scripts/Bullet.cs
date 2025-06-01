@@ -4,16 +4,24 @@ public class Bullet : MonoBehaviour
 {
 
     [SerializeField] private GameObject bulletImpactFX;
-    private Rigidbody rb => GetComponent<Rigidbody>();
-    private MeshRenderer meshRenderer => GetComponent<MeshRenderer>();
-    private BoxCollider boxCollider => GetComponent<BoxCollider>();
-    private TrailRenderer trail => GetComponent<TrailRenderer>();
+    private Rigidbody rb;
+    private MeshRenderer meshRenderer;
+    private BoxCollider boxCollider;
+    private TrailRenderer trail;
 
 
     private float flyDistance;
     private Vector3 startPosition;
 
     private bool returnCalled = false;
+
+    private void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+        meshRenderer = GetComponent<MeshRenderer>();
+        boxCollider = GetComponent<BoxCollider>();
+        trail = GetComponent<TrailRenderer>();
+    }
 
     // It's called when the bullet is shot. (After the positioning)
     public void BulletSetup(float flyDistance)
@@ -83,7 +91,6 @@ public class Bullet : MonoBehaviour
             ContactPoint contact = collision.GetContact(0);
 
             GameObject newImpactFX = ObjectPool.instance.GetObject(bulletImpactFX);
-                // Instantiate(bulletImpactFX, contact.point, Quaternion.LookRotation(contact.normal));
 
             newImpactFX.transform.SetPositionAndRotation(contact.point, Quaternion.LookRotation(contact.normal));
 

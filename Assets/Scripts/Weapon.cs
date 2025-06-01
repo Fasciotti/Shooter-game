@@ -102,6 +102,7 @@ public class Weapon
         maximumSpread = weaponData.maxSpread;
         spreadIncreaseRate = weaponData.spreadIncreaseRate;
 
+
         // Generics
         weaponType = weaponData.weaponType;
         reloadSpeed = weaponData.reloadSpeed;
