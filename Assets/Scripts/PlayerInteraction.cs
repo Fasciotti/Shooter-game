@@ -8,6 +8,20 @@ public class PlayerInteraction : MonoBehaviour
 
     private Interactable closestInteractable;
 
+    private Player player;
+
+    private void Start()
+    {
+        player = GetComponent<Player>();
+
+        player.controls.Character.Interact.performed += context => InteractWithClosest();
+    }
+
+    private void InteractWithClosest()
+    {
+        closestInteractable?.Interaction();
+    }
+
     public void UpdateClosestInteractable()
     {
         closestInteractable?.HighlighActive(false);

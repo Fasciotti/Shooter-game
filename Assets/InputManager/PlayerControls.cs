@@ -152,6 +152,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Interact"",
+                    ""type"": ""Button"",
+                    ""id"": ""82cdba68-f924-4fa9-b31d-7197f68e8ad9"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -352,6 +361,17 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""ToogleBurst"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c21d62f7-8c44-41d8-927a-191d9a398617"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Interact"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -374,6 +394,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Character_AimPrecisely = m_Character.FindAction("AimPrecisely", throwIfNotFound: true);
         m_Character_LockIntoTarget = m_Character.FindAction("LockIntoTarget", throwIfNotFound: true);
         m_Character_ToogleBurst = m_Character.FindAction("ToogleBurst", throwIfNotFound: true);
+        m_Character_Interact = m_Character.FindAction("Interact", throwIfNotFound: true);
     }
 
     ~@PlayerControls()
@@ -454,6 +475,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Character_AimPrecisely;
     private readonly InputAction m_Character_LockIntoTarget;
     private readonly InputAction m_Character_ToogleBurst;
+    private readonly InputAction m_Character_Interact;
     public struct CharacterActions
     {
         private @PlayerControls m_Wrapper;
@@ -472,6 +494,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         public InputAction @AimPrecisely => m_Wrapper.m_Character_AimPrecisely;
         public InputAction @LockIntoTarget => m_Wrapper.m_Character_LockIntoTarget;
         public InputAction @ToogleBurst => m_Wrapper.m_Character_ToogleBurst;
+        public InputAction @Interact => m_Wrapper.m_Character_Interact;
         public InputActionMap Get() { return m_Wrapper.m_Character; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -523,6 +546,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @ToogleBurst.started += instance.OnToogleBurst;
             @ToogleBurst.performed += instance.OnToogleBurst;
             @ToogleBurst.canceled += instance.OnToogleBurst;
+            @Interact.started += instance.OnInteract;
+            @Interact.performed += instance.OnInteract;
+            @Interact.canceled += instance.OnInteract;
         }
 
         private void UnregisterCallbacks(ICharacterActions instance)
@@ -569,6 +595,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @ToogleBurst.started -= instance.OnToogleBurst;
             @ToogleBurst.performed -= instance.OnToogleBurst;
             @ToogleBurst.canceled -= instance.OnToogleBurst;
+            @Interact.started -= instance.OnInteract;
+            @Interact.performed -= instance.OnInteract;
+            @Interact.canceled -= instance.OnInteract;
         }
 
         public void RemoveCallbacks(ICharacterActions instance)
@@ -602,5 +631,6 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         void OnAimPrecisely(InputAction.CallbackContext context);
         void OnLockIntoTarget(InputAction.CallbackContext context);
         void OnToogleBurst(InputAction.CallbackContext context);
+        void OnInteract(InputAction.CallbackContext context);
     }
 }

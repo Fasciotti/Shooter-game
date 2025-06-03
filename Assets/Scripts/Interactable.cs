@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class Interactable : MonoBehaviour
 {
-    [SerializeField] private MeshRenderer mesh;
     [SerializeField] private Material highlightMaterial;
+    private MeshRenderer mesh;
     private Material defaulMaterial;
 
     private void Start()
@@ -14,7 +14,7 @@ public class Interactable : MonoBehaviour
         defaulMaterial = mesh.material;
     }
 
-    private void OnTriggerEnter(Collider other)
+    protected virtual void OnTriggerEnter(Collider other)
     {
         
         if (!other.TryGetComponent<PlayerInteraction>(out var playerInteraction))
@@ -22,6 +22,11 @@ public class Interactable : MonoBehaviour
 
         playerInteraction.interactables.Add(this);
         playerInteraction.UpdateClosestInteractable();
+    }
+
+    public virtual void Interaction()
+    {
+        Debug.Log("Interacted with: " + gameObject.name);
     }
 
     public void HighlighActive(bool active)
@@ -32,7 +37,7 @@ public class Interactable : MonoBehaviour
             mesh.material = defaulMaterial;
     }
 
-    private void OnTriggerExit(Collider other)
+    protected virtual void OnTriggerExit(Collider other)
     {
         
         if (!other.TryGetComponent<PlayerInteraction>(out var playerInteraction))
