@@ -2,16 +2,16 @@ using UnityEngine;
 
 public class Interactable : MonoBehaviour
 {
-    [SerializeField] private Material highlightMaterial;
-    private MeshRenderer mesh;
-    private Material defaulMaterial;
+    [SerializeField] protected Material highlightMaterial;
+    protected MeshRenderer mesh;
+    protected Material defaulMaterial;
 
     private void Start()
     {
         if (mesh == null)
             mesh = GetComponentInChildren<MeshRenderer>();
 
-        defaulMaterial = mesh.material;
+        defaulMaterial = mesh.sharedMaterial;
     }
 
     protected virtual void OnTriggerEnter(Collider other)
@@ -35,6 +35,12 @@ public class Interactable : MonoBehaviour
             mesh.material = highlightMaterial;
         else
             mesh.material = defaulMaterial;
+    }
+
+    protected void UpdateMeshAndMaterial(MeshRenderer newMesh)
+    {
+        mesh = newMesh;
+        defaulMaterial = mesh.sharedMaterial;
     }
 
     protected virtual void OnTriggerExit(Collider other)

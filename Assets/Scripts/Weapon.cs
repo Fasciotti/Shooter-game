@@ -58,7 +58,7 @@ public class Weapon
 
     private float baseSpread;
     private float maximumSpread;
-    private float spreadCooldown; // In seconds
+    private float spreadCooldown = 1; // In seconds
     private float spreadIncreaseRate; // Per shot
     #endregion
 

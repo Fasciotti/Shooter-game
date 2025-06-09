@@ -14,7 +14,7 @@ public class CameraManager : MonoBehaviour
 
     private float targetCameraDistance;
 
-    // Determined by weapon. Declared in Weapon.cs
+    // Determined by weapon. Declared in Weapon.cs. Called in PlayerWeaponController.
     public void ChangeCameraDistance(float cameraDistance) => targetCameraDistance = cameraDistance;
 
     private void Update()

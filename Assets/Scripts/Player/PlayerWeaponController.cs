@@ -93,20 +93,33 @@ public class PlayerWeaponController : MonoBehaviour
     // Called by the pickup object
     public void PickUpWeapon(Weapon_Data newWeaponData)
     {
-        if (weaponSlots.Count >= maxSlots)
-        {
-            Debug.Log("Inventory is full");
-            return;
-        }
-
-        // This verifies if the player already has this newWeapon in the inventory
-        if (weaponSlots[0].weaponType == newWeaponData.weaponType)
-        {
-            Debug.Log("You already have this weapon equipped");
-            return;
-        }
-
         Weapon newWeapon = new Weapon(newWeaponData);
+
+
+        // This verifies if the player already has this newWeapon in the inventory, if so, add ammo to it.
+        if (WeaponInSlots(newWeapon.weaponType) != null)
+        {
+            Debug.Log("You already have this weapon equipped. Collecting ammo...");
+
+            WeaponInSlots(newWeapon.weaponType).totalReserveAmmo += newWeapon.bulletsInMagazine;
+
+            return;
+        }
+
+        // This verifies if the player has a full inventory and is not trying to get the same weapon he is holding (though redundant), if not, replace it
+        if (weaponSlots.Count >= maxSlots && currentWeapon.weaponType != newWeapon.weaponType)
+        {
+            Debug.Log("Inventory is full. Replacing the weapon...");
+
+            int weaponIndex = weaponSlots.IndexOf(currentWeapon);
+
+            player.weaponVisuals.SwitchOffWeaponModels();
+
+            weaponSlots[weaponIndex] = newWeapon;
+            EquipWeapon(weaponIndex);
+
+            return;
+        }
 
         weaponSlots.Add(newWeapon);
         player.weaponVisuals.SwitchOnBackupWeaponModel(); // Makes the picked newWeapon appear 

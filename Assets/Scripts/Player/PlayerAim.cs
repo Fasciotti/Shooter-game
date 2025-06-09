@@ -25,8 +25,8 @@ public class PlayerAim : MonoBehaviour
 
     [Header("Camera control")]
     [SerializeField] private Transform cameraTarget;         // Follow target for the camera rig
-    [Range(1f, 3f)][SerializeField] private float maxCameraDistance;
-    [Range(.5f, 1f)][SerializeField] private float minCameraDistance;
+    [Range(1.5f, 3f)][SerializeField] private float maxCameraDistance;
+    [Range(.5f, 1.5f)][SerializeField] private float minCameraDistance;
     [Range(3f, 10f)][SerializeField] private float cameraSensitivity;
     float CameraDistance;
 
