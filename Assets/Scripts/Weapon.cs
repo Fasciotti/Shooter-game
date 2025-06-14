@@ -69,7 +69,9 @@ public class Weapon
     public float weaponMaximumDistance {  get; private set; }
     public float cameraDistance {  get; private set; }
     #endregion
-    
+
+    public Weapon_Data weaponData { get; } // Default weaponData
+
 
     public Weapon(Weapon_Data weaponData)
     {
@@ -109,6 +111,9 @@ public class Weapon
         equipSpeed = weaponData.equipSpeed;
         weaponMaximumDistance = weaponData.weaponMaximumDistance;
         cameraDistance = weaponData.cameraDistance;
+
+        // WeaponData
+        this.weaponData = weaponData;
     }
 
 

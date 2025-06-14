@@ -21,6 +21,8 @@ public class PlayerWeaponController : MonoBehaviour
     [SerializeField] private int maxSlots = 2;
     [SerializeField] private List<Weapon> weaponSlots;
 
+    [SerializeField] private GameObject weaponPickupPrefab;
+
     private void Start()
     {
         player = GetComponent<Player>();
@@ -86,42 +88,51 @@ public class PlayerWeaponController : MonoBehaviour
         if (HasOnlyOneWeapon())
             return;
 
+        player.weaponVisuals.SwitchOffWeaponModels();
+        CreateWeaponOnGround();
+
         weaponSlots.Remove(currentWeapon);
         EquipWeapon(0);
     }
 
-    // Called by the pickup object
-    public void PickUpWeapon(Weapon_Data newWeaponData)
+    private void CreateWeaponOnGround()
     {
-        Weapon newWeapon = new Weapon(newWeaponData);
+        GameObject droppedWeaponPickup = ObjectPool.instance.GetObject(weaponPickupPrefab);
 
+        droppedWeaponPickup.GetComponent<Pickup_Weapon>()?.SetupPickupWeapon(currentWeapon, transform);
+    }
+
+    // Called by the pickup object
+    public void PickUpWeapon(Weapon Weapon)
+    {
 
         // This verifies if the player already has this newWeapon in the inventory, if so, add ammo to it.
-        if (WeaponInSlots(newWeapon.weaponType) != null)
+        if (WeaponInSlots(Weapon.weaponType) != null)
         {
             Debug.Log("You already have this weapon equipped. Collecting ammo...");
 
-            WeaponInSlots(newWeapon.weaponType).totalReserveAmmo += newWeapon.bulletsInMagazine;
+            WeaponInSlots(Weapon.weaponType).totalReserveAmmo += Weapon.bulletsInMagazine;
 
             return;
         }
 
         // This verifies if the player has a full inventory and is not trying to get the same weapon he is holding (though redundant), if not, replace it
-        if (weaponSlots.Count >= maxSlots && currentWeapon.weaponType != newWeapon.weaponType)
+        if (weaponSlots.Count >= maxSlots && currentWeapon.weaponType != Weapon.weaponType)
         {
             Debug.Log("Inventory is full. Replacing the weapon...");
 
             int weaponIndex = weaponSlots.IndexOf(currentWeapon);
 
             player.weaponVisuals.SwitchOffWeaponModels();
+            CreateWeaponOnGround();
 
-            weaponSlots[weaponIndex] = newWeapon;
+            weaponSlots[weaponIndex] = Weapon;
             EquipWeapon(weaponIndex);
 
             return;
         }
 
-        weaponSlots.Add(newWeapon);
+        weaponSlots.Add(Weapon);
         player.weaponVisuals.SwitchOnBackupWeaponModel(); // Makes the picked newWeapon appear 
     }
 
@@ -187,6 +198,12 @@ public class PlayerWeaponController : MonoBehaviour
             FireSingleBullet();
 
             yield return new WaitForSeconds(currentWeapon.burstFireDelay);
+
+            if (currentWeapon.bulletsInMagazine <= 0 )
+            {
+                SetWeaponReady(true);
+                yield break;
+            }
 
             if (i >= currentWeapon.bulletsPerShoot)
             {
