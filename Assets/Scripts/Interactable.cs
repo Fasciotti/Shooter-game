@@ -6,6 +6,8 @@ public class Interactable : MonoBehaviour
     protected MeshRenderer mesh;
     protected Material defaulMaterial;
 
+    protected Player player;
+
     private void Start()
     {
         if (mesh == null)
@@ -16,9 +18,11 @@ public class Interactable : MonoBehaviour
 
     protected virtual void OnTriggerEnter(Collider other)
     {
-        
         if (!other.TryGetComponent<PlayerInteraction>(out var playerInteraction))
             return;
+
+        if (player == null)
+            player = other.GetComponent<Player>();
 
         playerInteraction.GetInteractables().Add(this);
         playerInteraction.UpdateClosestInteractable();

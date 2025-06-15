@@ -6,8 +6,6 @@ public enum AmmoBoxType { smallBox, bigBox}
 
 public class Pickup_Ammo : Interactable
 {
-    private Player player;
-
     [SerializeField] private AmmoBoxType ammoBoxType;
 
     [System.Serializable]
@@ -42,6 +40,8 @@ public class Pickup_Ammo : Interactable
                 UpdateMeshAndMaterial(boxModels[i].GetComponent<MeshRenderer>());
             }
         }
+
+        gameObject.name = "Pickup Ammo: " + ammoBoxType.ToString();
     }
 
     public override void Interaction()
@@ -60,15 +60,6 @@ public class Pickup_Ammo : Interactable
         }
 
         ObjectPool.instance.ReturnObject(gameObject);
-    }
-
-    protected override void OnTriggerEnter(Collider other)
-    {
-        base.OnTriggerEnter(other);
-
-        if (player == null)
-            player = other.GetComponent<Player>();
-        
     }
 
     private int GetBulletAmount(AmmoData ammo)
