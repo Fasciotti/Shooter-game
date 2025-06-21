@@ -15,6 +15,7 @@ public class Enemy : MonoBehaviour
 
     public NavMeshAgent agent { get; private set; }
     public EnemyStateMachine stateMachine { get; private set; }
+    public Animator anim {  get; private set; }
 
 
     protected virtual void Awake()
@@ -22,6 +23,8 @@ public class Enemy : MonoBehaviour
         stateMachine = new EnemyStateMachine();
 
         agent = GetComponent<NavMeshAgent>();
+
+        anim = GetComponentInChildren<Animator>();
     }
 
     protected virtual void Start()
