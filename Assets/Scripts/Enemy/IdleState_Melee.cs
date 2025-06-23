@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class IdleState_Melee : EnemyState
 {
-    private Enemy_Melee enemy;
+    private readonly Enemy_Melee enemy;
 
     public IdleState_Melee(Enemy enemyBase, EnemyStateMachine stateMachine, string animBoolName)
         : base(enemyBase, stateMachine, animBoolName)

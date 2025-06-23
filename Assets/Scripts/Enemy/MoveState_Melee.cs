@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class MoveState_Melee : EnemyState
 {
-    private Enemy_Melee enemy;
+    private readonly Enemy_Melee enemy;
 
     private Vector3 destination;
 

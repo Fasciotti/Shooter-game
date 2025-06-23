@@ -10,8 +10,8 @@ public class Enemy_Melee : Enemy
         base.Awake();
 
 
-        idleState = new IdleState_Melee(this, stateMachine, "idle");
-        moveState = new MoveState_Melee(this, stateMachine, "move");
+        idleState = new IdleState_Melee(this, stateMachine, "Idle");
+        moveState = new MoveState_Melee(this, stateMachine, "Move");
 
         
     }
