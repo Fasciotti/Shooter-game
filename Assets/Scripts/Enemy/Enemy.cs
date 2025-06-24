@@ -1,3 +1,4 @@
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
@@ -9,6 +10,7 @@ public class Enemy : MonoBehaviour
 
     [Header("Move Configuration")]
     [SerializeField] private float moveSpeed;
+    [SerializeField] private float rotationSpeed;
     public Transform[] patrolPoints;
     public int currentPatrolIndex;
 
@@ -31,6 +33,10 @@ public class Enemy : MonoBehaviour
     {
         InitializePatrolPoints();
     }
+    protected virtual void Update()
+    {
+        
+    }
 
     private void InitializePatrolPoints()
     {
@@ -38,10 +44,6 @@ public class Enemy : MonoBehaviour
             t.parent = null;
     }
 
-    protected virtual void Update()
-    {
-        
-    }
 
     public Vector3 GetPatronDestination()
     {
@@ -53,5 +55,16 @@ public class Enemy : MonoBehaviour
             currentPatrolIndex = 0;
 
         return destination;
+    }
+
+    public Quaternion FaceTarget(Vector3 target)
+    {
+        Quaternion targetRotation = Quaternion.LookRotation(target - transform.position);
+
+        Vector3 currentRotation = transform.rotation.eulerAngles;
+
+        float yRotation = Mathf.LerpAngle(currentRotation.y, targetRotation.eulerAngles.y, rotationSpeed * Time.deltaTime);
+
+        return Quaternion.Euler(currentRotation.x, yRotation, currentRotation.z);
     }
 }
