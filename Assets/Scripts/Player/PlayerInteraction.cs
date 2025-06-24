@@ -42,8 +42,6 @@ public class PlayerInteraction : MonoBehaviour
                 closestDistance = distance;
             }
         }
-        Debug.Log(closestInteractable);
-
         closestInteractable?.HighlighActive(true);
     }
 

@@ -5,16 +5,25 @@ using UnityEngine.InputSystem;
 
 public class Enemy : MonoBehaviour
 {
+
+    [SerializeField] private float rotationSpeed;
+    [SerializeField] private float aggressionRange;
+
+
     [Header("Idle Configuration")]
     public float idleTime;
 
     [Header("Move Configuration")]
     [SerializeField] private float moveSpeed;
-    [SerializeField] private float rotationSpeed;
+
+    [Space]
+
+    [SerializeField]private int currentPatrolIndex;
+
     public Transform[] patrolPoints;
-    public int currentPatrolIndex;
 
 
+    public Player player { get; private set; }
     public NavMeshAgent agent { get; private set; }
     public EnemyStateMachine stateMachine { get; private set; }
     public Animator anim {  get; private set; }
@@ -27,6 +36,8 @@ public class Enemy : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
 
         anim = GetComponentInChildren<Animator>();
+
+        player = GameObject.Find("Player").GetComponent<Player>();
     }
 
     protected virtual void Start()
@@ -35,7 +46,7 @@ public class Enemy : MonoBehaviour
     }
     protected virtual void Update()
     {
-        
+
     }
 
     private void InitializePatrolPoints()
@@ -44,6 +55,14 @@ public class Enemy : MonoBehaviour
             t.parent = null;
     }
 
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, aggressionRange);
+    }
+    public void AnimationTrigger() => stateMachine.currentState.AnimationTrigger();
+
+    public bool isPlayerInAggressionRange() => Vector3.Distance(transform.position, player.transform.position) < aggressionRange;
 
     public Vector3 GetPatronDestination()
     {

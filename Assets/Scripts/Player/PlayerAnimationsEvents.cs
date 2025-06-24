@@ -1,11 +1,14 @@
 using UnityEngine;
-using UnityEngine.Android;
-
 public class PlayerAnimationsEvents : MonoBehaviour
 {
     // TODO: Separate the rigging and IK resets in methods
 
-    private Player player => GetComponentInParent<Player>();
+    private Player player;
+
+    private void Awake()
+    {
+        player = GetComponentInParent<Player>();
+    }
     public void ReloadIsOver()
     {
         player.weapon.CurrentWeapon().RefillBullets();
