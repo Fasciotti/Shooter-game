@@ -21,8 +21,6 @@ public class RecoveryState_Melee : EnemyState
     public override void Exit()
     {
         base.Exit();
-
-        enemy.agent.isStopped = false;
     }
 
     public override void Update()
