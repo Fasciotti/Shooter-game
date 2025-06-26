@@ -5,15 +5,18 @@ This repository holds a Unity project for an experimental shooter game. The code
 ## Opening the Project
 
 1. Clone the repository.
-2. Open the folder with the Unity Hub or the Unity editor of your choice.
+2. Open the folder with the Unity Hub or the Unity Editor.
 
 ## Project Overview
 
 The `Assets` directory contains all game assets and scripts:
 
-- `Scripts` – C# code for gameplay systems like the player controller, weapons, and enemy AI.
-- `Prefab` – prefabricated objects such as projectiles and pickups.
+- `Scripts` – Script for gameplay systems like the player controller, weapons, and enemy AI.
+- `Prefab` – Prefabricated objects such as projectiles and pickups.
 - `Scenes` – Unity scene files.
+- `Models` – Contains all visual imported assets, excluding animations.
+- `Animations` - It's where all animations are. They are in inside FBXs.
+- `Data` - ScriptableObject scripts that hold specific data.
 
 Other configuration is stored in `Packages` and `ProjectSettings`.
 
