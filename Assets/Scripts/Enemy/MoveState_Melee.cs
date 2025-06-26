@@ -19,21 +19,20 @@ public class MoveState_Melee : EnemyState
 
         destination = enemy.GetPatronDestination();
         enemy.agent.SetDestination(destination);
+
+        enemy.agent.speed = enemy.moveSpeed;
     }
 
     public override void Exit()
     {
         base.Exit();
-
-        Debug.Log("I left move state");
-
     }
 
     public override void Update()
     {
         base.Update();
 
-        if (enemy.isPlayerInAggressionRange())
+        if (enemy.IsPlayerInAggressionRange())
         {
             stateMachine.ChangeState(enemy.recoveryState);
             return;
@@ -48,21 +47,6 @@ public class MoveState_Melee : EnemyState
 
     // This method can be substituted by the NavMesh property steeringTarget
     // that automatically gives the rotation to face the path.
-    private Vector3 GetNextPathPoint()
-    {
-        NavMeshAgent agent = enemy.agent;
-        NavMeshPath path = agent.path;
-
-        if (path.corners.Length < 2)
-            return agent.destination;
-
-        for (int i = 0; i < path.corners.Length; i++)
-        {
-            if (Vector3.Distance(agent.transform.position, path.corners[i]) < 1)
-                return path.corners[i + 1];
-        }
-
-        return agent.destination;
-    }
+    
 
 }

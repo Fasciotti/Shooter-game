@@ -6,20 +6,29 @@ using UnityEngine.InputSystem;
 public class Enemy : MonoBehaviour
 {
 
-    [SerializeField] private float rotationSpeed;
-    [SerializeField] private float aggressionRange;
 
+    [Header("Attack Configuration")]
+    public float aggressionRange;
+    public float attackRange;
+    public float attackMoveSpeed;
 
     [Header("Idle Configuration")]
     public float idleTime;
 
     [Header("Move Configuration")]
-    [SerializeField] private float moveSpeed;
+    public float moveSpeed;
+    public float chaseSpeed;
+    public float rotationSpeed;
+    public bool manualMovement;
+
+
+    //[System.NonSerialized] public float chaseAcceleration = 15;
+    //[System.NonSerialized] public float standardAcceleration = 8;
+
 
     [Space]
 
     [SerializeField]private int currentPatrolIndex;
-
     public Transform[] patrolPoints;
 
 
@@ -57,12 +66,20 @@ public class Enemy : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        // Aggression Range
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, aggressionRange);
-    }
-    public void AnimationTrigger() => stateMachine.currentState.AnimationTrigger();
 
-    public bool isPlayerInAggressionRange() => Vector3.Distance(transform.position, player.transform.position) < aggressionRange;
+        // Attack Range
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
+    }
+
+    public void SetActiveManualMovement(bool manualMovement) => this.manualMovement = manualMovement;
+    public bool ManualMovementActive() => manualMovement;
+    public void AnimationTrigger() => stateMachine.currentState.AnimationTrigger();
+    public bool IsPlayerInAggressionRange() => Vector3.Distance(transform.position, player.transform.position) < aggressionRange;
+    public bool IsPlayerInAttackRange() => Vector3.Distance(transform.position, player.transform.position) < attackRange;
 
     public Vector3 GetPatronDestination()
     {

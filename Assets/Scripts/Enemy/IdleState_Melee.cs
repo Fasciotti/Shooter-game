@@ -25,7 +25,7 @@ public class IdleState_Melee : EnemyState
     {
         base.Update();
 
-        if (enemy.isPlayerInAggressionRange())
+        if (enemy.IsPlayerInAggressionRange())
         {
             stateMachine.ChangeState(enemy.recoveryState);
             return;

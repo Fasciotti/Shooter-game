@@ -21,6 +21,8 @@ public class RecoveryState_Melee : EnemyState
     public override void Exit()
     {
         base.Exit();
+
+        enemy.agent.isStopped = false;
     }
 
     public override void Update()
@@ -31,7 +33,7 @@ public class RecoveryState_Melee : EnemyState
 
         if (triggerCalled)
         {
-            Debug.Log("I'm supposed to change state here");
+            stateMachine.ChangeState(enemy.chaseState);
         }
 
     }
