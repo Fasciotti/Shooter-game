@@ -1,5 +1,15 @@
 using UnityEngine;
 
+[System.Serializable]
+public struct AttackData
+{
+    public float attackRange;
+    public float moveSpeed;
+    public int attackIndex;
+    [Range(1,2)]
+    public float animationSpeed;
+}
+
 public class Enemy_Melee : Enemy
 {
     public MoveState_Melee moveState {  get; private set; }
@@ -7,6 +17,8 @@ public class Enemy_Melee : Enemy
     public RecoveryState_Melee recoveryState { get; private set; }
     public ChaseState_Melee chaseState { get; private set; }
     public AttackState_Melee attackState { get; private set; }
+
+    public AttackData attackData;
 
     [SerializeField] private Transform hiddenWeapon;
     [SerializeField] private Transform pulledWeapon;
@@ -42,4 +54,15 @@ public class Enemy_Melee : Enemy
         hiddenWeapon.gameObject.SetActive(false);
         pulledWeapon.gameObject.SetActive(true);
     }
+
+    protected override void OnDrawGizmos()
+    {
+        base.OnDrawGizmos();
+
+        // Attack Range
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position, attackData.attackRange);
+    }
+
+    public bool IsPlayerInAttackRange() => Vector3.Distance(transform.position, player.transform.position) < attackData.attackRange;
 }

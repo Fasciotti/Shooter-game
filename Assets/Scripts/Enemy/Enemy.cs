@@ -6,21 +6,15 @@ using UnityEngine.InputSystem;
 public class Enemy : MonoBehaviour
 {
 
-
-    [Header("Attack Configuration")]
-    public float aggressionRange;
-    public float attackRange;
-    public float attackMoveSpeed;
-
     [Header("Idle Configuration")]
     public float idleTime;
+    public float aggressionRange;
 
     [Header("Move Configuration")]
     public float moveSpeed;
     public float chaseSpeed;
     public float rotationSpeed;
-    public bool manualMovement;
-
+    private bool manualMovement;
 
     //[System.NonSerialized] public float chaseAcceleration = 15;
     //[System.NonSerialized] public float standardAcceleration = 8;
@@ -64,22 +58,18 @@ public class Enemy : MonoBehaviour
             t.parent = null;
     }
 
-    private void OnDrawGizmos()
+    protected virtual void OnDrawGizmos()
     {
         // Aggression Range
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, aggressionRange);
 
-        // Attack Range
-        Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
     }
 
     public void SetActiveManualMovement(bool manualMovement) => this.manualMovement = manualMovement;
     public bool ManualMovementActive() => manualMovement;
     public void AnimationTrigger() => stateMachine.currentState.AnimationTrigger();
     public bool IsPlayerInAggressionRange() => Vector3.Distance(transform.position, player.transform.position) < aggressionRange;
-    public bool IsPlayerInAttackRange() => Vector3.Distance(transform.position, player.transform.position) < attackRange;
 
     public Vector3 GetPatronDestination()
     {

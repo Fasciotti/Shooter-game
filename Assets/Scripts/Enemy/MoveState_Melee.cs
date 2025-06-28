@@ -3,7 +3,7 @@ using UnityEngine.AI;
 
 public class MoveState_Melee : EnemyState
 {
-    private readonly Enemy_Melee enemy;
+    private Enemy_Melee enemy;
 
     private Vector3 destination;
 
