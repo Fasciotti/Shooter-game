@@ -15,6 +15,7 @@ public class Enemy : MonoBehaviour
     public float chaseSpeed;
     public float rotationSpeed;
     private bool manualMovement;
+    private bool manualRotation;
 
     //[System.NonSerialized] public float chaseAcceleration = 15;
     //[System.NonSerialized] public float standardAcceleration = 8;
@@ -68,8 +69,12 @@ public class Enemy : MonoBehaviour
 
     public void SetActiveManualMovement(bool manualMovement) => this.manualMovement = manualMovement;
     public bool ManualMovementActive() => manualMovement;
+    public void SetActiveManualRotation(bool manualRotation) => this.manualRotation = manualRotation;
+    public bool ManualRotationActive() => manualRotation;
+    
     public void AnimationTrigger() => stateMachine.currentState.AnimationTrigger();
     public bool IsPlayerInAggressionRange() => Vector3.Distance(transform.position, player.transform.position) < aggressionRange;
+
 
     public Vector3 GetPatronDestination()
     {
