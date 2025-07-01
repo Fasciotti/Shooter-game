@@ -71,7 +71,6 @@ public class Enemy : MonoBehaviour
     public bool ManualMovementActive() => manualMovement;
     public void SetActiveManualRotation(bool manualRotation) => this.manualRotation = manualRotation;
     public bool ManualRotationActive() => manualRotation;
-    
     public void AnimationTrigger() => stateMachine.currentState.AnimationTrigger();
     public bool IsPlayerInAggressionRange() => Vector3.Distance(transform.position, player.transform.position) < aggressionRange;
 

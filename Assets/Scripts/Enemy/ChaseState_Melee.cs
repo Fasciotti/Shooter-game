@@ -16,11 +16,11 @@ public class ChaseState_Melee : EnemyState
     public override void Enter()
     {
         base.Enter();
+        enemy.PullWeapon();
 
         enemy.agent.isStopped = false;
 
         enemy.agent.speed = enemy.chaseSpeed;
-        enemy.PullWeapon();
 
         //enemy.agent.acceleration = enemy.chaseAcceleration;
     }

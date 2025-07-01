@@ -1,14 +1,21 @@
+using NUnit.Framework;
+using System.Collections.Generic;
 using UnityEngine;
+using RangeAttribute = UnityEngine.RangeAttribute;
 
 [System.Serializable]
 public struct AttackData
 {
+    public string attackName;
     public float attackRange;
     public float moveSpeed;
     public int attackIndex;
+    public AttackType_Melee attackType;
     [Range(1,2)]
     public float animationSpeed;
 }
+
+public enum AttackType_Melee { CloseAttack, ChargeAttack}
 
 public class Enemy_Melee : Enemy
 {
@@ -18,7 +25,9 @@ public class Enemy_Melee : Enemy
     public ChaseState_Melee chaseState { get; private set; }
     public AttackState_Melee attackState { get; private set; }
 
+    [Header("AttackData")]
     public AttackData attackData;
+    public List<AttackData> attackList;
 
     [SerializeField] private Transform hiddenWeapon;
     [SerializeField] private Transform pulledWeapon;
@@ -65,4 +74,5 @@ public class Enemy_Melee : Enemy
     }
 
     public bool IsPlayerInAttackRange() => Vector3.Distance(transform.position, player.transform.position) < attackData.attackRange;
+
 }

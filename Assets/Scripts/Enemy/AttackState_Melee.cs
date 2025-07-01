@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -33,11 +34,15 @@ public class AttackState_Melee : EnemyState
     public override void Exit()
     {
         base.Exit();
+        SetupNextAttack();
+    }
 
-        enemy.anim.SetFloat("RecoveryIndex", 0);
+    private void SetupNextAttack()
+    {
+        int recoveryIndex = PlayerClose() ? 1 : 0;
+        enemy.anim.SetFloat("RecoveryIndex", recoveryIndex);
 
-        if (enemy.IsPlayerInAttackRange())
-            enemy.anim.SetFloat("RecoveryIndex", 1);
+        enemy.attackData = UpdateAttackData();
     }
 
     public override void Update()
@@ -65,5 +70,21 @@ public class AttackState_Melee : EnemyState
                 stateMachine.ChangeState(enemy.chaseState);
             
         }
+    }
+
+    private bool PlayerClose() => Vector3.Distance(enemy.transform.position, enemy.player.transform.position) < 1;
+
+    private AttackData UpdateAttackData()
+    {
+        List<AttackData> validAttacks = new List<AttackData>(enemy.attackList);
+
+        if (PlayerClose())
+        {
+            validAttacks.RemoveAll(parameter => parameter.attackType == AttackType_Melee.ChargeAttack);
+        }
+
+        int random = Random.Range(0, validAttacks.Count);
+        return validAttacks[random];
+
     }
 }
