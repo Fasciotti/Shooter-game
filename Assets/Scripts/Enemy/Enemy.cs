@@ -2,6 +2,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 public class Enemy : MonoBehaviour
 {
@@ -65,6 +66,23 @@ public class Enemy : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, aggressionRange);
 
+    }
+
+    public virtual void GetHit()
+    {
+        
+    }
+
+    public virtual void HitImpact(Vector3 force, Vector3 hitpoint, Rigidbody rb)
+    {
+        StartCoroutine(HitImpactCoroutine(force, hitpoint, rb));
+    }
+
+    private IEnumerator HitImpactCoroutine(Vector3 force, Vector3 hitPoint, Rigidbody rb)
+    {
+        yield return new WaitForSeconds(0.05f);
+        
+        rb.AddForceAtPosition(force, hitPoint, ForceMode.Impulse);
     }
 
     public void SetActiveManualMovement(bool manualMovement) => this.manualMovement = manualMovement;

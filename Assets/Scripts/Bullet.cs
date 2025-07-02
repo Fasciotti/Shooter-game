@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Bullet : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class Bullet : MonoBehaviour
 
 
     private float flyDistance;
+    private float impactForce;
     private Vector3 startPosition;
 
     private bool returnCalled = false;
@@ -24,13 +26,14 @@ public class Bullet : MonoBehaviour
     }
 
     // It's called when the bullet is shot. (After the positioning)
-    public void BulletSetup(float flyDistance)
+    public void BulletSetup(float flyDistance, float impactForce)
     {
         startPosition = transform.position;
 
-        // Determined when shooting. Different weapons, different ranges.
+        // Both determined when shooting. Different weapons, different ranges.
+        this.impactForce = impactForce;
         this.flyDistance = flyDistance;
-
+        
         ResetBullet();
     }
 
@@ -54,6 +57,17 @@ public class Bullet : MonoBehaviour
     {
         CreateImpactFX(collision);
 
+        Enemy enemy = collision.gameObject.GetComponentInParent<Enemy>();
+
+        if (enemy != null)
+        {
+            Vector3 force = rb.linearVelocity.normalized * impactForce;
+            Rigidbody targetRigidbody = collision.collider.attachedRigidbody;
+            
+            enemy.HitImpact(force, collision.contacts[0].point, targetRigidbody);
+            enemy.GetHit();
+        }
+            
         ReturnBullet();
     }
 

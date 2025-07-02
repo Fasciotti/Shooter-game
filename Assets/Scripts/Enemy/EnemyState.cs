@@ -22,6 +22,9 @@ public class EnemyState
     {
         Debug.Log("State entered: " + stateMachine.currentState);
 
+        if (!enemyBase.agent.enabled)
+            enemyBase.agent.enabled = true;
+
         enemyBase.anim.SetBool(animBoolName, true);
         triggerCalled = false;
     }

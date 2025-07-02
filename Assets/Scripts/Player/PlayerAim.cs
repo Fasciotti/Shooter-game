@@ -93,7 +93,7 @@ public class PlayerAim : MonoBehaviour
 
         // Unless in “precise-aim” mode, keep the helper at shoulder height
         if (!isAimingPrecise)
-            aim.position = new Vector3(aim.position.x, transform.position.y + 1f, aim.position.z);
+            aim.position = new Vector3(aim.position.x, transform.position.y + 0.95f, aim.position.z);
     }
 
     private void UpdateCameraPosition()

@@ -14,6 +14,7 @@ public class PlayerWeaponController : MonoBehaviour
     [SerializeField] Weapon_Data defaultWeaponData;
 
     [Header("Bullet options")]
+    [SerializeField] private float bulletImpactForce = 100;
     [SerializeField] private float bulletSpeed;
     [SerializeField] private GameObject bulletPrefab;
 
@@ -29,6 +30,7 @@ public class PlayerWeaponController : MonoBehaviour
 
         AssignInputEvents();
 
+        //Used invoke to make sure all data has been loaded.
         Invoke("EquipStartingWeapon", 0.1f);
 
     }
@@ -230,7 +232,7 @@ public class PlayerWeaponController : MonoBehaviour
         Bullet bullet = newBullet.GetComponent<Bullet>();
 
 
-        bullet.BulletSetup(currentWeapon.weaponMaximumDistance);
+        bullet.BulletSetup(currentWeapon.weaponMaximumDistance, bulletImpactForce);
 
         newBulletRb.mass = REFERENCE_BULLET_SPEED / bulletSpeed; // This makes sure the mass of the bullet is always the same
         newBulletRb.linearVelocity = bulletDirection * bulletSpeed;
