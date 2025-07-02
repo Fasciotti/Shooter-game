@@ -7,6 +7,9 @@ using System.Collections;
 public class Enemy : MonoBehaviour
 {
 
+    [Header("Health")]
+    [SerializeField] protected int healthPoints = 20;
+
     [Header("Idle Configuration")]
     public float idleTime;
     public float aggressionRange;
@@ -70,7 +73,7 @@ public class Enemy : MonoBehaviour
 
     public virtual void GetHit()
     {
-        
+        healthPoints--;
     }
 
     public virtual void HitImpact(Vector3 force, Vector3 hitpoint, Rigidbody rb)

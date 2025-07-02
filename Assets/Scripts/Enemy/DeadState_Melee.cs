@@ -5,7 +5,9 @@ public class DeadState_Melee : EnemyState
     private Enemy_Melee enemy;
     private EnemyRagdoll ragdoll;
 
+    #pragma warning disable S4487 // Unread "private" fields should be removed
     private bool interactionDisabled;
+
 
     public DeadState_Melee(Enemy enemyBase, EnemyStateMachine stateMachine, string animBoolName) : base(enemyBase, stateMachine, animBoolName)
     {
