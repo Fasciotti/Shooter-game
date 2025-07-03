@@ -17,6 +17,8 @@ public struct AttackData
 
 public enum AttackType_Melee { CloseAttack, ChargeAttack}
 
+public enum EnemyMelee_Type { Regular, Shield};
+
 public class Enemy_Melee : Enemy
 {
     public MoveState_Melee moveState {  get; private set; }
@@ -29,6 +31,10 @@ public class Enemy_Melee : Enemy
     [Header("AttackData")]
     public AttackData attackData;
     public List<AttackData> attackList;
+
+    [Header("Enemy Settings")]
+    public EnemyMelee_Type meleeType;
+    [SerializeField] private Transform shieldTransform;
 
     [SerializeField] private Transform hiddenWeapon;
     [SerializeField] private Transform pulledWeapon;
@@ -53,6 +59,7 @@ public class Enemy_Melee : Enemy
         base.Start();
 
         stateMachine.Initialize(idleState);
+        InitializeSpeciality();
     }
 
     protected override void Update()
@@ -68,6 +75,15 @@ public class Enemy_Melee : Enemy
 
         if (healthPoints <= 0)
             stateMachine.ChangeState(deadState);
+    }
+
+    protected void InitializeSpeciality()
+    {
+        if (EnemyMelee_Type.Shield == meleeType)
+        {
+            anim.SetFloat("ChaseIndex", 1);
+            shieldTransform.gameObject.SetActive(true);
+        }
     }
 
     public void PullWeapon()

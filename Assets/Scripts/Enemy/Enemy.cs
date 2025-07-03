@@ -83,7 +83,7 @@ public class Enemy : MonoBehaviour
 
     private IEnumerator HitImpactCoroutine(Vector3 force, Vector3 hitPoint, Rigidbody rb)
     {
-        yield return new WaitForSeconds(0.05f);
+        yield return new WaitForSeconds(0.1f);
         
         rb.AddForceAtPosition(force, hitPoint, ForceMode.Impulse);
     }
