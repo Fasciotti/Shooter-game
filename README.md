@@ -20,4 +20,4 @@ The `Assets` directory contains all game assets and scripts:
 
 Other configuration is stored in `Packages` and `ProjectSettings`.
 
-See `Docs/enemy_state_machine.md` for an in depth explanation of the enemy AI.
+See `Docs/enemy_state_machine.md` for an in depth explanation of the enemy AI. (outdated)
