@@ -17,7 +17,7 @@ public struct AttackData
 
 public enum AttackType_Melee { CloseAttack, ChargeAttack}
 
-public enum EnemyMelee_Type { Regular, Shield};
+public enum EnemyMelee_Type { Regular, Shield, Dodge};
 
 public class Enemy_Melee : Enemy
 {
@@ -35,6 +35,12 @@ public class Enemy_Melee : Enemy
     [Header("Enemy Settings")]
     public EnemyMelee_Type meleeType;
     [SerializeField] private Transform shieldTransform;
+
+    [SerializeField] private float dodgeCooldown = 5;
+    [SerializeField] private float dodgeMinimumDistance = 2;
+    private float lastDodge;
+
+    [Space]
 
     [SerializeField] private Transform hiddenWeapon;
     [SerializeField] private Transform pulledWeapon;
@@ -103,4 +109,22 @@ public class Enemy_Melee : Enemy
 
     public bool IsPlayerInAttackRange() => Vector3.Distance(transform.position, player.transform.position) < attackData.attackRange;
 
+    public void ActivateDodgeAnimation()
+    {
+        if (meleeType != EnemyMelee_Type.Dodge)
+            return;
+
+        if (stateMachine.currentState != chaseState)
+            return;
+
+        if (Vector3.Distance(transform.position, player.transform.position) < dodgeMinimumDistance)
+            return;
+
+        if (Time.time > lastDodge + dodgeCooldown)
+        {
+            lastDodge = Time.time;
+            anim.SetTrigger("Dodge");
+
+        }
+    }
 }

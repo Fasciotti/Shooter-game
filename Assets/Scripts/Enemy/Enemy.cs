@@ -83,7 +83,7 @@ public class Enemy : MonoBehaviour
 
     private IEnumerator HitImpactCoroutine(Vector3 force, Vector3 hitPoint, Rigidbody rb)
     {
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.05f);
         
         rb.AddForceAtPosition(force, hitPoint, ForceMode.Impulse);
     }
@@ -96,7 +96,7 @@ public class Enemy : MonoBehaviour
     public bool IsPlayerInAggressionRange() => Vector3.Distance(transform.position, player.transform.position) < aggressionRange;
 
 
-    public Vector3 GetPatronDestination()
+    public Vector3 GetPatrolDestination()
     {
         Vector3 destination = patrolPoints[currentPatrolIndex].transform.position;
 

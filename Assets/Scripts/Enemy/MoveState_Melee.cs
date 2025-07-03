@@ -17,7 +17,7 @@ public class MoveState_Melee : EnemyState
     {
         base.Enter();
 
-        destination = enemy.GetPatronDestination();
+        destination = enemy.GetPatrolDestination();
         enemy.agent.SetDestination(destination);
 
         enemy.agent.speed = enemy.moveSpeed;

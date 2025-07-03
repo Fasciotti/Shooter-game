@@ -146,6 +146,7 @@ public class PlayerWeaponController : MonoBehaviour
 
     public bool HasOnlyOneWeapon() => weaponSlots.Count <= 1;
 
+    #endregion
     public Weapon WeaponInSlots(WeaponType weaponType)
     {
         foreach (var weapon in weaponSlots)
@@ -157,7 +158,6 @@ public class PlayerWeaponController : MonoBehaviour
         return null;
     }
 
-    #endregion
     #endregion
     private void Reload()
     {
@@ -187,6 +187,7 @@ public class PlayerWeaponController : MonoBehaviour
             return;
         }
 
+        PlayerShootingEnemy();
         FireSingleBullet();
     }
 
@@ -259,6 +260,22 @@ public class PlayerWeaponController : MonoBehaviour
     public Weapon CurrentWeapon() => currentWeapon;
 
     #endregion
+
+    public void PlayerShootingEnemy()
+    {
+        Vector3 rayOrigin = CurrentWeaponGunPoint().position;
+        Vector3 rayDirection = BulletDirection();
+
+        if (Physics.Raycast(rayOrigin, rayDirection, out RaycastHit hitInfo, Mathf.Infinity))
+        {
+            Enemy_Melee enemy = hitInfo.collider.gameObject.GetComponentInParent<Enemy_Melee>();
+
+            if (enemy != null)
+            {
+                enemy.ActivateDodgeAnimation();
+            }
+        }
+    }
 
     #region Input Events
     private void AssignInputEvents()
