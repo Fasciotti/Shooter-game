@@ -88,11 +88,11 @@ public class Enemy : MonoBehaviour
         rb.AddForceAtPosition(force, hitPoint, ForceMode.Impulse);
     }
 
+    public void AnimationTrigger() => stateMachine.currentState.AnimationTrigger();
     public void SetActiveManualMovement(bool manualMovement) => this.manualMovement = manualMovement;
     public bool ManualMovementActive() => manualMovement;
     public void SetActiveManualRotation(bool manualRotation) => this.manualRotation = manualRotation;
     public bool ManualRotationActive() => manualRotation;
-    public void AnimationTrigger() => stateMachine.currentState.AnimationTrigger();
     public bool IsPlayerInAggressionRange() => Vector3.Distance(transform.position, player.transform.position) < aggressionRange;
 
 

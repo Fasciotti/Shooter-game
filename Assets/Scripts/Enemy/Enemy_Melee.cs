@@ -17,7 +17,7 @@ public struct AttackData
 
 public enum AttackType_Melee { CloseAttack, ChargeAttack}
 
-public enum EnemyMelee_Type { Regular, Shield, Dodge};
+public enum EnemyMelee_Type { Regular, Shield, Dodge, Axe};
 
 public class Enemy_Melee : Enemy
 {
@@ -26,6 +26,7 @@ public class Enemy_Melee : Enemy
     public RecoveryState_Melee recoveryState { get; private set; }
     public ChaseState_Melee chaseState { get; private set; }
     public AttackState_Melee attackState { get; private set; }
+    public AbilityState_Melee abilityState { get; private set; }
     public DeadState_Melee deadState { get; private set; }
 
     [Header("AttackData")]
@@ -38,6 +39,7 @@ public class Enemy_Melee : Enemy
 
     [SerializeField] private float dodgeCooldown = 5;
     [SerializeField] private float dodgeMinimumDistance = 2;
+    private float moveSpeedMultiplierInAbility = 0.5f;
     private float lastDodge;
 
     [Space]
@@ -54,6 +56,7 @@ public class Enemy_Melee : Enemy
         recoveryState = new RecoveryState_Melee(this, stateMachine, "Recovery");
         chaseState = new ChaseState_Melee(this, stateMachine, "Chase");
         attackState = new AttackState_Melee(this, stateMachine, "Attack");
+        abilityState = new AbilityState_Melee(this, stateMachine, null); //Null is used because the variable is defined inside the class.
         deadState = new DeadState_Melee(this, stateMachine, "Idle"); //Idle anim is just a place holder. Ragdoll
 
         attackState.UpdateAttackData();
@@ -90,6 +93,12 @@ public class Enemy_Melee : Enemy
             anim.SetFloat("ChaseIndex", 1);
             shieldTransform.gameObject.SetActive(true);
         }
+    }
+
+    public void TriggerAbility()
+    {
+        moveSpeed *= moveSpeedMultiplierInAbility;
+        pulledWeapon.gameObject.SetActive(false);
     }
 
     public void PullWeapon()
