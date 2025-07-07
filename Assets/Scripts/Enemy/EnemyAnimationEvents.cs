@@ -18,4 +18,5 @@ public class EnemyAnimationEvents : MonoBehaviour
     public void StopManualRotation() => enemy.SetActiveManualRotation(false);
 
     public void AbilityEvent() => enemy.GetComponentInParent<Enemy_Melee>().TriggerAbility();
+    public void EquipWeapon() => enemy.GetComponentInParent<Enemy>().SetEquipWeapon(true);
 }

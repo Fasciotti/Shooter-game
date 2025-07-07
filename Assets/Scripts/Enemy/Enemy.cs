@@ -20,6 +20,7 @@ public class Enemy : MonoBehaviour
     public float rotationSpeed;
     private bool manualMovement;
     private bool manualRotation;
+    private bool equipWeapon;
 
     //[System.NonSerialized] public float chaseAcceleration = 15;
     //[System.NonSerialized] public float standardAcceleration = 8;
@@ -94,6 +95,8 @@ public class Enemy : MonoBehaviour
     public void SetActiveManualRotation(bool manualRotation) => this.manualRotation = manualRotation;
     public bool ManualRotationActive() => manualRotation;
     public bool IsPlayerInAggressionRange() => Vector3.Distance(transform.position, player.transform.position) < aggressionRange;
+    public bool WeaponEquipped() => equipWeapon;
+    public void SetEquipWeapon(bool equipWeapon) => this.equipWeapon = equipWeapon;
 
 
     public Vector3 GetPatrolDestination()

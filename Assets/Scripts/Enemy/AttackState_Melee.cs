@@ -31,6 +31,8 @@ public class AttackState_Melee : EnemyState
         enemy.anim.SetFloat("AttackSlashIndex", Random.Range(0, 6));
         enemy.anim.SetFloat("AttackSpinIndex", Random.Range(0, 2));
 
+        enemy.attackCount++;
+
     }
 
     public override void Exit()

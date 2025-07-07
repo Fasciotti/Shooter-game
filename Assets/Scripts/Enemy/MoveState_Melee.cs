@@ -46,7 +46,7 @@ public class MoveState_Melee : EnemyState
     }
 
     // This method can be substituted by the NavMesh property steeringTarget
-    // that automatically gives the rotation to face the path.
+    // that automatically gives the weaponRotation to face the path.
     
 
 }

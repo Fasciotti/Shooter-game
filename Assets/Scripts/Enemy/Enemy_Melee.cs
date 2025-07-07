@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using RangeAttribute = UnityEngine.RangeAttribute;
@@ -17,7 +18,7 @@ public struct AttackData
 
 public enum AttackType_Melee { CloseAttack, ChargeAttack}
 
-public enum EnemyMelee_Type { Regular, Shield, Dodge, Axe};
+public enum EnemyMelee_Type { Regular, Shield, Dodge, AxeThrow};
 
 public class Enemy_Melee : Enemy
 {
@@ -33,19 +34,22 @@ public class Enemy_Melee : Enemy
     public AttackData attackData;
     public List<AttackData> attackList;
 
+    [System.NonSerialized]
+    public int attackCount;
+    public bool abilityCalled;
+
     [Header("Enemy Settings")]
     public EnemyMelee_Type meleeType;
     [SerializeField] private Transform shieldTransform;
 
     [SerializeField] private float dodgeCooldown = 5;
     [SerializeField] private float dodgeMinimumDistance = 2;
-    private float moveSpeedMultiplierInAbility = 0.5f;
     private float lastDodge;
 
     [Space]
 
-    [SerializeField] private Transform hiddenWeapon;
-    [SerializeField] private Transform pulledWeapon;
+    public Transform hiddenWeapon;
+    public Transform pulledWeapon;
 
     protected override void Awake()
     {
@@ -56,7 +60,7 @@ public class Enemy_Melee : Enemy
         recoveryState = new RecoveryState_Melee(this, stateMachine, "Recovery");
         chaseState = new ChaseState_Melee(this, stateMachine, "Chase");
         attackState = new AttackState_Melee(this, stateMachine, "Attack");
-        abilityState = new AbilityState_Melee(this, stateMachine, null); //Null is used because the variable is defined inside the class.
+        abilityState = new AbilityState_Melee(this, stateMachine, "AxeThrow");
         deadState = new DeadState_Melee(this, stateMachine, "Idle"); //Idle anim is just a place holder. Ragdoll
 
         attackState.UpdateAttackData();
@@ -97,8 +101,9 @@ public class Enemy_Melee : Enemy
 
     public void TriggerAbility()
     {
-        moveSpeed *= moveSpeedMultiplierInAbility;
-        pulledWeapon.gameObject.SetActive(false);
+
+        abilityCalled = true;
+        
     }
 
     public void PullWeapon()
