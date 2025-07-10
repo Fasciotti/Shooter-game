@@ -10,6 +10,7 @@ public class EnemyState
     protected float stateTimer;
 
     protected bool triggerCalled;
+    protected bool abilityCalled;
 
     public EnemyState(Enemy enemyBase, EnemyStateMachine stateMachine, string animBoolName)
     {
@@ -39,6 +40,11 @@ public class EnemyState
     }
 
     public void AnimationTrigger() => triggerCalled = true;
+
+    public virtual void AbilityTrigger()
+    {
+
+    }
 
     protected Vector3 GetNextPathPoint()
     {

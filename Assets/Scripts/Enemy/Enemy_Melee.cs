@@ -33,6 +33,13 @@ public class Enemy_Melee : Enemy
     public AttackData attackData;
     public List<AttackData> attackList;
 
+    [Header("Axe Throw Ability")]
+    public GameObject axePrefab;
+    public Transform axeStartPoint;
+    public float axeFlySpeed;
+    public float axeThrowCooldown;
+    public float axeAimTimer;
+
     [Header("Enemy Settings")]
     public EnemyMelee_Type meleeType;
     [SerializeField] private Transform shieldTransform;
@@ -95,12 +102,6 @@ public class Enemy_Melee : Enemy
         }
     }
 
-    public void TriggerAbility()
-    {
-        moveSpeed *= moveSpeedMultiplierInAbility;
-        pulledWeapon.gameObject.SetActive(false);
-    }
-
     public void PullWeapon()
     {
         hiddenWeapon.gameObject.SetActive(false);
@@ -117,6 +118,15 @@ public class Enemy_Melee : Enemy
     }
 
     public bool IsPlayerInAttackRange() => Vector3.Distance(transform.position, player.transform.position) < attackData.attackRange;
+
+    public override void AbilityTrigger()
+    {
+        base.AbilityTrigger();
+
+        moveSpeed *= moveSpeedMultiplierInAbility;
+        //create axe
+        pulledWeapon.gameObject.SetActive(false);
+    }
 
     public void ActivateDodgeAnimation()
     {

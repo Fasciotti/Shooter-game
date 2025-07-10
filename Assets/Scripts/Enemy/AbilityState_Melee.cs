@@ -61,4 +61,18 @@ public class AbilityState_Melee : EnemyState
         if (triggerCalled)
             stateMachine.ChangeState(enemy.recoveryState);
     }
+
+    public override void AbilityTrigger()
+    {
+        base.AbilityTrigger();
+
+        GameObject axePrefab = ObjectPool.instance.GetObject(enemy.axePrefab);
+
+        axePrefab.transform.position = enemy.axeStartPoint.position;
+
+        axePrefab.GetComponent<EnemyAxe>().SetupAxe(enemy.player.transform, enemy.axeFlySpeed, enemy.axeAimTimer);
+
+        
+
+    }
 }
