@@ -23,7 +23,7 @@ public class Pickup_Weapon : Interactable
     {
         player.weapon.PickUpWeapon(weapon);
 
-        ObjectPool.instance.ReturnObject(gameObject);
+        ObjectPool.Instance.ReturnObject(gameObject);
     }
 
     [ContextMenu("Update Item Model")]

@@ -96,7 +96,7 @@ public class Bullet : MonoBehaviour
         DisableBulletVisually();
         returnCalled = true;
 
-        ObjectPool.instance.ReturnObject(trail.time, gameObject);
+        ObjectPool.Instance.ReturnObject(gameObject, trail.time);
     }
 
     private void DisableBulletVisually()
@@ -112,11 +112,11 @@ public class Bullet : MonoBehaviour
         {
             ContactPoint contact = collision.GetContact(0);
 
-            GameObject newImpactFX = ObjectPool.instance.GetObject(bulletImpactFX);
+            GameObject newImpactFX = ObjectPool.Instance.GetObject(bulletImpactFX);
 
             newImpactFX.transform.SetPositionAndRotation(contact.point, Quaternion.LookRotation(contact.normal));
 
-            ObjectPool.instance.ReturnObject(0.8f, newImpactFX);
+            ObjectPool.Instance.ReturnObject(newImpactFX, 0.8f);
         }
     }
 }

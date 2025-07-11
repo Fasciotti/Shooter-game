@@ -3,11 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 
 public class ObjectPool : MonoBehaviour
 {
-    public static ObjectPool instance;
+    public static ObjectPool Instance;
 
     [SerializeField] private int poolSize;
 
@@ -28,7 +29,7 @@ public class ObjectPool : MonoBehaviour
         }
     }
 
-    public GameObject GetObject(GameObject prefab)
+    public GameObject GetObject(GameObject prefab, Vector3 position = default)
     {
         if (!poolDictionary.ContainsKey(prefab))
             InitializeNewPool(prefab);
@@ -37,20 +38,24 @@ public class ObjectPool : MonoBehaviour
             CreateNewObject(prefab);
         
         GameObject objectToGet = poolDictionary[prefab].Dequeue();
-        objectToGet.SetActive(true);
+
         objectToGet.transform.parent = null; // Throw out of the pool
+
+        objectToGet.transform.position = position;
+        
+        objectToGet.SetActive(true);
 
         return objectToGet;
     }
 
-    private IEnumerator DelayReturn(float delay, GameObject objectToReturn)
+    private IEnumerator DelayReturn(GameObject objectToReturn, float delay)
     {
         yield return new WaitForSeconds(delay);
 
         ReturnObject(objectToReturn);
     }
-    public void ReturnObject(float delay, GameObject objectToReturn)
-        => StartCoroutine(DelayReturn(delay, objectToReturn));
+    public void ReturnObject(GameObject objectToReturn, float delay)
+        => StartCoroutine(DelayReturn(objectToReturn, delay));
 
     public void ReturnObject(GameObject objectToReturn)
     {
@@ -86,8 +91,8 @@ public class ObjectPool : MonoBehaviour
     #region Awake Singleton
     private void Awake()
     {
-        if (instance == null)
-            instance = this;
+        if (Instance == null)
+            Instance = this;
         else
             Destroy(gameObject);
 

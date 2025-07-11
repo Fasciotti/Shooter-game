@@ -59,7 +59,7 @@ public class Pickup_Ammo : Interactable
             AddBulletsToWeapon(weapon, GetBulletAmount(ammo));
         }
 
-        ObjectPool.instance.ReturnObject(gameObject);
+        ObjectPool.Instance.ReturnObject(gameObject);
     }
 
     private int GetBulletAmount(AmmoData ammo)

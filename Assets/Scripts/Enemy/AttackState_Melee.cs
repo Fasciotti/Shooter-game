@@ -67,10 +67,19 @@ public class AttackState_Melee : EnemyState
         if (triggerCalled)
         {
             if (enemy.IsPlayerInAttackRange())
+            {
                 stateMachine.ChangeState(enemy.recoveryState);
-            else
+            }
+            else if (Random.Range(0, 2) == 1)
+            {
                 stateMachine.ChangeState(enemy.chaseState);
-            
+            }
+            else
+            {
+                stateMachine.ChangeState(enemy.recoveryState);
+
+            }
+
         }
     }
 

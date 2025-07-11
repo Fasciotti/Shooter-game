@@ -37,19 +37,21 @@ public class Enemy_Melee : Enemy
     public GameObject axePrefab;
     public Transform axeStartPoint;
     public float axeFlySpeed;
-    public float axeThrowCooldown;
     public float axeAimTimer;
+    public float axeThrowCooldown;
+    private float axeLastThrownTime;
+
 
     [Header("Enemy Settings")]
     public EnemyMelee_Type meleeType;
     [SerializeField] private Transform shieldTransform;
-
     [SerializeField] private float dodgeCooldown = 5;
-    [SerializeField] private float dodgeMinimumDistance = 2;
-    private float moveSpeedMultiplierInAbility = 0.5f;
+
+    private readonly float dodgeMinimumDistance = 2;
+    private readonly float moveSpeedMultiplierInAbility = 0.5f;
     private float lastDodge;
 
-    [Space]
+    [Header("Weapon References")]
 
     [SerializeField] private Transform hiddenWeapon;
     [SerializeField] private Transform pulledWeapon;
@@ -124,7 +126,6 @@ public class Enemy_Melee : Enemy
         base.AbilityTrigger();
 
         moveSpeed *= moveSpeedMultiplierInAbility;
-        //create axe
         pulledWeapon.gameObject.SetActive(false);
     }
 
@@ -145,5 +146,22 @@ public class Enemy_Melee : Enemy
             anim.SetTrigger("Dodge");
 
         }
+    }
+
+    public bool CanThrowAxe()
+    {
+        if (meleeType != EnemyMelee_Type.Axe)
+            return false;
+
+        if (Time.time > axeLastThrownTime + axeThrowCooldown)
+        {
+            axeLastThrownTime = Time.time;
+            return true;
+
+        }
+
+        Debug.Log(axeLastThrownTime + "///" + Time.time);
+
+        return false;
     }
 }
