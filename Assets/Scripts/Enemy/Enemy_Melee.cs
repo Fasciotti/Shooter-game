@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using RangeAttribute = UnityEngine.RangeAttribute;
 
@@ -85,6 +86,21 @@ public class Enemy_Melee : Enemy
         base.Update();
 
         stateMachine.currentState.Update();
+
+        if (ShouldEnterBattleMode())
+        {
+            EnterBattleMode();
+        }
+    }
+
+    public override void EnterBattleMode()
+    {
+        if (inBattleMode)
+            return;
+
+        base.EnterBattleMode();
+
+        stateMachine.ChangeState(recoveryState);
     }
 
     public override void GetHit()
@@ -129,7 +145,7 @@ public class Enemy_Melee : Enemy
         pulledWeapon.gameObject.SetActive(false);
     }
 
-    public void ActivateDodgeAnimation()
+    public async Task ActivateDodgeAnimationAsync()
     {
         if (meleeType != EnemyMelee_Type.Dodge)
             return;
@@ -142,9 +158,19 @@ public class Enemy_Melee : Enemy
 
         if (Time.time > lastDodge + dodgeCooldown)
         {
+            // Calling it here to prevent multiple callings from the wait of the AnimationTrigger... method
             lastDodge = Time.time;
-            anim.SetTrigger("Dodge");
+            await AnimationService.AnimationTriggerReturnFinished(anim, "Dodge");
 
+            // Calling one more time to start counting the cooldown start after the dodge actually finish
+            lastDodge = Time.time;
+
+
+            // The important thing is that only one path
+            // (the one that passes the check)
+            // will get to the second assignment
+            // Unpredictable behavior may occur if dodgeCooldown is too small
+            // Particularly, smaller than the dodge animation duration
         }
     }
 
