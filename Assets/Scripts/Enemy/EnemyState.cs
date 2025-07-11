@@ -21,7 +21,7 @@ public class EnemyState
 
     public virtual void Enter()
     {
-        Debug.Log("State entered: " + stateMachine.currentState);
+        //Debug.Log("State entered: " + stateMachine.currentState);
 
         if (!enemyBase.agent.enabled)
             enemyBase.agent.enabled = true;

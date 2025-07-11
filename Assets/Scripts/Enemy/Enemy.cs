@@ -36,6 +36,7 @@ public class Enemy : MonoBehaviour
     public EnemyStateMachine stateMachine { get; private set; }
     public Animator anim {  get; private set; }
 
+    public bool inBattleMode { get; private set; }
 
     protected virtual void Awake()
     {
@@ -63,14 +64,23 @@ public class Enemy : MonoBehaviour
             t.parent = null;
     }
 
-    protected virtual void OnDrawGizmos()
+    public virtual void EnterBattleMode()
     {
-        // Aggression Range
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, aggressionRange);
-
+        inBattleMode = true;
     }
 
+    protected bool ShouldEnterBattleMode()
+    {
+        bool inAggressionRange = Vector3.Distance(transform.position, player.transform.position) < aggressionRange;
+
+        if (inAggressionRange && !inBattleMode)
+        {
+            EnterBattleMode();
+            return true;
+        }
+
+        return false;
+    }
     public virtual void GetHit()
     {
         healthPoints--;
@@ -93,7 +103,6 @@ public class Enemy : MonoBehaviour
     public bool ManualMovementActive() => manualMovement;
     public void SetActiveManualRotation(bool manualRotation) => this.manualRotation = manualRotation;
     public bool ManualRotationActive() => manualRotation;
-    public bool IsPlayerInAggressionRange() => Vector3.Distance(transform.position, player.transform.position) < aggressionRange;
     public virtual void AbilityTrigger() => stateMachine.currentState.AbilityTrigger();
 
     public Vector3 GetPatrolDestination()
@@ -117,5 +126,12 @@ public class Enemy : MonoBehaviour
         float yRotation = Mathf.LerpAngle(currentRotation.y, targetRotation.eulerAngles.y, rotationSpeed * Time.deltaTime);
 
         return Quaternion.Euler(currentRotation.x, yRotation, currentRotation.z);
+    }
+    protected virtual void OnDrawGizmos()
+    {
+        // Aggression Range
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, aggressionRange);
+
     }
 }
