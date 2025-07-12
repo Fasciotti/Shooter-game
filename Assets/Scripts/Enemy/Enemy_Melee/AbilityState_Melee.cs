@@ -53,7 +53,7 @@ public class AbilityState_Melee : EnemyState
 
         if (enemy.ManualRotationActive())
         {
-            enemy.transform.rotation = enemy.FaceTarget(enemy.player.transform.position);
+            enemy.FaceTarget(enemy.player.transform.position);
             moveDirection = enemy.transform.position + (enemy.transform.forward * MAX_MOVEMENT_DISTANCE);
         }
 
@@ -76,7 +76,7 @@ public class AbilityState_Melee : EnemyState
 
         GameObject axePrefab = ObjectPool.Instance.GetObject(enemy.axePrefab, enemy.axeStartPoint.position);
 
-        axePrefab.GetComponent<EnemyAxe>().SetupAxe(enemy.player.transform, enemy.axeFlySpeed, enemy.axeAimTimer);
+        axePrefab.GetComponent<Enemy_Axe>().SetupAxe(enemy.player.transform, enemy.axeFlySpeed, enemy.axeAimTimer);
 
     }
 }

@@ -45,11 +45,11 @@ public class ChaseState_Melee : EnemyState
         // Temporary
         if (enemy.agent.path.corners.Length > 2 )
         {
-            enemy.transform.rotation = enemy.FaceTarget(enemy.agent.path.corners[1]);
+            enemy.FaceTarget(enemy.agent.path.corners[1]);
         }
         else
         {
-            enemy.transform.rotation = enemy.FaceTarget(enemy.player.transform.position);
+            enemy.FaceTarget(enemy.player.transform.position);
         }
 
         if (CanUpdateDestination())

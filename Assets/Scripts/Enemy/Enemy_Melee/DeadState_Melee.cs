@@ -3,16 +3,15 @@ using UnityEngine;
 public class DeadState_Melee : EnemyState
 {
     private Enemy_Melee enemy;
-    private EnemyRagdoll ragdoll;
+    private Enemy_Ragdoll ragdoll;
 
-    #pragma warning disable S4487 // Unread "private" fields should be removed
     private bool interactionDisabled;
 
 
     public DeadState_Melee(Enemy enemyBase, EnemyStateMachine stateMachine, string animBoolName) : base(enemyBase, stateMachine, animBoolName)
     {
         enemy = enemyBase as Enemy_Melee;
-        ragdoll = enemy.gameObject.GetComponentInChildren<EnemyRagdoll>();
+        ragdoll = enemy.gameObject.GetComponentInChildren<Enemy_Ragdoll>();
     }
     public override void Enter()
     {
@@ -38,7 +37,12 @@ public class DeadState_Melee : EnemyState
         base.Update();
 
         // Uncomment to disable interaction with the dead enemy. (Not recommended, affects performance)
-        /*
+        //DisableInteraction();
+
+    }
+
+    private void DisableInteraction()
+    {
         if (stateTimer <= 0 && !interactionDisabled)
         {
             interactionDisabled = true;
@@ -46,6 +50,5 @@ public class DeadState_Melee : EnemyState
             ragdoll.ColliderActive(false);
             enemy.agent.enabled = false;
         }
-        */
     }
 }

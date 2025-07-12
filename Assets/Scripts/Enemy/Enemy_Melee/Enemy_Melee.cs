@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -50,7 +51,7 @@ public class Enemy_Melee : Enemy
 
     private readonly float dodgeMinimumDistance = 2;
     private readonly float moveSpeedMultiplierInAbility = 0.5f;
-    private float lastDodge;
+    private float lastDodge = -10;
 
     [Header("Weapon References")]
 
@@ -126,17 +127,10 @@ public class Enemy_Melee : Enemy
         pulledWeapon.gameObject.SetActive(true);
     }
 
-    protected override void OnDrawGizmos()
-    {
-        base.OnDrawGizmos();
-
-        // Attack Range
-        Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(transform.position, attackData.attackRange);
-    }
 
     public bool IsPlayerInAttackRange() => Vector3.Distance(transform.position, player.transform.position) < attackData.attackRange;
 
+    // Called by EnemyAnimationEvents
     public override void AbilityTrigger()
     {
         base.AbilityTrigger();
@@ -145,7 +139,7 @@ public class Enemy_Melee : Enemy
         pulledWeapon.gameObject.SetActive(false);
     }
 
-    public async Task ActivateDodgeAnimationAsync()
+    public void ActivateDodgeAnimation()
     {
         if (meleeType != EnemyMelee_Type.Dodge)
             return;
@@ -156,22 +150,28 @@ public class Enemy_Melee : Enemy
         if (Vector3.Distance(transform.position, player.transform.position) < dodgeMinimumDistance)
             return;
 
-        if (Time.time > lastDodge + dodgeCooldown)
+        // Maybe call it just once?
+        if (Time.time > lastDodge + dodgeCooldown + GetAnimationDuration("Dodge"))
         {
-            // Calling it here to prevent multiple callings from the wait of the AnimationTrigger... method
             lastDodge = Time.time;
-            await AnimationService.AnimationTriggerReturnFinished(anim, "Dodge");
-
-            // Calling one more time to start counting the cooldown start after the dodge actually finish
-            lastDodge = Time.time;
-
-
-            // The important thing is that only one path
-            // (the one that passes the check)
-            // will get to the second assignment
-            // Unpredictable behavior may occur if dodgeCooldown is too small
-            // Particularly, smaller than the dodge animation duration
+            anim.SetTrigger("Dodge");
         }
+    }
+
+    private float GetAnimationDuration(string clipName)
+    {
+        AnimationClip[] clips = anim.runtimeAnimatorController.animationClips;
+
+        foreach (AnimationClip clip in clips)
+        {
+            if (clip.name == clipName)
+                return clip.length;
+        }
+
+        Debug.LogError("Animation not found. You might have changed the name of it." +
+                       " Check the code that calls this method");
+        return 0;
+
     }
 
     public bool CanThrowAxe()
@@ -189,5 +189,14 @@ public class Enemy_Melee : Enemy
         Debug.Log(axeLastThrownTime + "///" + Time.time);
 
         return false;
+    }
+
+    protected override void OnDrawGizmos()
+    {
+        base.OnDrawGizmos();
+
+        // Attack Range
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position, attackData.attackRange);
     }
 }

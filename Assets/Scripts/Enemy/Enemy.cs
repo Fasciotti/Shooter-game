@@ -29,6 +29,7 @@ public class Enemy : MonoBehaviour
 
     [SerializeField]private int currentPatrolIndex;
     public Transform[] patrolPoints;
+    private Vector3[] patrolPointsPosition;
 
 
     public Player player { get; private set; }
@@ -60,8 +61,13 @@ public class Enemy : MonoBehaviour
 
     private void InitializePatrolPoints()
     {
-        foreach (Transform t in patrolPoints)
-            t.parent = null;
+        patrolPointsPosition = new Vector3[patrolPoints.Length];
+
+        for (int i = 0;  i < patrolPoints.Length; i++)
+        {
+            patrolPointsPosition[i] = patrolPoints[i].position;
+            patrolPoints[i].gameObject.SetActive(false);
+        }
     }
 
     public virtual void EnterBattleMode()
@@ -84,14 +90,16 @@ public class Enemy : MonoBehaviour
     public virtual void GetHit()
     {
         healthPoints--;
+
+        EnterBattleMode();
     }
 
-    public virtual void HitImpact(Vector3 force, Vector3 hitpoint, Rigidbody rb)
+    public virtual void DeathImpact(Vector3 force, Vector3 hitpoint, Rigidbody rb)
     {
-        StartCoroutine(HitImpactCoroutine(force, hitpoint, rb));
+        StartCoroutine(DeathImpactCoroutine(force, hitpoint, rb));
     }
 
-    private IEnumerator HitImpactCoroutine(Vector3 force, Vector3 hitPoint, Rigidbody rb)
+    private IEnumerator DeathImpactCoroutine(Vector3 force, Vector3 hitPoint, Rigidbody rb)
     {
         yield return new WaitForSeconds(0.05f);
         
@@ -107,7 +115,7 @@ public class Enemy : MonoBehaviour
 
     public Vector3 GetPatrolDestination()
     {
-        Vector3 destination = patrolPoints[currentPatrolIndex].transform.position;
+        Vector3 destination = patrolPointsPosition[currentPatrolIndex];
 
         currentPatrolIndex++;
 
@@ -117,7 +125,7 @@ public class Enemy : MonoBehaviour
         return destination;
     }
 
-    public Quaternion FaceTarget(Vector3 target)
+    public void FaceTarget(Vector3 target)
     {
         Quaternion targetRotation = Quaternion.LookRotation(target - transform.position);
 
@@ -125,7 +133,7 @@ public class Enemy : MonoBehaviour
 
         float yRotation = Mathf.LerpAngle(currentRotation.y, targetRotation.eulerAngles.y, rotationSpeed * Time.deltaTime);
 
-        return Quaternion.Euler(currentRotation.x, yRotation, currentRotation.z);
+        transform.rotation = Quaternion.Euler(currentRotation.x, yRotation, currentRotation.z);
     }
     protected virtual void OnDrawGizmos()
     {

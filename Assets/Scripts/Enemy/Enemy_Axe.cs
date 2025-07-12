@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent (typeof(Rigidbody), typeof(Collider))]
-public class EnemyAxe : MonoBehaviour
+public class Enemy_Axe : MonoBehaviour
 {
     [SerializeField] private Rigidbody rb;
     [SerializeField] private Transform visualAxe;
@@ -14,11 +14,11 @@ public class EnemyAxe : MonoBehaviour
     private float rotationSpeed = 1500;
     private float timer = 1;
 
-    public void SetupAxe(Transform player, float flySpeed = 2, float timer = 1)
+    public void SetupAxe(Transform player, float flySpeed = 2, float axeAimTimer = 1)
     {
         this.player = player;
         this.flySpeed = flySpeed;
-        this.timer = timer;
+        this.timer = axeAimTimer;
     }
 
     private void Update()

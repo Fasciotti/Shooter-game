@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class EnemyShield : MonoBehaviour
+public class Enemy_Shield : MonoBehaviour
 {
     [SerializeField] private int durability;
 

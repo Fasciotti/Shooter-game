@@ -266,13 +266,13 @@ public class PlayerWeaponController : MonoBehaviour
         Vector3 rayOrigin = CurrentWeaponGunPoint().position;
         Vector3 rayDirection = BulletDirection();
 
-        if (Physics.Raycast(rayOrigin, rayDirection, out RaycastHit hitInfo, currentWeapon.weaponMaximumDistance + 5)) // Abitrary number
+        if (Physics.Raycast(rayOrigin, rayDirection, out RaycastHit hitInfo, Mathf.Infinity))
         {
             Enemy_Melee enemy = hitInfo.collider.gameObject.GetComponentInParent<Enemy_Melee>();
 
             if (enemy != null)
             {
-                enemy.ActivateDodgeAnimationAsync();
+                enemy.ActivateDodgeAnimation();
             }
         }
     }
