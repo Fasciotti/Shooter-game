@@ -49,7 +49,7 @@ public class Enemy_Melee : Enemy
     [SerializeField] private Transform shieldTransform;
     [SerializeField] private float dodgeCooldown = 5;
 
-    private readonly float dodgeMinimumDistance = 2;
+    private readonly float dodgeMinimumDistance = 2.5f;
     private readonly float moveSpeedMultiplierInAbility = 0.5f;
     private float lastDodge = -10;
 
@@ -177,6 +177,9 @@ public class Enemy_Melee : Enemy
     public bool CanThrowAxe()
     {
         if (meleeType != EnemyMelee_Type.Axe)
+            return false;
+
+        if (Vector3.Distance(transform.position, player.transform.position) < 1.5f)
             return false;
 
         if (Time.time > axeLastThrownTime + axeThrowCooldown)
