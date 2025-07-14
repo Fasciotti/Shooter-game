@@ -19,10 +19,11 @@ public struct AttackData
 
 public enum AttackType_Melee { CloseAttack, ChargeAttack}
 
-public enum EnemyMelee_Type { Regular, Shield, Dodge, Axe};
+public enum EnemyMelee_Type { Regular, Shield, Dodge, AxeThrow};
 
 public class Enemy_Melee : Enemy
 {
+    private Enemy_Visuals visuals;
     public MoveState_Melee moveState {  get; private set; }
     public IdleState_Melee idleState {  get; private set; }
     public RecoveryState_Melee recoveryState { get; private set; }
@@ -35,7 +36,7 @@ public class Enemy_Melee : Enemy
     public AttackData attackData;
     public List<AttackData> attackList;
 
-    [Header("Axe Throw Ability")]
+    [Header("AxeThrow Throw Ability")]
     public GameObject axePrefab;
     public Transform axeStartPoint;
     public float axeFlySpeed;
@@ -52,11 +53,6 @@ public class Enemy_Melee : Enemy
     private readonly float dodgeMinimumDistance = 2.5f;
     private readonly float moveSpeedMultiplierInAbility = 0.5f;
     private float lastDodge = -10;
-
-    [Header("Weapon References")]
-
-    [SerializeField] private Transform hiddenWeapon;
-    [SerializeField] private Transform pulledWeapon;
 
     protected override void Awake()
     {
@@ -78,6 +74,7 @@ public class Enemy_Melee : Enemy
     {
         base.Start();
 
+        visuals = GetComponent<Enemy_Visuals>();
         stateMachine.Initialize(idleState);
         InitializeSpeciality();
     }
@@ -114,17 +111,22 @@ public class Enemy_Melee : Enemy
 
     protected void InitializeSpeciality()
     {
+        if (EnemyMelee_Type.AxeThrow == meleeType)
+            visuals.SetEnemyWeaponType(Enemy_MeleeWeaponType.Throw);
+
         if (EnemyMelee_Type.Shield == meleeType)
         {
             anim.SetFloat("ChaseIndex", 1);
             shieldTransform.gameObject.SetActive(true);
+
+            visuals.SetEnemyWeaponType(Enemy_MeleeWeaponType.OneHand);
+
         }
     }
 
-    public void PullWeapon()
+    public void WeaponModelActive(bool active)
     {
-        hiddenWeapon.gameObject.SetActive(false);
-        pulledWeapon.gameObject.SetActive(true);
+        visuals.CurrentWeaponModel().SetActive(active);
     }
 
 
@@ -136,7 +138,7 @@ public class Enemy_Melee : Enemy
         base.AbilityTrigger();
 
         moveSpeed *= moveSpeedMultiplierInAbility;
-        pulledWeapon.gameObject.SetActive(false);
+        WeaponModelActive(false);
     }
 
     public void ActivateDodgeAnimation()
@@ -176,7 +178,7 @@ public class Enemy_Melee : Enemy
 
     public bool CanThrowAxe()
     {
-        if (meleeType != EnemyMelee_Type.Axe)
+        if (meleeType != EnemyMelee_Type.AxeThrow)
             return false;
 
         if (Vector3.Distance(transform.position, player.transform.position) < 1.5f)

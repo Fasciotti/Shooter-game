@@ -14,7 +14,7 @@ public class AbilityState_Melee : EnemyState
     {
         enemy = enemyBase as Enemy_Melee;
 
-        if (enemy.meleeType == EnemyMelee_Type.Axe)
+        if (enemy.meleeType == EnemyMelee_Type.AxeThrow)
         {
             base.animBoolName = "AxeThrow";
             return;
@@ -33,7 +33,7 @@ public class AbilityState_Melee : EnemyState
 
         enemy.agent.isStopped = true;
 
-        enemy.PullWeapon();
+        enemy.WeaponModelActive(true);
     }
 
     public override void Exit()

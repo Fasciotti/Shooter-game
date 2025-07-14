@@ -16,7 +16,7 @@ public class ChaseState_Melee : EnemyState
     public override void Enter()
     {
         base.Enter();
-        enemy.PullWeapon();
+        enemy.WeaponModelActive(true);
 
         enemy.agent.isStopped = false;
 
