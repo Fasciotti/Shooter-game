@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using Random = UnityEngine.Random;
 using RangeAttribute = UnityEngine.RangeAttribute;
 
 [System.Serializable]
@@ -75,8 +76,11 @@ public class Enemy_Melee : Enemy
         base.Start();
 
         visuals = GetComponent<Enemy_Visuals>();
+
         stateMachine.Initialize(idleState);
+
         InitializeSpeciality();
+        visuals.SetupLook();
     }
 
     protected override void Update()
@@ -114,19 +118,21 @@ public class Enemy_Melee : Enemy
         if (EnemyMelee_Type.AxeThrow == meleeType)
             visuals.SetEnemyWeaponType(Enemy_MeleeWeaponType.Throw);
 
+        if (EnemyMelee_Type.Dodge == meleeType)
+            visuals.SetEnemyWeaponType(Enemy_MeleeWeaponType.Unarmed);
+
         if (EnemyMelee_Type.Shield == meleeType)
         {
             anim.SetFloat("ChaseIndex", 1);
             shieldTransform.gameObject.SetActive(true);
 
             visuals.SetEnemyWeaponType(Enemy_MeleeWeaponType.OneHand);
-
         }
     }
 
     public void WeaponModelActive(bool active)
     {
-        visuals.CurrentWeaponModel().SetActive(active);
+        visuals.currentWeaponModel.SetActive(active);
     }
 
 
