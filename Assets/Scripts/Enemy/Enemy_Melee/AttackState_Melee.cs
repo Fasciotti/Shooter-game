@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -42,6 +43,12 @@ public class AttackState_Melee : EnemyState
     private void SetupNextAttack()
     {
         int recoveryIndex = PlayerClose() ? 1 : 0;
+
+        if (!LookingAtPlayer())
+        {
+            recoveryIndex = 0;
+        }
+
         enemy.anim.SetFloat("RecoveryIndex", recoveryIndex);
 
         enemy.attackData = UpdateAttackData();
@@ -49,6 +56,7 @@ public class AttackState_Melee : EnemyState
 
     public override void Update()
     {
+
         base.Update();
 
         if (enemy.ManualRotationActive())
@@ -82,6 +90,12 @@ public class AttackState_Melee : EnemyState
 
         }
     }
+
+    private bool LookingAtPlayer() =>
+    Vector3.Dot(
+        enemy.transform.forward,
+        (enemy.player.transform.position - enemy.transform.position).normalized
+    ) > 0.6f;
 
     private bool PlayerClose() => Vector3.Distance(enemy.transform.position, enemy.player.transform.position) < 1;
 
