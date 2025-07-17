@@ -45,6 +45,12 @@ public class Enemy_Visuals : MonoBehaviour
         weaponType = type;
     }
 
+    public void TrailEffectActive(bool active)
+    {
+        Enemy_WeaponModel currentWeaponScript = GetComponentInChildren<Enemy_WeaponModel>();
+        currentWeaponScript.TrailEffectActive(active);
+    }
+
     private void SetupRandomWeapon()
     {
         List<Enemy_WeaponModel> filteredWeaponModels = new List<Enemy_WeaponModel>();

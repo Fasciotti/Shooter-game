@@ -21,6 +21,8 @@ public class AttackState_Melee : EnemyState
     {
         base.Enter();
 
+        enemy.visuals.TrailEffectActive(true);
+
         enemy.agent.isStopped = true;
         enemy.agent.velocity = Vector3.zero;
 
@@ -37,6 +39,7 @@ public class AttackState_Melee : EnemyState
     public override void Exit()
     {
         base.Exit();
+        enemy.visuals.TrailEffectActive(false);
         SetupNextAttack();
     }
 
