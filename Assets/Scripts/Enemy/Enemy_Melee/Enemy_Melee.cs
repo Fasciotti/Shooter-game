@@ -25,13 +25,13 @@ public enum EnemyMelee_Type { Regular, Shield, Dodge, AxeThrow};
 public class Enemy_Melee : Enemy
 {
     public Enemy_Visuals visuals { get; private set;}
-    public MoveState_Melee moveState {  get; private set; }
-    public IdleState_Melee idleState {  get; private set; }
-    public RecoveryState_Melee recoveryState { get; private set; }
-    public ChaseState_Melee chaseState { get; private set; }
-    public AttackState_Melee attackState { get; private set; }
-    public AbilityState_Melee abilityState { get; private set; }
-    public DeadState_Melee deadState { get; private set; }
+    public MoveState_Melee MoveState {  get; private set; }
+    public IdleState_Melee IdleState {  get; private set; }
+    public RecoveryState_Melee RecoveryState { get; private set; }
+    public ChaseState_Melee ChaseState { get; private set; }
+    public AttackState_Melee AttackState { get; private set; }
+    public AbilityState_Melee AbilityState { get; private set; }
+    public DeadState_Melee DeadState { get; private set; }
 
     [Header("AttackData_Enemy_Melee")]
     public AttackData_Enemy_Melee attackData;
@@ -59,15 +59,15 @@ public class Enemy_Melee : Enemy
     {
         base.Awake();
 
-        idleState = new IdleState_Melee(this, stateMachine, "Idle");
-        moveState = new MoveState_Melee(this, stateMachine, "Move");
-        recoveryState = new RecoveryState_Melee(this, stateMachine, "Recovery");
-        chaseState = new ChaseState_Melee(this, stateMachine, "Chase");
-        attackState = new AttackState_Melee(this, stateMachine, "Attack");
-        abilityState = new AbilityState_Melee(this, stateMachine, null); //Null is used because the variable is defined inside the class.
-        deadState = new DeadState_Melee(this, stateMachine, "Idle"); //Idle anim is just a place holder. Ragdoll
+        IdleState = new IdleState_Melee(this, stateMachine, "Idle");
+        MoveState = new MoveState_Melee(this, stateMachine, "Move");
+        RecoveryState = new RecoveryState_Melee(this, stateMachine, "Recovery");
+        ChaseState = new ChaseState_Melee(this, stateMachine, "Chase");
+        AttackState = new AttackState_Melee(this, stateMachine, "Attack");
+        AbilityState = new AbilityState_Melee(this, stateMachine, null); //Null is used because the variable is defined inside the class.
+        DeadState = new DeadState_Melee(this, stateMachine, "Idle"); //Idle anim is just a place holder. Ragdoll
 
-        attackState.UpdateAttackData();
+        AttackState.UpdateAttackData();
 
     }
 
@@ -77,7 +77,7 @@ public class Enemy_Melee : Enemy
 
         visuals = GetComponent<Enemy_Visuals>();
 
-        stateMachine.Initialize(idleState);
+        stateMachine.Initialize(IdleState);
 
         InitializePerk();
         visuals.SetupLook();
@@ -88,11 +88,6 @@ public class Enemy_Melee : Enemy
         base.Update();
 
         stateMachine.currentState.Update();
-
-        if (ShouldEnterBattleMode())
-        {
-            EnterBattleMode();
-        }
     }
 
 
@@ -103,14 +98,14 @@ public class Enemy_Melee : Enemy
 
         base.EnterBattleMode();
 
-        stateMachine.ChangeState(recoveryState);
+        stateMachine.ChangeState(RecoveryState);
     }
     public override void GetHit()
     {
         base.GetHit();
 
         if (healthPoints <= 0)
-            stateMachine.ChangeState(deadState);
+            stateMachine.ChangeState(DeadState);
     }
     protected void InitializePerk()
     {
@@ -142,7 +137,7 @@ public class Enemy_Melee : Enemy
         if (meleeType != EnemyMelee_Type.Dodge)
             return;
 
-        if (stateMachine.currentState != chaseState)
+        if (stateMachine.currentState != ChaseState)
             return;
 
         if (Vector3.Distance(transform.position, player.transform.position) < dodgeMinimumDistance)

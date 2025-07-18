@@ -65,7 +65,7 @@ public class AbilityState_Melee : EnemyState
 
 
         if (triggerCalled)
-            stateMachine.ChangeState(enemy.recoveryState);
+            stateMachine.ChangeState(enemy.RecoveryState);
     }
 
     public override void AbilityTrigger()

@@ -22,8 +22,8 @@ public class AttackState_Melee : EnemyState
 
         base.Enter();
 
-        enemy.UpdateAttackData();
         enemy.visuals.TrailEffectActive(true);
+        enemy.UpdateAttackData();
 
         enemy.agent.isStopped = true;
         enemy.agent.velocity = Vector3.zero;
@@ -82,15 +82,15 @@ public class AttackState_Melee : EnemyState
         {
             if (enemy.IsPlayerInAttackRange())
             {
-                stateMachine.ChangeState(enemy.recoveryState);
+                stateMachine.ChangeState(enemy.RecoveryState);
             }
             else if (Random.Range(0, 2) == 1)
             {
-                stateMachine.ChangeState(enemy.chaseState);
+                stateMachine.ChangeState(enemy.ChaseState);
             }
             else
             {
-                stateMachine.ChangeState(enemy.recoveryState);
+                stateMachine.ChangeState(enemy.RecoveryState);
 
             }
 

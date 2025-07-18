@@ -29,7 +29,7 @@ public class ObjectPool : MonoBehaviour
         }
     }
 
-    public GameObject GetObject(GameObject prefab, Vector3 position = default)
+    public GameObject GetObject(GameObject prefab, Vector3 position = default, Quaternion rotation = default)
     {
         if (!poolDictionary.ContainsKey(prefab))
             InitializeNewPool(prefab);
@@ -42,6 +42,7 @@ public class ObjectPool : MonoBehaviour
         objectToGet.transform.parent = null; // Throw out of the pool
 
         objectToGet.transform.position = position;
+        objectToGet.transform.rotation = rotation;
         
         objectToGet.SetActive(true);
 

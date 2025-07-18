@@ -1,19 +1,19 @@
 using UnityEngine;
 
-public class IdleState_Melee : EnemyState
+public class IdleState_Range : EnemyState
 {
-    private readonly Enemy_Melee enemy;
+    private Enemy_Range enemy;
 
-    public IdleState_Melee(Enemy enemyBase, EnemyStateMachine stateMachine, string animBoolName)
-        : base(enemyBase, stateMachine, animBoolName)
+    public IdleState_Range(Enemy enemyBase, EnemyStateMachine stateMachine, string animBoolName) : base(enemyBase, stateMachine, animBoolName)
     {
-        enemy = enemyBase as Enemy_Melee;
+        enemy = enemyBase as Enemy_Range;
     }
+
     public override void Enter()
     {
         base.Enter();
 
-        stateTimer = enemyBase.idleTime;
+        stateTimer = enemy.idleTime;
     }
 
     public override void Exit()

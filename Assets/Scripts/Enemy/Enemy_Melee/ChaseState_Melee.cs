@@ -40,7 +40,7 @@ public class ChaseState_Melee : EnemyState
 
         if (enemy.IsPlayerInAttackRange())
         {
-            stateMachine.ChangeState(enemy.attackState);
+            stateMachine.ChangeState(enemy.AttackState);
         }
 
         // Temporary

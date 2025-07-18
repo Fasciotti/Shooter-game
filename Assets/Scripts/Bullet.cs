@@ -26,7 +26,7 @@ public class Bullet : MonoBehaviour
     }
 
     // It's called when the bullet is shot. (After the positioning)
-    public void BulletSetup(float flyDistance, float impactForce)
+    public void BulletSetup(float flyDistance = 100, float impactForce = 100)
     {
         startPosition = transform.position;
 
@@ -49,14 +49,14 @@ public class Bullet : MonoBehaviour
         // Both determined when shooting (see FireSingleBullet() in PlayerWeaponController).
         if (Vector3.Distance(startPosition, transform.position) > flyDistance && gameObject.activeSelf)
         {
-            ReturnBullet();
+            ReturnBulletToPool();
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
+    protected virtual void OnCollisionEnter(Collision collision)
     {
         CreateImpactFX(collision);
-        ReturnBullet();
+        ReturnBulletToPool();
 
         Enemy enemy = collision.gameObject.GetComponentInParent<Enemy>();
         Enemy_Shield shield =  collision.gameObject.GetComponent<Enemy_Shield>();
@@ -88,7 +88,7 @@ public class Bullet : MonoBehaviour
         trail.Clear();
     }
 
-    private void ReturnBullet()
+    protected void ReturnBulletToPool()
     {
         if (returnCalled)
             return;
@@ -106,7 +106,7 @@ public class Bullet : MonoBehaviour
         boxCollider.enabled = false;
     }
 
-    private void CreateImpactFX(Collision collision)
+    protected void CreateImpactFX(Collision collision)
     {
         if (collision.contactCount > 0)
         {

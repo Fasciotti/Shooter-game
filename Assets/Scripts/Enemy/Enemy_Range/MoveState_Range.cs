@@ -1,22 +1,20 @@
 using UnityEngine;
-using UnityEngine.AI;
 
-public class MoveState_Melee : EnemyState
+public class MoveState_Range : EnemyState
 {
-    private Enemy_Melee enemy;
-
+    private Enemy_Range enemy;
     private Vector3 destination;
 
-    public MoveState_Melee(Enemy enemyBase, EnemyStateMachine stateMachine, string animBoolName)
-        : base(enemyBase, stateMachine, animBoolName)
+    public MoveState_Range(Enemy enemyBase, EnemyStateMachine stateMachine, string animBoolName) : base(enemyBase, stateMachine, animBoolName)
     {
-        enemy = enemyBase as Enemy_Melee;
+        enemy = enemyBase as Enemy_Range;
     }
 
     public override void Enter()
     {
         base.Enter();
 
+        enemy.agent.isStopped = false;
         destination = enemy.GetPatrolDestination();
         enemy.agent.SetDestination(destination);
 
@@ -36,11 +34,5 @@ public class MoveState_Melee : EnemyState
 
         if (enemy.agent.remainingDistance <= enemy.agent.stoppingDistance && enemy.agent.hasPath)
             stateMachine.ChangeState(enemy.IdleState);
-        
     }
-
-    // This method can be substituted by the NavMesh property steeringTarget
-    // that automatically gives the rotation to face the path.
-    
-
 }
