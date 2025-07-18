@@ -48,6 +48,7 @@ public class Enemy_Visuals : MonoBehaviour
     public void TrailEffectActive(bool active)
     {
         Enemy_WeaponModel currentWeaponScript = GetComponentInChildren<Enemy_WeaponModel>();
+
         currentWeaponScript.TrailEffectActive(active);
     }
 
