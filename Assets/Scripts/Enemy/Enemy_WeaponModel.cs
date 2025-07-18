@@ -7,6 +7,7 @@ public class Enemy_WeaponModel : MonoBehaviour
 {
     public Enemy_MeleeWeaponType weaponType;
     public AnimatorOverrideController animatorOverride;
+    public Enemy_MeleeWeaponData weaponData;
 
     [SerializeField] GameObject[] effects;
 

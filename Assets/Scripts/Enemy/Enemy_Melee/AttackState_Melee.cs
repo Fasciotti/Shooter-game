@@ -19,8 +19,10 @@ public class AttackState_Melee : EnemyState
 
     public override void Enter()
     {
+
         base.Enter();
 
+        enemy.UpdateAttackData();
         enemy.visuals.TrailEffectActive(true);
 
         enemy.agent.isStopped = true;
@@ -47,10 +49,11 @@ public class AttackState_Melee : EnemyState
     {
         int recoveryIndex = PlayerClose() ? 1 : 0;
 
+        if (enemy.meleeType == EnemyMelee_Type.Dodge)
+            recoveryIndex = 1;
+
         if (!LookingAtPlayer())
-        {
             recoveryIndex = 0;
-        }
 
         enemy.anim.SetFloat("RecoveryIndex", recoveryIndex);
 
@@ -64,7 +67,7 @@ public class AttackState_Melee : EnemyState
 
         if (enemy.ManualRotationActive())
         {
-            enemy.FaceTarget(enemy.player.transform.position);
+            enemy.FaceTarget(enemy.player.transform.position); 
             attackDirection = enemy.transform.position + (enemy.transform.forward * MAX_ATTACK_DISTANCE);
         }
 
@@ -98,13 +101,14 @@ public class AttackState_Melee : EnemyState
     Vector3.Dot(
         enemy.transform.forward,
         (enemy.player.transform.position - enemy.transform.position).normalized
-    ) > 0.6f;
+    ) > 0.4f;
+    
 
     private bool PlayerClose() => Vector3.Distance(enemy.transform.position, enemy.player.transform.position) < 1;
 
-    public AttackData UpdateAttackData()
+    public AttackData_Enemy_Melee UpdateAttackData()
     {
-        List<AttackData> validAttacks = new List<AttackData>(enemy.attackList);
+        List<AttackData_Enemy_Melee> validAttacks = new List<AttackData_Enemy_Melee>(enemy.attackList);
 
         if (PlayerClose())
         {

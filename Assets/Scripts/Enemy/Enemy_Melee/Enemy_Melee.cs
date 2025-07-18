@@ -7,7 +7,7 @@ using Random = UnityEngine.Random;
 using RangeAttribute = UnityEngine.RangeAttribute;
 
 [System.Serializable]
-public struct AttackData
+public struct AttackData_Enemy_Melee
 {
     public string attackName;
     public float attackRange;
@@ -33,9 +33,9 @@ public class Enemy_Melee : Enemy
     public AbilityState_Melee abilityState { get; private set; }
     public DeadState_Melee deadState { get; private set; }
 
-    [Header("AttackData")]
-    public AttackData attackData;
-    public List<AttackData> attackList;
+    [Header("AttackData_Enemy_Melee")]
+    public AttackData_Enemy_Melee attackData;
+    public List<AttackData_Enemy_Melee> attackList;
 
     [Header("Axe Throw Ability")]
     public GameObject axePrefab;
@@ -79,7 +79,7 @@ public class Enemy_Melee : Enemy
 
         stateMachine.Initialize(idleState);
 
-        InitializeSpeciality();
+        InitializePerk();
         visuals.SetupLook();
     }
 
@@ -95,6 +95,7 @@ public class Enemy_Melee : Enemy
         }
     }
 
+
     public override void EnterBattleMode()
     {
         if (inBattleMode)
@@ -104,7 +105,6 @@ public class Enemy_Melee : Enemy
 
         stateMachine.ChangeState(recoveryState);
     }
-
     public override void GetHit()
     {
         base.GetHit();
@@ -112,8 +112,7 @@ public class Enemy_Melee : Enemy
         if (healthPoints <= 0)
             stateMachine.ChangeState(deadState);
     }
-
-    protected void InitializeSpeciality()
+    protected void InitializePerk()
     {
         if (EnemyMelee_Type.AxeThrow == meleeType)
             visuals.SetEnemyWeaponType(Enemy_MeleeWeaponType.Throw);
@@ -130,14 +129,6 @@ public class Enemy_Melee : Enemy
         }
     }
 
-    public void WeaponModelActive(bool active)
-    {
-        visuals.currentWeaponModel.SetActive(active);
-    }
-
-
-    public bool IsPlayerInAttackRange() => Vector3.Distance(transform.position, player.transform.position) < attackData.attackRange;
-
     // Called by EnemyAnimationEvents
     public override void AbilityTrigger()
     {
@@ -146,7 +137,6 @@ public class Enemy_Melee : Enemy
         moveSpeed *= moveSpeedMultiplierInAbility;
         WeaponModelActive(false);
     }
-
     public void ActivateDodgeAnimation()
     {
         if (meleeType != EnemyMelee_Type.Dodge)
@@ -165,7 +155,6 @@ public class Enemy_Melee : Enemy
             anim.SetTrigger("Dodge");
         }
     }
-
     private float GetAnimationDuration(string clipName)
     {
         AnimationClip[] clips = anim.runtimeAnimatorController.animationClips;
@@ -181,7 +170,10 @@ public class Enemy_Melee : Enemy
         return 0;
 
     }
-
+    public void WeaponModelActive(bool active)
+    {
+        visuals.currentWeaponModel.SetActive(active);
+    }
     public bool CanThrowAxe()
     {
         if (meleeType != EnemyMelee_Type.AxeThrow)
@@ -199,7 +191,17 @@ public class Enemy_Melee : Enemy
 
         return false;
     }
+    public void UpdateAttackData()
+    {
+        Enemy_WeaponModel enemy_Weapon = GetComponentInChildren<Enemy_WeaponModel>();
 
+        if (enemy_Weapon.weaponType == Enemy_MeleeWeaponType.Unarmed)
+        {
+            attackList = new List<AttackData_Enemy_Melee>(enemy_Weapon.weaponData.attackData);
+            rotationSpeed = enemy_Weapon.weaponData.turnSpeed;
+        }
+    }
+    public bool IsPlayerInAttackRange() => Vector3.Distance(transform.position, player.transform.position) < attackData.attackRange;
     protected override void OnDrawGizmos()
     {
         base.OnDrawGizmos();

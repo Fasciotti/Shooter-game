@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class EnemyAnimationEvents : MonoBehaviour
+public class Enemy_AnimationEvents : MonoBehaviour
 {
     private Enemy enemy;
 
