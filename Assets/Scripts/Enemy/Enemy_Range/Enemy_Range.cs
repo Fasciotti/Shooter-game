@@ -7,6 +7,9 @@ public class Enemy_Range : Enemy
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private Transform gunPoint;
 
+
+    [Header("Shooting Settings")]
+    public Enemy_RangeWeaponType weaponType;
     public float fireRate = 1; // Bullets per second
     public float bulletSpeed = 20;
     public float bulletsToShoot = 5; // How many bullets is going to be shoot before entering in cooldown
@@ -29,6 +32,7 @@ public class Enemy_Range : Enemy
     {
         base.Start();
         stateMachine.Initialize(IdleState);
+        visuals.SetupLook();
     }
 
     protected override void Update()

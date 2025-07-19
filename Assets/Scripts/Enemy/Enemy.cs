@@ -31,7 +31,7 @@ public class Enemy : MonoBehaviour
     public Transform[] patrolPoints;
     private Vector3[] patrolPointsPosition;
 
-
+    public Enemy_Visuals visuals { get; private set; }
     public Player player { get; private set; }
     public NavMeshAgent agent { get; private set; }
     public EnemyStateMachine stateMachine { get; private set; }
@@ -41,6 +41,8 @@ public class Enemy : MonoBehaviour
 
     protected virtual void Awake()
     {
+        visuals = GetComponent<Enemy_Visuals>();
+
         stateMachine = new EnemyStateMachine();
 
         agent = GetComponent<NavMeshAgent>();

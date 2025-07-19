@@ -24,7 +24,6 @@ public enum EnemyMelee_Type { Regular, Shield, Dodge, AxeThrow};
 
 public class Enemy_Melee : Enemy
 {
-    public Enemy_Visuals visuals { get; private set;}
     public MoveState_Melee MoveState {  get; private set; }
     public IdleState_Melee IdleState {  get; private set; }
     public RecoveryState_Melee RecoveryState { get; private set; }
@@ -33,7 +32,7 @@ public class Enemy_Melee : Enemy
     public AbilityState_Melee AbilityState { get; private set; }
     public DeadState_Melee DeadState { get; private set; }
 
-    [Header("AttackData_Enemy_Melee")]
+    [Header("Attack Data")]
     public AttackData_Enemy_Melee attackData;
     public List<AttackData_Enemy_Melee> attackList;
 
@@ -48,10 +47,11 @@ public class Enemy_Melee : Enemy
 
     [Header("Enemy Settings")]
     public EnemyMelee_Type meleeType;
+    public Enemy_MeleeWeaponType weaponType;
     [SerializeField] private Transform shieldTransform;
     [SerializeField] private float dodgeCooldown = 5;
 
-    private readonly float dodgeMinimumDistance = 2.5f;
+    private readonly float dodgeMinimumDistance = 3f;
     private readonly float moveSpeedMultiplierInAbility = 0.5f;
     private float lastDodge = -10;
 
@@ -74,8 +74,6 @@ public class Enemy_Melee : Enemy
     protected override void Start()
     {
         base.Start();
-
-        visuals = GetComponent<Enemy_Visuals>();
 
         stateMachine.Initialize(IdleState);
 
@@ -110,17 +108,17 @@ public class Enemy_Melee : Enemy
     protected void InitializePerk()
     {
         if (EnemyMelee_Type.AxeThrow == meleeType)
-            visuals.SetEnemyWeaponType(Enemy_MeleeWeaponType.Throw);
+            weaponType = Enemy_MeleeWeaponType.Throw;
 
         if (EnemyMelee_Type.Dodge == meleeType)
-            visuals.SetEnemyWeaponType(Enemy_MeleeWeaponType.Unarmed);
+            weaponType = Enemy_MeleeWeaponType.Unarmed;
 
         if (EnemyMelee_Type.Shield == meleeType)
         {
             anim.SetFloat("ChaseIndex", 1);
             shieldTransform.gameObject.SetActive(true);
 
-            visuals.SetEnemyWeaponType(Enemy_MeleeWeaponType.OneHand);
+            weaponType = Enemy_MeleeWeaponType.OneHand;
         }
     }
 

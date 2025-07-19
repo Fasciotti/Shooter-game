@@ -6,6 +6,8 @@ using UnityEditor.Rendering;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
+public enum Enemy_MeleeWeaponType { Throw, OneHand, Unarmed }
+public enum Enemy_RangeWeaponType { Pistol, Revolver, Shotgun, Rifle, AutoRifle}
 public class Enemy_Visuals : MonoBehaviour
 {
     [Header("Corruption Visuals")]
@@ -15,9 +17,6 @@ public class Enemy_Visuals : MonoBehaviour
 
     [Header("Weapon Visuals")]
     public GameObject currentWeaponModel { get; private set; }
-    private Enemy_MeleeWeaponType weaponType;
-    private Enemy_WeaponModel[] weaponModels;
-
 
     [Header("Skin Settings")]   
     [SerializeField] private Texture[] textures;
@@ -26,7 +25,6 @@ public class Enemy_Visuals : MonoBehaviour
 
     void Awake()
     {
-        weaponModels = GetComponentsInChildren<Enemy_WeaponModel>(true);
         skinnedMesh = GetComponentInChildren<SkinnedMeshRenderer>();
         
         CollectCrystalObjects();
@@ -38,13 +36,6 @@ public class Enemy_Visuals : MonoBehaviour
         SetupRandomWeapon();
         SetupRandomCrystals();
     }
-
-    // Used to make sure the weapon the enemy is holding makes sense with its type
-    public void SetEnemyWeaponType(Enemy_MeleeWeaponType type)
-    {
-        weaponType = type;
-    }
-
     public void TrailEffectActive(bool active)
     {
         Enemy_WeaponModel currentWeaponScript = GetComponentInChildren<Enemy_WeaponModel>();
@@ -54,9 +45,59 @@ public class Enemy_Visuals : MonoBehaviour
 
     private void SetupRandomWeapon()
     {
+        bool isEnemyMelee = GetComponent<Enemy_Melee>() != null;
+        bool isEnemyRange = GetComponent<Enemy_Range>() != null;
+
+        if (isEnemyMelee)
+            currentWeaponModel = FindMeleeWeapon();
+
+        if (isEnemyRange)
+            currentWeaponModel = FindRangeWeapon();
+
+        currentWeaponModel.SetActive(true);
+
+        OverrideAnimatorIfPossible();
+    }
+
+    private GameObject FindRangeWeapon()
+    {
+        Enemy_RangeWeaponModel[] weaponModels = GetComponentsInChildren<Enemy_RangeWeaponModel>(true);
+        Enemy_RangeWeaponType weaponType = GetComponent<Enemy_Range>().weaponType;
+
+        foreach (var model in weaponModels)
+        {
+            // First deactivate all models, as only one can be active at a time (Not needed, all models starts deactivated)
+            model.gameObject.SetActive(false);
+
+            if (weaponType == model.weaponType)
+            {
+                currentWeaponModel = model.gameObject;
+            }
+        } 
+
+        return currentWeaponModel;
+    }
+
+    private void OverrideAnimatorIfPossible()
+    {
+        if (!currentWeaponModel.TryGetComponent<Enemy_WeaponModel>(out var weaponComponent))
+            return;
+
+        AnimatorOverrideController animatorOverride = weaponComponent.animatorOverride;
+
+        if (animatorOverride != null)
+        {
+            GetComponentInChildren<Animator>().runtimeAnimatorController = animatorOverride;
+        }
+    }
+
+    private GameObject FindMeleeWeapon()
+    {
+        Enemy_WeaponModel[] weaponModels = GetComponentsInChildren<Enemy_WeaponModel>(true);
+        Enemy_MeleeWeaponType weaponType = GetComponent<Enemy_Melee>().weaponType;
         List<Enemy_WeaponModel> filteredWeaponModels = new List<Enemy_WeaponModel>();
 
-        foreach (Enemy_WeaponModel model in weaponModels)
+        foreach (var model in weaponModels)
         {
             // Deactivates every model first
             model.gameObject.SetActive(false);
@@ -68,17 +109,7 @@ public class Enemy_Visuals : MonoBehaviour
         }
 
         int randomIndex = Random.Range(0, filteredWeaponModels.Count);
-        currentWeaponModel = filteredWeaponModels[randomIndex].gameObject;
-        currentWeaponModel.SetActive(true);
-
-        AnimatorOverrideController animatorOverride =
-            currentWeaponModel.GetComponent<Enemy_WeaponModel>().animatorOverride;
-
-        if (weaponType == Enemy_MeleeWeaponType.Unarmed && animatorOverride != null)
-        {
-            GetComponentInChildren<Animator>().runtimeAnimatorController = animatorOverride;
-        }
-
+        return filteredWeaponModels[randomIndex].gameObject;
     }
 
     private void SetupRandomColor()

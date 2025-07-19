@@ -69,6 +69,7 @@ public class Bullet : MonoBehaviour
 
         if (enemy != null)
         {
+
             Vector3 force = rb.linearVelocity.normalized * impactForce;
             Rigidbody targetRigidbody = collision.collider.attachedRigidbody;
             
