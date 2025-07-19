@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEditor;
 using UnityEditor.Rendering;
 using UnityEngine;
@@ -118,6 +119,7 @@ public class Enemy_Visuals : MonoBehaviour
 
             if (weaponType == model.weaponType)
             {
+                SwitchLayerAnimation(((int)model.weaponHoldType));
                 currentWeaponModel = model.gameObject;
             }
         } 
@@ -144,6 +146,20 @@ public class Enemy_Visuals : MonoBehaviour
         int randomIndex = Random.Range(0, filteredWeaponModels.Count);
         return filteredWeaponModels[randomIndex].gameObject;
     }
+    private void SwitchLayerAnimation(int index)
+    {
+        Animator animator = GetComponentInChildren<Animator>();
+
+        for (int i = 0; i < animator.layerCount;  i++)
+        {
+            animator.SetLayerWeight(i, 0);
+
+        }
+
+        animator.SetLayerWeight(index, 1);
+
+    }
+    
     private void OverrideAnimatorIfPossible()
     {
         if (!currentWeaponModel.TryGetComponent<Enemy_WeaponModel>(out var weaponComponent))
