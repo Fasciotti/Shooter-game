@@ -9,6 +9,8 @@ public class Enemy_Range : Enemy
 
     public float fireRate = 1; // Bullets per second
     public float bulletSpeed = 20;
+    public float bulletsToShoot = 5; // How many bullets is going to be shoot before entering in cooldown
+    public float weaponCooldown = 1.5f;
 
 
     public IdleState_Range IdleState { get; private set; }
@@ -64,8 +66,8 @@ public class Enemy_Range : Enemy
 
         newBulletRb.mass = 20 / bulletSpeed;
         newBulletRb.linearVelocity = bulletDirection * bulletSpeed;
-    }
 
+    }
     protected override void OnDrawGizmos()
     {
         base.OnDrawGizmos();
