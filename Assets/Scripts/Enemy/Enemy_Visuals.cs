@@ -12,8 +12,6 @@ public class Enemy_Visuals : MonoBehaviour
 {
     [Header("Corruption Visuals")]
     [SerializeField] private int corruptionAmount;
-    private GameObject[] corruptionCrystals;
-
 
     [Header("Weapon Visuals")]
     public GameObject currentWeaponModel { get; private set; }
@@ -22,14 +20,10 @@ public class Enemy_Visuals : MonoBehaviour
     [SerializeField] private Texture[] textures;
     private SkinnedMeshRenderer skinnedMesh;
 
-
     void Awake()
     {
         skinnedMesh = GetComponentInChildren<SkinnedMeshRenderer>();
-        
-        CollectCrystalObjects();
     }
-
     public void SetupLook()
     {
         SetupRandomColor();
@@ -42,7 +36,6 @@ public class Enemy_Visuals : MonoBehaviour
 
         currentWeaponScript.TrailEffectActive(active);
     }
-
     private void SetupRandomWeapon()
     {
         bool isEnemyMelee = GetComponent<Enemy_Melee>() != null;
@@ -58,60 +51,6 @@ public class Enemy_Visuals : MonoBehaviour
 
         OverrideAnimatorIfPossible();
     }
-
-    private GameObject FindRangeWeapon()
-    {
-        Enemy_RangeWeaponModel[] weaponModels = GetComponentsInChildren<Enemy_RangeWeaponModel>(true);
-        Enemy_RangeWeaponType weaponType = GetComponent<Enemy_Range>().weaponType;
-
-        foreach (var model in weaponModels)
-        {
-            // First deactivate all models, as only one can be active at a time (Not needed, all models starts deactivated)
-            model.gameObject.SetActive(false);
-
-            if (weaponType == model.weaponType)
-            {
-                currentWeaponModel = model.gameObject;
-            }
-        } 
-
-        return currentWeaponModel;
-    }
-
-    private void OverrideAnimatorIfPossible()
-    {
-        if (!currentWeaponModel.TryGetComponent<Enemy_WeaponModel>(out var weaponComponent))
-            return;
-
-        AnimatorOverrideController animatorOverride = weaponComponent.animatorOverride;
-
-        if (animatorOverride != null)
-        {
-            GetComponentInChildren<Animator>().runtimeAnimatorController = animatorOverride;
-        }
-    }
-
-    private GameObject FindMeleeWeapon()
-    {
-        Enemy_WeaponModel[] weaponModels = GetComponentsInChildren<Enemy_WeaponModel>(true);
-        Enemy_MeleeWeaponType weaponType = GetComponent<Enemy_Melee>().weaponType;
-        List<Enemy_WeaponModel> filteredWeaponModels = new List<Enemy_WeaponModel>();
-
-        foreach (var model in weaponModels)
-        {
-            // Deactivates every model first
-            model.gameObject.SetActive(false);
-
-            if (model.weaponType == weaponType)
-            {
-                filteredWeaponModels.Add(model);
-            }
-        }
-
-        int randomIndex = Random.Range(0, filteredWeaponModels.Count);
-        return filteredWeaponModels[randomIndex].gameObject;
-    }
-
     private void SetupRandomColor()
     {
         int randomIndex = Random.Range(0, textures.Length);
@@ -126,6 +65,8 @@ public class Enemy_Visuals : MonoBehaviour
     #region Crystals
     private void SetupRandomCrystals()
     {
+        GameObject[] corruptionCrystals = CollectCrystalObjects();
+
         // Creates an availableIndexes of ints, that is going to represent what crystals are available to activate
         List<int> availableIndexes = new List<int>();
 
@@ -150,18 +91,69 @@ public class Enemy_Visuals : MonoBehaviour
             availableIndexes.RemoveAt(randomIndex);
         }
     }
-
-    private void CollectCrystalObjects()
+    private GameObject[] CollectCrystalObjects()
     {
         // Get all tag-scripts attached to the crystal objects, and use it to gather all gameObjects
         Enemy_CorruptionCrystals[] crystalsComponent = GetComponentsInChildren<Enemy_CorruptionCrystals>(true);
-        corruptionCrystals = new GameObject[crystalsComponent.Length];
+        GameObject[] corruptionCrystals = new GameObject[crystalsComponent.Length];
 
         for (int i = 0; i < crystalsComponent.Length; i++)
         {
             // Preparing the corruptionCrystal array, and deactivating all of them 
             corruptionCrystals[i] = crystalsComponent[i].gameObject;
         }
+
+        return corruptionCrystals;
     }
     #endregion
+    private GameObject FindRangeWeapon()
+    {
+        Enemy_RangeWeaponModel[] weaponModels = GetComponentsInChildren<Enemy_RangeWeaponModel>(true);
+        Enemy_RangeWeaponType weaponType = GetComponent<Enemy_Range>().weaponType;
+
+        foreach (var model in weaponModels)
+        {
+            // First deactivate all models, as only one can be active at a time (Not needed, all models starts deactivated)
+            model.gameObject.SetActive(false);
+
+            if (weaponType == model.weaponType)
+            {
+                currentWeaponModel = model.gameObject;
+            }
+        } 
+
+        return currentWeaponModel;
+    }
+    private GameObject FindMeleeWeapon()
+    {
+        Enemy_WeaponModel[] weaponModels = GetComponentsInChildren<Enemy_WeaponModel>(true);
+        Enemy_MeleeWeaponType weaponType = GetComponent<Enemy_Melee>().weaponType;
+        List<Enemy_WeaponModel> filteredWeaponModels = new List<Enemy_WeaponModel>();
+
+        foreach (var model in weaponModels)
+        {
+            // Deactivates every model first
+            model.gameObject.SetActive(false);
+
+            if (model.weaponType == weaponType)
+            {
+                filteredWeaponModels.Add(model);
+            }
+        }
+
+        int randomIndex = Random.Range(0, filteredWeaponModels.Count);
+        return filteredWeaponModels[randomIndex].gameObject;
+    }
+    private void OverrideAnimatorIfPossible()
+    {
+        if (!currentWeaponModel.TryGetComponent<Enemy_WeaponModel>(out var weaponComponent))
+            return;
+
+        AnimatorOverrideController animatorOverride = weaponComponent.animatorOverride;
+
+        if (animatorOverride != null)
+        {
+            GetComponentInChildren<Animator>().runtimeAnimatorController = animatorOverride;
+        }
+    }
 }
