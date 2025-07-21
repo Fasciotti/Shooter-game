@@ -1,20 +1,19 @@
+using NUnit.Framework;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Enemy_Range : Enemy
 {
-    [SerializeField] private GameObject weaponHolder;
+    [Header("Weapon Settings")]
+    public Enemy_RangeWeaponType weaponType;
+    public Enemy_RangeWeaponData weaponData;
 
+    [Space]
+    
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private Transform gunPoint;
 
-
-    [Header("Shooting Settings")]
-    public Enemy_RangeWeaponType weaponType;
-    public float fireRate = 1; // Bullets per second
-    public float bulletSpeed = 20;
-    public float bulletsToShoot = 5; // How many bullets is going to be shoot before entering in cooldown
-    public float weaponCooldown = 1.5f;
-
+    [SerializeField] private List<Enemy_RangeWeaponData> availableWeaponPresets;
 
     public IdleState_Range IdleState { get; private set; }
     public MoveState_Range MoveState { get; private set; }
@@ -31,9 +30,13 @@ public class Enemy_Range : Enemy
     protected override void Start()
     {
         base.Start();
+        
         stateMachine.Initialize(IdleState);
+        
         visuals.SetupLook();
         visuals.IKActive(false);
+
+        SetupWeaponData();
     }
 
     protected override void Update()
@@ -69,10 +72,22 @@ public class Enemy_Range : Enemy
 
         Rigidbody newBulletRb = newBullet.GetComponent<Rigidbody>();
 
-        newBulletRb.mass = 20 / bulletSpeed;
-        newBulletRb.linearVelocity = bulletDirection * bulletSpeed;
+        newBulletRb.mass = 20 / weaponData.bulletSpeed;
+        newBulletRb.linearVelocity = bulletDirection * weaponData.bulletSpeed;
 
     }
+
+    private void SetupWeaponData()
+    {
+        foreach (var data in availableWeaponPresets)
+        {
+            if (weaponType == data.weaponType)
+            {
+                weaponData = data;
+            }
+        }
+    }
+
     protected override void OnDrawGizmos()
     {
         base.OnDrawGizmos();

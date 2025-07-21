@@ -6,6 +6,8 @@ public class BattleState_Range : EnemyState
 
     private float lastTimeShot;
     private float bulletsShot;
+    private float weaponCooldown;
+    private float bulletsPerAttack;
 
     public BattleState_Range(Enemy enemyBase, EnemyStateMachine stateMachine, string animBoolName) : base(enemyBase, stateMachine, animBoolName)
     {
@@ -14,9 +16,11 @@ public class BattleState_Range : EnemyState
 
     public override void Enter()
     {
+        base.Enter();
         enemy.agent.isStopped = true;
         enemy.visuals.IKActive(true);
-        base.Enter();
+
+        ResetWeapon();
     }
 
     public override void Exit()
@@ -48,18 +52,20 @@ public class BattleState_Range : EnemyState
     private void ResetWeapon()
     {
         bulletsShot = 0;
+        weaponCooldown = enemy.weaponData.GetWeaponCooldown();
+        bulletsPerAttack = enemy.weaponData.GetBulletsPerAttack();
     }
 
-    private bool WeaponCooldown() => Time.time > lastTimeShot + enemy.weaponCooldown; // This will return true when the weapon leaves the cooldown
+    private bool WeaponCooldown() => Time.time > lastTimeShot + weaponCooldown; // This will return true when the weapon leaves the cooldown
 
     private bool WeaponOutOfBullets()
     {
-        return bulletsShot >= enemy.bulletsToShoot;
+        return bulletsShot >= bulletsPerAttack;
     }
 
     private bool CanShoot()
     {
-        return Time.time > lastTimeShot + (1f / enemy.fireRate);
+        return Time.time > lastTimeShot + (1f / enemy.weaponData.fireRate);
     }
 
     private void Shoot()
