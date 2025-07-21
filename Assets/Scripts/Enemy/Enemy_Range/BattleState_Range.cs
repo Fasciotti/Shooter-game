@@ -18,7 +18,7 @@ public class BattleState_Range : EnemyState
     {
         base.Enter();
         enemy.agent.isStopped = true;
-        enemy.visuals.IKActive(true);
+        enemy.visuals.IKActive(true, true);
 
         ResetWeapon();
     }
@@ -26,7 +26,7 @@ public class BattleState_Range : EnemyState
     public override void Exit()
     {
         base.Exit();
-        enemy.visuals.IKActive(false);
+        enemy.visuals.IKActive(false, false);
     }
 
     public override void Update()

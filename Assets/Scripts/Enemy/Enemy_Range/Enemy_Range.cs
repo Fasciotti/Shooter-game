@@ -12,12 +12,15 @@ public class Enemy_Range : Enemy
     
     [SerializeField] private GameObject bulletPrefab;
     private Transform gunPoint;
+    public Transform coverDestination;
+    public bool canUseCover = true;
 
     [SerializeField] private List<Enemy_RangeWeaponData> availableWeaponPresets;
 
     public IdleState_Range IdleState { get; private set; }
     public MoveState_Range MoveState { get; private set; }
     public BattleState_Range BattleState { get; private set; }
+    public RunToCoverState_Range CoverState { get; private set; }
 
     protected override void Awake()
     {
@@ -25,6 +28,7 @@ public class Enemy_Range : Enemy
         IdleState = new IdleState_Range(this, stateMachine, "Idle");
         MoveState = new MoveState_Range(this, stateMachine, "Move");
         BattleState = new BattleState_Range(this, stateMachine, "Battle");
+        CoverState = new RunToCoverState_Range(this, stateMachine, "Run");
     }
 
     protected override void Start()
@@ -34,7 +38,7 @@ public class Enemy_Range : Enemy
         stateMachine.Initialize(IdleState);
         
         visuals.SetupLook();
-        visuals.IKActive(false);
+        visuals.IKActive(false, false);
 
         SetupWeapon();
     }
@@ -52,7 +56,13 @@ public class Enemy_Range : Enemy
 
         base.EnterBattleMode();
 
-        stateMachine.ChangeState(BattleState);
+        if (canUseCover)
+        {
+            stateMachine.ChangeState(CoverState);
+        }else
+        {
+            stateMachine.ChangeState(BattleState);
+        }
     }
 
     public void FireSingleBullet()

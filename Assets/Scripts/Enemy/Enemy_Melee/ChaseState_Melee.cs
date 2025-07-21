@@ -21,7 +21,7 @@ public class ChaseState_Melee : EnemyState
 
         enemy.agent.isStopped = false;
 
-        enemy.agent.speed = enemy.chaseSpeed;
+        enemy.agent.speed = enemy.runSpeed;
 
         //enemy.agent.acceleration = enemy.chaseAcceleration;
     }

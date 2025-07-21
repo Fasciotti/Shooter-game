@@ -22,8 +22,11 @@ public class Enemy_Visuals : MonoBehaviour
     [SerializeField] private Texture[] textures;
     private SkinnedMeshRenderer skinnedMesh;
 
+    [Header("Enemy Range Properties")]
+    [Space]
     [Header("Rig References")]
-    [SerializeField] private Rig rig;
+    [SerializeField] private TwoBoneIKConstraint leftHandIK;
+    [SerializeField] private MultiAimConstraint weaponAimIK;
     [SerializeField] private Transform leftHandIKTarget;
     [SerializeField] private Transform leftHandIKHint;
 
@@ -191,8 +194,10 @@ public class Enemy_Visuals : MonoBehaviour
         leftHandIKHint.SetPositionAndRotation(hint.position, hint.rotation);
     }
 
-    public void IKActive(bool active)
+    public void IKActive(bool leftHandIKActive, bool weaponAimIKActive)
     {
-        rig.weight = active ? 1 : 0;
+        leftHandIK.weight = leftHandIKActive ? 0.8f : 0; // Max weight 0.8f
+        weaponAimIK.weight = weaponAimIKActive ? 0.5f : 0; // Max weight 0.5f, or the weapon won't move correctly,
+                                                           // and the left hand will be off the correct position
     }
 }
