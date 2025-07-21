@@ -11,7 +11,7 @@ public class Enemy_Range : Enemy
     [Space]
     
     [SerializeField] private GameObject bulletPrefab;
-    [SerializeField] private Transform gunPoint;
+    private Transform gunPoint;
 
     [SerializeField] private List<Enemy_RangeWeaponData> availableWeaponPresets;
 
@@ -36,7 +36,7 @@ public class Enemy_Range : Enemy
         visuals.SetupLook();
         visuals.IKActive(false);
 
-        SetupWeaponData();
+        SetupWeapon();
     }
 
     protected override void Update()
@@ -72,20 +72,38 @@ public class Enemy_Range : Enemy
 
         Rigidbody newBulletRb = newBullet.GetComponent<Rigidbody>();
 
+        bulletDirection = weaponData.ApplyWeaponSpread(bulletDirection);
+
         newBulletRb.mass = 20 / weaponData.bulletSpeed;
         newBulletRb.linearVelocity = bulletDirection * weaponData.bulletSpeed;
 
     }
 
-    private void SetupWeaponData()
+    private void SetupWeapon()
     {
+        List<Enemy_RangeWeaponData> filteredData = new List<Enemy_RangeWeaponData>();
+
         foreach (var data in availableWeaponPresets)
         {
             if (weaponType == data.weaponType)
             {
-                weaponData = data;
+                filteredData.Add(data);
             }
         }
+
+        if (filteredData.Count > 0)
+        {
+            int randomIndex = Random.Range(0, filteredData.Count);
+            weaponData = filteredData[randomIndex];
+        }
+        else
+        {
+            Debug.LogWarning("No Enemy Range Weapon Data was found.");
+        }
+
+
+        gunPoint = visuals.currentWeaponModel.GetComponent<Enemy_RangeWeaponModel>().gunPoint;
+
     }
 
     protected override void OnDrawGizmos()

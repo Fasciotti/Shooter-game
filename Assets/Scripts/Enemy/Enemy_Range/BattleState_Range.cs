@@ -52,8 +52,8 @@ public class BattleState_Range : EnemyState
     private void ResetWeapon()
     {
         bulletsShot = 0;
-        weaponCooldown = enemy.weaponData.GetWeaponCooldown();
-        bulletsPerAttack = enemy.weaponData.GetBulletsPerAttack();
+        weaponCooldown = enemy.weaponData.GetRandomWeaponCooldown();
+        bulletsPerAttack = enemy.weaponData.GetRandomBulletsPerAttack();
     }
 
     private bool WeaponCooldown() => Time.time > lastTimeShot + weaponCooldown; // This will return true when the weapon leaves the cooldown
@@ -75,4 +75,5 @@ public class BattleState_Range : EnemyState
 
         bulletsShot++;
     }
+
 }

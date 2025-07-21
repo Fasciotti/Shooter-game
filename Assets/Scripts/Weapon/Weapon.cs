@@ -163,7 +163,7 @@ public class Weapon
             Random.Range(-currentSpread, currentSpread)
             );
 
-        // This applies the euler rotation to the vector position.
+        // This applies the euler rotation to the vector direction.
         // (It's important to remember that this is not a multiplication operation,
         // but rather a custom operator to apply euler rotation. The order (Quaternion) & (Vector) is mandatory)
         return spreadDirection * currentBulletDirection;

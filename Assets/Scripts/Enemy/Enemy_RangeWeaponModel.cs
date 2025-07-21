@@ -5,6 +5,7 @@ public class Enemy_RangeWeaponModel : MonoBehaviour
 {
     public Enemy_RangeWeaponType weaponType;
     public Enemy_RangeWeaponHoldType weaponHoldType;
+    public Transform gunPoint;
     public Transform leftHandIKTarget;
     public Transform leftHandIKHint;
 }

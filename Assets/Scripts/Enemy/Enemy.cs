@@ -27,9 +27,9 @@ public class Enemy : MonoBehaviour
 
     [Space]
 
-    [SerializeField]private int currentPatrolIndex;
     public Transform[] patrolPoints;
-    private Vector3[] patrolPointsPosition;
+    private Vector3[] patrolPointsPosition; // Used to store the locations initialize, no need to null parent.
+    private int currentPatrolIndex;
 
     public Enemy_Visuals visuals { get; private set; }
     public Player player { get; private set; }
