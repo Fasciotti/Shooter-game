@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using UnityEditor;
 using UnityEditor.Rendering;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 using Random = UnityEngine.Random;
 
 public enum Enemy_MeleeWeaponType { Throw, OneHand, Unarmed }
@@ -21,6 +22,11 @@ public class Enemy_Visuals : MonoBehaviour
     [SerializeField] private Texture[] textures;
     private SkinnedMeshRenderer skinnedMesh;
 
+    [Header("Rig References")]
+    [SerializeField] private Rig rig;
+    [SerializeField] private Transform leftHandIKTarget;
+    [SerializeField] private Transform leftHandIKHint;
+
     void Awake()
     {
         skinnedMesh = GetComponentInChildren<SkinnedMeshRenderer>();
@@ -30,6 +36,7 @@ public class Enemy_Visuals : MonoBehaviour
         SetupRandomColor();
         SetupRandomWeapon();
         SetupRandomCrystals();
+
     }
     public void TrailEffectActive(bool active)
     {
@@ -120,6 +127,7 @@ public class Enemy_Visuals : MonoBehaviour
             if (weaponType == model.weaponType)
             {
                 SwitchLayerAnimation(((int)model.weaponHoldType));
+                SetupRigIKConstrains(model.leftHandIKTarget, model.leftHandIKHint);
                 currentWeaponModel = model.gameObject;
             }
         } 
@@ -171,5 +179,20 @@ public class Enemy_Visuals : MonoBehaviour
         {
             GetComponentInChildren<Animator>().runtimeAnimatorController = animatorOverride;
         }
+    }
+
+    // It's important to notice that I'm setting global position and rotation, and in the player I used local.
+    // This is because I had already configured the rig references positions to compensate the differences in local and global position.
+    // Making both use local (the recommended) would take me a lot of time to do now.
+    // TODO: Fix this.
+    private void SetupRigIKConstrains(Transform target, Transform hint)
+    {
+        leftHandIKTarget.SetPositionAndRotation(target.position, target.rotation);
+        leftHandIKHint.SetPositionAndRotation(hint.position, hint.rotation);
+    }
+
+    public void IKActive(bool active)
+    {
+        rig.weight = active ? 1 : 0;
     }
 }

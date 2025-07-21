@@ -33,6 +33,7 @@ public class Enemy_Range : Enemy
         base.Start();
         stateMachine.Initialize(IdleState);
         visuals.SetupLook();
+        visuals.IKActive(false);
     }
 
     protected override void Update()

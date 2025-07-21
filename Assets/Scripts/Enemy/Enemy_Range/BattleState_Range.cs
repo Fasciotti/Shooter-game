@@ -15,12 +15,14 @@ public class BattleState_Range : EnemyState
     public override void Enter()
     {
         enemy.agent.isStopped = true;
+        enemy.visuals.IKActive(true);
         base.Enter();
     }
 
     public override void Exit()
     {
         base.Exit();
+        enemy.visuals.IKActive(false);
     }
 
     public override void Update()

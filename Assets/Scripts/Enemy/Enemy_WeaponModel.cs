@@ -8,6 +8,7 @@ public class Enemy_WeaponModel : MonoBehaviour
     public AnimatorOverrideController animatorOverride;
     public Enemy_MeleeWeaponData weaponData;
 
+
     [SerializeField] GameObject[] effects;
 
     private void Awake()
