@@ -32,6 +32,11 @@ public class MoveState_Range : EnemyState
 
         enemy.FaceTarget(GetNextPathPoint());
 
+        if (!enemy.agent.hasPath)
+        {
+             enemy.agent.SetDestination(enemy.GetPatrolDestination());
+        }
+
         if (enemy.agent.remainingDistance <= enemy.agent.stoppingDistance && enemy.agent.hasPath)
             stateMachine.ChangeState(enemy.IdleState);
     }

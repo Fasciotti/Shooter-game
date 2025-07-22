@@ -19,7 +19,7 @@ public class RunToCoverState_Range : EnemyState
 
         enemy.visuals.IKActive(true, false);
 
-        destination = enemy.coverDestination.position;
+        destination = enemy.AttemptToFindCover().position;
         enemy.agent.destination = destination;
     }
 

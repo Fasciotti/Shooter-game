@@ -1,21 +1,25 @@
 using NUnit.Framework;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Enemy_Range : Enemy
 {
+    [Header("Cover Settings")]
+    public bool canUseCover = true;
+    public float searchRadius;
+    public Transform lastCover;
+    public List<Cover> allCovers;
+
     [Header("Weapon Settings")]
     public Enemy_RangeWeaponType weaponType;
     public Enemy_RangeWeaponData weaponData;
 
     [Space]
     
-    [SerializeField] private GameObject bulletPrefab;
+    public List<Enemy_RangeWeaponData> availableWeaponPresets;
+    public GameObject bulletPrefab;
     private Transform gunPoint;
-    public Transform coverDestination;
-    public bool canUseCover = true;
-
-    [SerializeField] private List<Enemy_RangeWeaponData> availableWeaponPresets;
 
     public IdleState_Range IdleState { get; private set; }
     public MoveState_Range MoveState { get; private set; }
@@ -39,6 +43,7 @@ public class Enemy_Range : Enemy
         
         visuals.SetupLook();
         visuals.IKActive(false, false);
+        allCovers.AddRange(CollectNerbyCovers());
 
         SetupWeapon();
     }
@@ -87,6 +92,55 @@ public class Enemy_Range : Enemy
         newBulletRb.mass = 20 / weaponData.bulletSpeed;
         newBulletRb.linearVelocity = bulletDirection * weaponData.bulletSpeed;
 
+    }
+
+    public Transform AttemptToFindCover()
+    {
+        List<CoverPoint> coverPoints = new List<CoverPoint>();
+
+        foreach (Cover cover in allCovers)
+        {
+            coverPoints.AddRange(cover.GetCoverPoints());
+        }
+
+        float shortestDistance = float.MaxValue;
+        float currentDistance = 0;
+        Transform closestCoverPoint = null;
+
+        foreach (CoverPoint coverPoint in coverPoints)
+        {
+            currentDistance = Vector3.Distance(transform.position, coverPoint.transform.position);
+
+            if (shortestDistance > currentDistance)
+            {
+                shortestDistance = currentDistance;
+                closestCoverPoint = coverPoint.transform;
+            }
+        }
+
+        if (closestCoverPoint != null)
+        {
+            lastCover = closestCoverPoint;
+        }
+
+        return lastCover.transform;
+
+    }
+
+    private List<Cover> CollectNerbyCovers()
+    {
+        Collider[] colliders = Physics.OverlapSphere(transform.position, searchRadius);
+        List<Cover> covers = new List<Cover>();
+
+        foreach (Collider collider in colliders)
+        {
+            if (collider.TryGetComponent<Cover>(out var cover) && !allCovers.Contains(cover))
+            {
+                covers.Add(collider.GetComponent<Cover>());
+            }
+        }
+
+        return covers;
     }
 
     private void SetupWeapon()
