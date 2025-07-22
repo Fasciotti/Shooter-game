@@ -6,10 +6,12 @@ using UnityEngine;
 public class Enemy_Range : Enemy
 {
     [Header("Cover Settings")]
+    private readonly float searchRadius = 30;
+
     public bool canUseCover = true;
-    public float searchRadius;
-    public Transform lastCover;
-    public List<Cover> allCovers;
+    public CoverPoint lastCover { get; private set; }
+    public CoverPoint currentCover { get; private set; }
+
 
     [Header("Weapon Settings")]
     public Enemy_RangeWeaponType weaponType;
@@ -43,7 +45,6 @@ public class Enemy_Range : Enemy
         
         visuals.SetupLook();
         visuals.IKActive(false, false);
-        allCovers.AddRange(CollectNerbyCovers());
 
         SetupWeapon();
     }
@@ -61,13 +62,14 @@ public class Enemy_Range : Enemy
 
         base.EnterBattleMode();
 
-        if (canUseCover)
+        if (CanGetCover())
         {
             stateMachine.ChangeState(CoverState);
         }else
         {
             stateMachine.ChangeState(BattleState);
         }
+
     }
 
     public void FireSingleBullet()
@@ -94,18 +96,32 @@ public class Enemy_Range : Enemy
 
     }
 
-    public Transform AttemptToFindCover()
+    public bool CanGetCover()
+    {
+        if (!canUseCover)
+            return false;
+
+        if (AttemptToFindCover() != null && lastCover != currentCover)
+        {
+            return true;
+        }
+        
+        Debug.LogWarning("Cover Not Found: " + gameObject.name);
+        return false;
+    }
+
+    private Transform AttemptToFindCover()
     {
         List<CoverPoint> coverPoints = new List<CoverPoint>();
 
-        foreach (Cover cover in allCovers)
+        foreach (Cover cover in CollectNerbyCovers())
         {
-            coverPoints.AddRange(cover.GetCoverPoints());
+            coverPoints.AddRange(cover.GetValidCoverPoints(transform));
         }
 
         float shortestDistance = float.MaxValue;
         float currentDistance = 0;
-        Transform closestCoverPoint = null;
+        CoverPoint closestCoverPoint = null;
 
         foreach (CoverPoint coverPoint in coverPoints)
         {
@@ -114,17 +130,22 @@ public class Enemy_Range : Enemy
             if (shortestDistance > currentDistance)
             {
                 shortestDistance = currentDistance;
-                closestCoverPoint = coverPoint.transform;
+                closestCoverPoint = coverPoint;
             }
         }
 
         if (closestCoverPoint != null)
         {
-            lastCover = closestCoverPoint;
+            lastCover?.SetOccupied(false);
+            lastCover = currentCover;
+
+            currentCover = closestCoverPoint;
+            currentCover.SetOccupied(true);
+            
+            return currentCover.transform;
         }
 
-        return lastCover.transform;
-
+        return null;
     }
 
     private List<Cover> CollectNerbyCovers()
@@ -134,7 +155,7 @@ public class Enemy_Range : Enemy
 
         foreach (Collider collider in colliders)
         {
-            if (collider.TryGetComponent<Cover>(out var cover) && !allCovers.Contains(cover))
+            if (collider.TryGetComponent<Cover>(out var cover) && !covers.Contains(cover))
             {
                 covers.Add(collider.GetComponent<Cover>());
             }

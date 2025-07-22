@@ -14,12 +14,12 @@ public class RunToCoverState_Range : EnemyState
     {
         base.Enter();
 
-        enemy.agent.isStopped = false;
-        enemy.agent.speed = enemy.runSpeed;
+        destination = enemy.currentCover.transform.position;
 
         enemy.visuals.IKActive(true, false);
 
-        destination = enemy.AttemptToFindCover().position;
+        enemy.agent.isStopped = false;
+        enemy.agent.speed = enemy.runSpeed;
         enemy.agent.destination = destination;
     }
 

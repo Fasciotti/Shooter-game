@@ -2,15 +2,7 @@ using UnityEngine;
 
 public class CoverPoint : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    public bool isOccupied = false;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public void SetOccupied(bool occupied) => isOccupied = occupied;
 }
