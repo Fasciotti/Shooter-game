@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
+public enum CoverPerk { NoCover, CanCoverOnce, CanCoverAndChange}
+
 public class Enemy_Range : Enemy
 {
     [Header("Cover Settings")]
+    public CoverPerk coverPerk;
     private readonly float searchRadius = 30;
-
+    public float safeDistance = 2;
     public bool canUseCover = true;
+
     public CoverPoint lastCover { get; private set; }
     public CoverPoint currentCover { get; private set; }
 
@@ -98,7 +102,7 @@ public class Enemy_Range : Enemy
 
     public bool CanGetCover()
     {
-        if (!canUseCover)
+        if (coverPerk == CoverPerk.NoCover)
             return false;
 
         if (AttemptToFindCover() != null && lastCover != currentCover)
@@ -191,8 +195,4 @@ public class Enemy_Range : Enemy
 
     }
 
-    protected override void OnDrawGizmos()
-    {
-        base.OnDrawGizmos();
-    }
 }

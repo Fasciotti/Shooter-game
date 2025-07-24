@@ -1,3 +1,4 @@
+using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
 public class BattleState_Range : EnemyState
@@ -8,6 +9,8 @@ public class BattleState_Range : EnemyState
     private float bulletsShot;
     private float weaponCooldown;
     private float bulletsPerAttack;
+
+    private float timeInCover;
 
     public BattleState_Range(Enemy enemyBase, EnemyStateMachine stateMachine, string animBoolName) : base(enemyBase, stateMachine, animBoolName)
     {
@@ -32,7 +35,12 @@ public class BattleState_Range : EnemyState
     public override void Update()
     {
         base.Update();
+
+        
+        ChangeCoverIfShould();
+
         enemy.FaceTarget(enemy.player.transform.position);
+
 
         if (WeaponOutOfBullets())
         {
@@ -47,6 +55,25 @@ public class BattleState_Range : EnemyState
             Shoot();
         }
 
+    }
+
+    private void ChangeCoverIfShould()
+    {
+        if (enemy.coverPerk != CoverPerk.CanCoverAndChange)
+            return;
+
+        timeInCover -= Time.deltaTime;
+
+        if (timeInCover < 0)
+        {
+            timeInCover = 1; // Minimum time in a cover point to it change
+
+            if (InPlayerSight() || IsPlayerClose())
+            {
+                if (enemy.CanGetCover())
+                    stateMachine.ChangeState(enemy.CoverState);
+            }
+        }
     }
 
     private void ResetWeapon()
@@ -74,6 +101,28 @@ public class BattleState_Range : EnemyState
         enemy.FireSingleBullet();
 
         bulletsShot++;
+    }
+
+    private bool IsPlayerClose()
+    {
+        return Vector3.Distance(enemy.transform.position, enemy.player.transform.position) < enemy.safeDistance;
+    }
+
+    private bool InPlayerSight()
+    {
+        Vector3 yOffset = new Vector3(0, 0.1f, 0);
+        Vector3 playerDirection = (enemy.player.transform.position - enemy.transform.position);
+
+        if (Physics.Raycast(enemy.transform.position + yOffset, playerDirection + yOffset, out var hit))
+        {
+            Player player = hit.collider.GetComponentInParent<Player>();
+            if (player != null)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }
