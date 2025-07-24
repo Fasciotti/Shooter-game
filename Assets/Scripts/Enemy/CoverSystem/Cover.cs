@@ -87,10 +87,10 @@ public class Cover : MonoBehaviour
 
     private bool IsCoverCloseToLastCover(CoverPoint coverPoint, Transform enemy)
     {
-        CoverPoint lastCover = enemy.GetComponent<Enemy_Range>().lastCover;
+        CoverPoint currentCover = enemy.GetComponent<Enemy_Range>().currentCover;
 
-        return lastCover != null &&
-            Vector3.Distance(lastCover.transform.position, coverPoint.transform.position) < 3;
+        return currentCover != null &&
+            Vector3.Distance(currentCover.transform.position, coverPoint.transform.position) < 3;
     }
 
     private bool IsCoverBehindPlayer(CoverPoint coverPoint, Transform enemy)
