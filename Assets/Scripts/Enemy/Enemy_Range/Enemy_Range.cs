@@ -7,12 +7,18 @@ public enum CoverPerk { NoCover, CanCoverOnce, CanCoverAndChange}
 
 public class Enemy_Range : Enemy
 {
-    [Header("Cover Settings")]
+    [Header("Advance settings")]
+    public float advanceStateSpeed = 3;
+    public float advanceStoppingDistance = 7;
+
+    [Header("Enemy Perk")]
     public CoverPerk coverPerk;
+
+    [Header("Cover Settings")]
     private readonly float searchRadius = 30;
+    
     public float safeDistance = 2;
     public bool canUseCover = true;
-
     public CoverPoint lastCover { get; private set; }
     public CoverPoint currentCover { get; private set; }
 
@@ -31,6 +37,7 @@ public class Enemy_Range : Enemy
     public MoveState_Range MoveState { get; private set; }
     public BattleState_Range BattleState { get; private set; }
     public RunToCoverState_Range CoverState { get; private set; }
+    public AdvanceState_Range AdvanceState { get; private set; }
 
     protected override void Awake()
     {
@@ -39,6 +46,7 @@ public class Enemy_Range : Enemy
         MoveState = new MoveState_Range(this, stateMachine, "Move");
         BattleState = new BattleState_Range(this, stateMachine, "Battle");
         CoverState = new RunToCoverState_Range(this, stateMachine, "Run");
+        AdvanceState = new AdvanceState_Range(this, stateMachine, "Advance");
     }
 
     protected override void Start()

@@ -90,7 +90,7 @@ public class Cover : MonoBehaviour
         CoverPoint currentCover = enemy.GetComponent<Enemy_Range>().currentCover;
 
         return currentCover != null &&
-            Vector3.Distance(currentCover.transform.position, coverPoint.transform.position) < 3;
+            Vector3.Distance(currentCover.transform.position, coverPoint.transform.position) < 2.5f;
     }
 
     private bool IsCoverBehindPlayer(CoverPoint coverPoint, Transform enemy)

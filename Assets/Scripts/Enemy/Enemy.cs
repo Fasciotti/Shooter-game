@@ -82,9 +82,7 @@ public class Enemy : MonoBehaviour
 
     protected bool ShouldEnterBattleMode()
     {
-        bool inAggressionRange = Vector3.Distance(transform.position, player.transform.position) < aggressionRange;
-
-        if (inAggressionRange && !inBattleMode)
+        if (IsPlayerInAggressionRange() && !inBattleMode)
         {
             EnterBattleMode();
             return true;
@@ -110,7 +108,7 @@ public class Enemy : MonoBehaviour
         
         rb.AddForceAtPosition(force, hitPoint, ForceMode.Impulse);
     }
-
+    public bool IsPlayerInAggressionRange() => Vector3.Distance(transform.position, player.transform.position) < aggressionRange;
     public void AnimationTrigger() => stateMachine.currentState.AnimationTrigger();
     public void SetActiveManualMovement(bool manualMovement) => this.manualMovement = manualMovement;
     public bool ManualMovementActive() => manualMovement;
