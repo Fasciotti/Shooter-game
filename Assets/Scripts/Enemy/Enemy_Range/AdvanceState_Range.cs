@@ -22,16 +22,17 @@ public class AdvanceState_Range : EnemyState
     {
         base.Update();
 
-        Vector3 playerPos = enemy.player.transform.position;
+        enemy.agent.SetDestination(enemy.aim.position);
+        enemy.FaceTarget(GetNextPathPoint());
+        enemy.UpdateAimPosition();
 
-        enemy.agent.SetDestination(playerPos);
-        enemy.FaceTarget(playerPos);
-
-        if (Vector3.Distance(enemy.transform.position, enemy.player.transform.position) < enemy.advanceStoppingDistance)
+        if (CanChangeToBattleState())
         {
-            enemy.currentCover.isOccupied = false;
             stateMachine.ChangeState(enemy.BattleState);
         }
-
+    }
+    private bool CanChangeToBattleState()
+    {
+        return Vector3.Distance(enemy.transform.position, enemy.player.transform.position) < enemy.advanceStoppingDistance && enemy.IsSeeingPlayer();
     }
 }

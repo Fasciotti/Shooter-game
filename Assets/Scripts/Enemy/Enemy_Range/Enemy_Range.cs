@@ -2,17 +2,18 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public enum CoverPerk { NoCover, CanCoverOnce, CanCoverAndChange}
 
 public class Enemy_Range : Enemy
 {
-    [Header("Advance settings")]
-    public float advanceStateSpeed = 3;
-    public float advanceStoppingDistance = 7;
-
     [Header("Enemy Perk")]
     public CoverPerk coverPerk;
+
+    [Header("Advance Settings")]
+    public float advanceStateSpeed = 3;
+    public float advanceStoppingDistance = 7;
 
     [Header("Cover Settings")]
     private readonly float searchRadius = 30;
@@ -22,10 +23,17 @@ public class Enemy_Range : Enemy
     public CoverPoint lastCover { get; private set; }
     public CoverPoint currentCover { get; private set; }
 
-
     [Header("Weapon Settings")]
     public Enemy_RangeWeaponType weaponType;
     public Enemy_RangeWeaponData weaponData;
+
+    [Header("Aim Settings")]
+    public Transform aim;
+    public Transform playerBody;
+    public LayerMask whatToIgnore;
+    public float slowAim = 4;
+    public float fastAim = 20;
+    public float aimMaxDistance = 2;
 
     [Space]
     
@@ -47,11 +55,16 @@ public class Enemy_Range : Enemy
         BattleState = new BattleState_Range(this, stateMachine, "Battle");
         CoverState = new RunToCoverState_Range(this, stateMachine, "Run");
         AdvanceState = new AdvanceState_Range(this, stateMachine, "Advance");
+
+
     }
 
     protected override void Start()
     {
         base.Start();
+
+        playerBody = player.playerBody;
+        aim.parent = null;
         
         stateMachine.Initialize(IdleState);
         
@@ -88,7 +101,7 @@ public class Enemy_Range : Enemy
     {
         anim.SetTrigger("Shoot");
 
-        Vector3 bulletDirection = ((player.transform.position + Vector3.up) - gunPoint.position).normalized;
+        Vector3 bulletDirection = (aim.position - gunPoint.position).normalized;
 
         GameObject bullet = ObjectPool.Instance.GetObject(bulletPrefab);
 
@@ -201,6 +214,35 @@ public class Enemy_Range : Enemy
 
         gunPoint = visuals.currentWeaponModel.GetComponent<Enemy_RangeWeaponModel>().gunPoint;
 
+    }
+
+    public void UpdateAimPosition()
+    {
+        float speed = AimOnPlayer() ? fastAim : slowAim;
+        aim.position = Vector3.MoveTowards(aim.position, playerBody.position, Time.deltaTime * speed);
+    }
+
+    public bool AimOnPlayer()
+    {
+        float distance = Vector3.Distance(player.transform.position, aim.position);
+
+        return distance < aimMaxDistance;
+    }
+
+    public bool IsSeeingPlayer()
+    {
+        Vector3 myPosition = transform.position + Vector3.up;
+        Vector3 directionToPlayer = playerBody.position - myPosition;
+
+        if (Physics.Raycast(myPosition, directionToPlayer, out var hit, Mathf.Infinity, ~whatToIgnore))
+        {
+            if (hit.transform == player.transform)
+            {
+                UpdateAimPosition();
+                return true;
+            }
+        }
+        return false;
     }
 
 }
