@@ -23,10 +23,19 @@ public class BattleState_Range : EnemyState
         base.Enter();
 
         enemy.agent.isStopped = true;
-        enemy.visuals.IKActive(true, true);
+
+        enemy.visuals.IKActive(true, true, 2f); // 2f is the perfect value to sync with the anim.
+
         stateTimer = enemy.attackDelay;
 
         ResetWeapon();
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
+
+        enemy.anim.ResetTrigger("Shoot");
     }
 
     public override void Update()
@@ -36,6 +45,11 @@ public class BattleState_Range : EnemyState
         if (enemy.IsSeeingPlayer()) // This method also updates the enemy aim position
         {
             enemy.FaceTarget(enemy.aim.position);
+        }
+
+        if (enemy.CanThrowGranade())
+        {
+            stateMachine.ChangeState(enemy.throwGranadeState);
         }
 
         if (MustAdvancePlayer())

@@ -17,7 +17,7 @@ public class ChaseState_Melee : EnemyState
     {
         base.Enter();
         enemy.UpdateAttackData();
-        enemy.WeaponModelActive(true);
+        enemy.visuals.WeaponModelActive(true);
 
         enemy.agent.isStopped = false;
 

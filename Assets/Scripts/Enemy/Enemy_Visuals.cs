@@ -30,10 +30,21 @@ public class Enemy_Visuals : MonoBehaviour
     [SerializeField] private Transform leftHandIKTarget;
     [SerializeField] private Transform leftHandIKHint;
 
+    [Header("Rig Settings")]
+    private float leftHandIKTargetWeight;
+    private float weaponAimIKTargetWeight;
+    private float rigChangeRate;
+
     void Awake()
     {
         skinnedMesh = GetComponentInChildren<SkinnedMeshRenderer>();
     }
+    private void Update()
+    {
+        leftHandIK.weight = UpdateIKWeights(leftHandIK.weight, leftHandIKTargetWeight);
+        weaponAimIK.weight = UpdateIKWeights(weaponAimIK.weight, weaponAimIKTargetWeight);
+    }
+
     public void SetupLook()
     {
         SetupRandomColor();
@@ -157,6 +168,34 @@ public class Enemy_Visuals : MonoBehaviour
         int randomIndex = Random.Range(0, filteredWeaponModels.Count);
         return filteredWeaponModels[randomIndex].gameObject;
     }
+    public void WeaponModelActive(bool active)
+    {
+        currentWeaponModel?.SetActive(active);
+    }
+
+    public void SecondaryWeaponModelActive(bool active)
+    {
+        FindSecondaryWeaponModel()?.SetActive(active);
+    }
+
+    public GameObject FindSecondaryWeaponModel()
+    {
+        Enemy_RangeSecondaryWeaponModel[] models =
+            GetComponentsInChildren<Enemy_RangeSecondaryWeaponModel>(true);
+
+        Enemy_Range enemy = GetComponent<Enemy_Range>();
+
+        foreach (var model in models)
+        {
+            if (enemy.weaponType == model.weaponType)
+            {
+                return model.gameObject;
+            }
+        }
+
+        return null;
+    }
+
     private void SwitchLayerAnimation(int index)
     {
         Animator animator = GetComponentInChildren<Animator>();
@@ -194,10 +233,19 @@ public class Enemy_Visuals : MonoBehaviour
         leftHandIKHint.SetPositionAndRotation(hint.position, hint.rotation);
     }
 
-    public void IKActive(bool leftHandIKActive, bool weaponAimIKActive)
+    public void IKActive(bool leftHandIKActive, bool weaponAimIKActive, float changeRate = 10)
     {
-        leftHandIK.weight = leftHandIKActive ? 0.8f : 0; // Max weight 0.8f
-        weaponAimIK.weight = weaponAimIKActive ? 0.5f : 0; // Max weight 0.5f, or the weapon won't move correctly,
-                                                           // and the left hand will be off the correct position
+        rigChangeRate = changeRate;
+        leftHandIKTargetWeight = leftHandIKActive ? 0.8f : 0; // Max weight 0.8f
+        weaponAimIKTargetWeight = weaponAimIKActive ? 0.5f : 0; // Max weight 0.5f, or the weapon won't move correctly,
+                                                                            // and the left hand will be off the correct position
+    }
+
+    private float UpdateIKWeights(float currentWeight, float targetWeight)
+    {
+        if (Mathf.Abs(currentWeight - targetWeight) > 0.05f)
+            return Mathf.Lerp(currentWeight, targetWeight, Time.deltaTime * rigChangeRate);
+        else
+            return targetWeight;
     }
 }

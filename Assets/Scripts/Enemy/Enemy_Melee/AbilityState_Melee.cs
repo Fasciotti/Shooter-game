@@ -33,7 +33,7 @@ public class AbilityState_Melee : EnemyState
 
         enemy.agent.isStopped = true;
 
-        enemy.WeaponModelActive(true);
+        enemy.visuals. WeaponModelActive(true);
     }
 
     public override void Exit()

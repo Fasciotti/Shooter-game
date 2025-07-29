@@ -16,7 +16,7 @@ public class RecoveryState_Melee : EnemyState
 
         enemy.agent.isStopped = true;
 
-        enemy.WeaponModelActive(true);
+        enemy.visuals.WeaponModelActive(true);
 
     }
 

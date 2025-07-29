@@ -5,14 +5,21 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public enum CoverPerk { NoCover, CanCoverOnce, CanCoverAndChange}
+public enum CoverPerk { Unavailable, CanCoverOnce, CanCoverAndChange}
 public enum UnstoppablePerk { Unavailable, Unstoppable}
+public enum ThrowGranadePerk { Unavailable, ThrowGranade};
 
 public class Enemy_Range : Enemy
 {
     [Header("Enemy Perk")]
     public CoverPerk coverPerk;
     public UnstoppablePerk unstoppablePerk;
+    public ThrowGranadePerk throwGranadePerk;
+
+    [Header("Throw Granade Settings")]
+    public float granadeCooldown;
+    public float granadeSafeDistance;
+    private float lastTimeGranadeThrown;
 
     [Header("Advance Settings")]
     public float advanceStateSpeed = 3;
@@ -51,6 +58,7 @@ public class Enemy_Range : Enemy
     public BattleState_Range BattleState { get; private set; }
     public RunToCoverState_Range RunToCoverState { get; private set; }
     public AdvanceState_Range AdvanceState { get; private set; }
+    public ThrowGranadeState_Range throwGranadeState { get; private set; }
 
     protected override void Awake()
     {
@@ -60,7 +68,7 @@ public class Enemy_Range : Enemy
         BattleState = new BattleState_Range(this, stateMachine, "Battle");
         RunToCoverState = new RunToCoverState_Range(this, stateMachine, "Run");
         AdvanceState = new AdvanceState_Range(this, stateMachine, "Advance");
-
+        throwGranadeState = new ThrowGranadeState_Range(this, stateMachine, "ThrowGranade");
 
     }
 
@@ -126,9 +134,11 @@ public class Enemy_Range : Enemy
 
     }
 
+    #region Cover System
+
     public bool CanGetCover()
     {
-        if (coverPerk == CoverPerk.NoCover)
+        if (coverPerk == CoverPerk.Unavailable)
             return false;
 
         if (AttemptToFindCover() != null && lastCover != currentCover)
@@ -194,6 +204,8 @@ public class Enemy_Range : Enemy
         return covers;
     }
 
+    #endregion
+
     protected override void InitializePerk()
     {
         base.InitializePerk();
@@ -204,7 +216,7 @@ public class Enemy_Range : Enemy
             visuals.corruptionAmount = 10; // High amount
             advanceStateSpeed = 1;
 
-            if (coverPerk != CoverPerk.NoCover)
+            if (coverPerk != CoverPerk.Unavailable)
                 Debug.LogWarning("An unstoppable enemy should not be able to take cover.");
         }
     }
@@ -212,6 +224,26 @@ public class Enemy_Range : Enemy
     public bool IsUnstoppable()
     {
         return unstoppablePerk == UnstoppablePerk.Unstoppable;
+    }
+
+    public bool CanThrowGranade()
+    {
+        if (throwGranadePerk != ThrowGranadePerk.ThrowGranade)
+            return false;
+
+        if (Vector3.Distance(transform.position, player.transform.position) < granadeSafeDistance)
+            return false;
+
+        if (Time.time < lastTimeGranadeThrown + granadeCooldown)
+            return false;
+
+        return true;
+    }
+
+    public void ThrowGranade()
+    {
+        lastTimeGranadeThrown = Time.time;
+        Debug.Log("THROWING GRANADE");
     }
 
     private void SetupWeapon()
@@ -241,6 +273,8 @@ public class Enemy_Range : Enemy
 
     }
 
+    #region Aim System
+
     public void UpdateAimPosition()
     {
         float speed = AimOnPlayer() ? fastAim : slowAim;
@@ -253,8 +287,6 @@ public class Enemy_Range : Enemy
 
         return distance < aimMaxDistance;
     }
-
-    
     
     public bool IsSeeingPlayer()
     {
@@ -272,4 +304,5 @@ public class Enemy_Range : Enemy
         return false;
     }
 
+    #endregion
 }

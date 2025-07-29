@@ -126,7 +126,7 @@ public class Enemy_Melee : Enemy
         base.AbilityTrigger();
 
         moveSpeed *= moveSpeedMultiplierInAbility;
-        WeaponModelActive(false);
+        visuals.WeaponModelActive(false);
     }
     public void ActivateDodgeAnimation()
     {
@@ -160,10 +160,6 @@ public class Enemy_Melee : Enemy
                        " Check the code that calls this method");
         return 0;
 
-    }
-    public void WeaponModelActive(bool active)
-    {
-        visuals.currentWeaponModel.SetActive(active);
     }
     public bool CanThrowAxe()
     {

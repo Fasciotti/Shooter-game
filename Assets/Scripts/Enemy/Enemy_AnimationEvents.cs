@@ -20,4 +20,12 @@ public class Enemy_AnimationEvents : MonoBehaviour
     public void StopManualRotation() => enemy.SetActiveManualRotation(false);
 
     public void AbilityEvent() => enemy.AbilityTrigger();
+
+    public void EnableIK() => enemy.visuals.IKActive(true, true, 1.75f); // perfect value to sync with anim
+
+    public void EnableWeaponModel()
+    {
+        enemy.visuals.SecondaryWeaponModelActive(false);
+        enemy.visuals.WeaponModelActive(true);
+    }
 }
