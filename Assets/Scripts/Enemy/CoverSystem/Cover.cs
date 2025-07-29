@@ -53,33 +53,21 @@ public class Cover : MonoBehaviour
 
     private bool CheckCoverPoint(CoverPoint coverPoint, Transform enemy)
     {
-        Debug.Log(0);
-
 
         if (coverPoint.isOccupied)
             return false;
 
-        Debug.Log(1);
-
         if (!IsCoverTheFurthestOne(coverPoint))
             return false;
 
-        Debug.Log(2);
-
-
         if (IsCoverBehindPlayer(coverPoint, enemy))
             return false;
-        Debug.Log(3);
 
         if (IsCoverCloseToPlayer(coverPoint))
             return false;
-        Debug.Log(4);
-
 
         if (IsCoverCloseToLastCover(coverPoint, enemy))
             return false;
-
-        Debug.Log(1);
 
 
         return true;

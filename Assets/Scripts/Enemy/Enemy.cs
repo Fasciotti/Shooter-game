@@ -55,6 +55,7 @@ public class Enemy : MonoBehaviour
     protected virtual void Start()
     {
         InitializePatrolPoints();
+        InitializePerk();
     }
     protected virtual void Update()
     {
@@ -100,6 +101,11 @@ public class Enemy : MonoBehaviour
     public virtual void DeathImpact(Vector3 force, Vector3 hitpoint, Rigidbody rb)
     {
         StartCoroutine(DeathImpactCoroutine(force, hitpoint, rb));
+    }
+
+    protected virtual void InitializePerk()
+    {
+
     }
 
     private IEnumerator DeathImpactCoroutine(Vector3 force, Vector3 hitPoint, Rigidbody rb)

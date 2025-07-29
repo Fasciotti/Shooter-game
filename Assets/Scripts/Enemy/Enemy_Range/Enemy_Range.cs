@@ -1,29 +1,34 @@
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Xml;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 public enum CoverPerk { NoCover, CanCoverOnce, CanCoverAndChange}
+public enum UnstoppablePerk { Unavailable, Unstoppable}
 
 public class Enemy_Range : Enemy
 {
     [Header("Enemy Perk")]
     public CoverPerk coverPerk;
+    public UnstoppablePerk unstoppablePerk;
 
     [Header("Advance Settings")]
     public float advanceStateSpeed = 3;
     public float advanceStoppingDistance = 7;
+    public float minAdvanceDuration = 2.5f;
 
     [Header("Cover Settings")]
-    private readonly float searchRadius = 30;
-    
-    public float safeDistance = 2;
+    public float minCoverDuration = 2.5f;
+    public float aimSafeDistance = 2;
     public bool canUseCover = true;
+    private readonly float searchRadius = 15;
     public CoverPoint lastCover { get; private set; }
     public CoverPoint currentCover { get; private set; }
 
     [Header("Weapon Settings")]
+    public float attackDelay = 0.5f;
     public Enemy_RangeWeaponType weaponType;
     public Enemy_RangeWeaponData weaponData;
 
@@ -44,7 +49,7 @@ public class Enemy_Range : Enemy
     public IdleState_Range IdleState { get; private set; }
     public MoveState_Range MoveState { get; private set; }
     public BattleState_Range BattleState { get; private set; }
-    public RunToCoverState_Range CoverState { get; private set; }
+    public RunToCoverState_Range RunToCoverState { get; private set; }
     public AdvanceState_Range AdvanceState { get; private set; }
 
     protected override void Awake()
@@ -53,7 +58,7 @@ public class Enemy_Range : Enemy
         IdleState = new IdleState_Range(this, stateMachine, "Idle");
         MoveState = new MoveState_Range(this, stateMachine, "Move");
         BattleState = new BattleState_Range(this, stateMachine, "Battle");
-        CoverState = new RunToCoverState_Range(this, stateMachine, "Run");
+        RunToCoverState = new RunToCoverState_Range(this, stateMachine, "Run");
         AdvanceState = new AdvanceState_Range(this, stateMachine, "Advance");
 
 
@@ -89,7 +94,7 @@ public class Enemy_Range : Enemy
 
         if (CanGetCover())
         {
-            stateMachine.ChangeState(CoverState);
+            stateMachine.ChangeState(RunToCoverState);
         }else
         {
             stateMachine.ChangeState(BattleState);
@@ -189,6 +194,26 @@ public class Enemy_Range : Enemy
         return covers;
     }
 
+    protected override void InitializePerk()
+    {
+        base.InitializePerk();
+
+        if (unstoppablePerk == UnstoppablePerk.Unstoppable)
+        {
+            anim.SetFloat("AdvanceIndex", 1);
+            visuals.corruptionAmount = 10; // High amount
+            advanceStateSpeed = 1;
+
+            if (coverPerk != CoverPerk.NoCover)
+                Debug.LogWarning("An unstoppable enemy should not be able to take cover.");
+        }
+    }
+
+    public bool IsUnstoppable()
+    {
+        return unstoppablePerk == UnstoppablePerk.Unstoppable;
+    }
+
     private void SetupWeapon()
     {
         List<Enemy_RangeWeaponData> filteredData = new List<Enemy_RangeWeaponData>();
@@ -229,6 +254,8 @@ public class Enemy_Range : Enemy
         return distance < aimMaxDistance;
     }
 
+    
+    
     public bool IsSeeingPlayer()
     {
         Vector3 myPosition = transform.position + Vector3.up;

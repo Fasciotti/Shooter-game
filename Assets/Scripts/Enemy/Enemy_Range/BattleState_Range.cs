@@ -11,6 +11,7 @@ public class BattleState_Range : EnemyState
     private float bulletsPerAttack;
 
     private float timeInCover;
+    private bool  firstTimeAttacking = true;
 
     public BattleState_Range(Enemy enemyBase, EnemyStateMachine stateMachine, string animBoolName) : base(enemyBase, stateMachine, animBoolName)
     {
@@ -20,16 +21,12 @@ public class BattleState_Range : EnemyState
     public override void Enter()
     {
         base.Enter();
+
         enemy.agent.isStopped = true;
         enemy.visuals.IKActive(true, true);
+        stateTimer = enemy.attackDelay;
 
         ResetWeapon();
-    }
-
-    public override void Exit()
-    {
-        base.Exit();
-        enemy.visuals.IKActive(false, false);
     }
 
     public override void Update()
@@ -41,7 +38,7 @@ public class BattleState_Range : EnemyState
             enemy.FaceTarget(enemy.aim.position);
         }
 
-        if (!enemy.IsPlayerInAggressionRange())
+        if (MustAdvancePlayer())
         {
             stateMachine.ChangeState(enemy.AdvanceState);
         }
@@ -50,9 +47,17 @@ public class BattleState_Range : EnemyState
         ChangeCoverIfShould();
 
 
+        if (stateTimer > 0)
+            return;
+
 
         if (WeaponOutOfBullets())
         {
+            if (enemy.IsUnstoppable() && UnstoppableWalkReady())
+            {
+                stateMachine.ChangeState(enemy.AdvanceState);
+            }
+
             if (WeaponCooldown())
                 ResetWeapon();
 
@@ -66,30 +71,36 @@ public class BattleState_Range : EnemyState
 
     }
 
-    private void ChangeCoverIfShould()
+    private bool MustAdvancePlayer()
     {
-        if (enemy.coverPerk != CoverPerk.CanCoverAndChange)
-            return;
+        if (enemy.IsUnstoppable())
+            return false; // We already handle the change when the weapon in out of bullets
 
-        timeInCover -= Time.deltaTime;
-
-        if (timeInCover < 0)
-        {
-            timeInCover = 1; // Minimum time in a cover point to it change
-
-            if (InPlayerSight() || IsPlayerClose())
-            {
-                if (enemy.CanGetCover())
-                    stateMachine.ChangeState(enemy.CoverState);
-            }
-        }
+        return !enemy.IsPlayerInAggressionRange() && ReadyToLeaveCover();
     }
 
+    private bool UnstoppableWalkReady()
+    {
+        float distanceToPlayer = Vector3.Distance(enemy.transform.position, enemy.player.transform.position);
+        bool close = distanceToPlayer < enemy.advanceStoppingDistance;
+
+        bool cooldown = Time.time > enemy.AdvanceState.lastTimeAdvanced + enemy.weaponData.minWeaponCooldown;
+
+        return !close && cooldown;
+    }
+
+    #region Weapon System
     private void ResetWeapon()
     {
         bulletsShot = 0;
-        weaponCooldown = enemy.weaponData.GetRandomWeaponCooldown();
-        bulletsPerAttack = enemy.weaponData.GetRandomBulletsPerAttack();
+
+        if (firstTimeAttacking)
+        {
+            firstTimeAttacking = false;
+
+            weaponCooldown = enemy.weaponData.GetRandomWeaponCooldown();
+            bulletsPerAttack = enemy.weaponData.GetRandomBulletsPerAttack();
+        }
     }
 
     private bool WeaponCooldown() => Time.time > lastTimeShot + weaponCooldown; // This will return true when the weapon leaves the cooldown
@@ -112,12 +123,47 @@ public class BattleState_Range : EnemyState
         bulletsShot++;
     }
 
-    private bool IsPlayerClose()
+    #endregion
+
+    #region Cover System
+    private void ChangeCoverIfShould()
     {
-        return Vector3.Distance(enemy.transform.position, enemy.player.transform.position) < enemy.safeDistance;
+        if (enemy.coverPerk != CoverPerk.CanCoverAndChange)
+            return;
+
+        timeInCover -= Time.deltaTime;
+
+        if (timeInCover < 0)
+        {
+            timeInCover = 1; // Check cover status every X second
+
+            if (ReadyToChangeCover())
+            {
+                if (enemy.CanGetCover())
+                    stateMachine.ChangeState(enemy.RunToCoverState);
+            }
+        }
     }
 
-    private bool InPlayerSight()
+    private bool ReadyToLeaveCover()
+    {
+        return Time.time > enemy.RunToCoverState.lastCoverTime + enemy.minCoverDuration;
+    }
+
+    private bool ReadyToChangeCover()
+    {
+        bool inDanger = IsPlayerCloseToAim() || IsPlayerInClearSight();
+        bool advancedOver = Time.time > enemy.AdvanceState.lastTimeAdvanced + enemy.minAdvanceDuration;
+
+        return inDanger && advancedOver;
+    }
+
+    private bool IsPlayerCloseToAim()
+    {
+        return Vector3.Distance(enemy.transform.position, enemy.player.transform.position) < enemy.aimSafeDistance;
+    }
+
+    private bool IsPlayerInClearSight()
     {
         Vector3 yOffset = new Vector3(0, 0.1f, 0);
         Vector3 playerDirection = (enemy.player.transform.position - enemy.transform.position);
@@ -134,4 +180,5 @@ public class BattleState_Range : EnemyState
         return false;
     }
 
+    #endregion
 }

@@ -76,8 +76,6 @@ public class Enemy_Melee : Enemy
         base.Start();
 
         stateMachine.Initialize(IdleState);
-
-        InitializePerk();
         visuals.SetupLook();
     }
 
@@ -105,7 +103,7 @@ public class Enemy_Melee : Enemy
         if (healthPoints <= 0)
             stateMachine.ChangeState(DeadState);
     }
-    protected void InitializePerk()
+    protected override void InitializePerk()
     {
         if (EnemyMelee_Type.AxeThrow == meleeType)
             weaponType = Enemy_MeleeWeaponType.Throw;

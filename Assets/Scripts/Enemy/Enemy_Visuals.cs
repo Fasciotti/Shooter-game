@@ -13,7 +13,7 @@ public enum Enemy_RangeWeaponType { Pistol, Revolver, Shotgun, Rifle, AutoRifle}
 public class Enemy_Visuals : MonoBehaviour
 {
     [Header("Corruption Visuals")]
-    [SerializeField] private int corruptionAmount;
+    public int corruptionAmount;
 
     [Header("Weapon Visuals")]
     public GameObject currentWeaponModel { get; private set; }
