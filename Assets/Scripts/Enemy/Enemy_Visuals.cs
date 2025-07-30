@@ -1,15 +1,10 @@
-using NUnit.Framework;
-using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using UnityEditor;
-using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using Random = UnityEngine.Random;
 
 public enum Enemy_MeleeWeaponType { Throw, OneHand, Unarmed }
-public enum Enemy_RangeWeaponType { Pistol, Revolver, Shotgun, Rifle, AutoRifle}
+public enum Enemy_RangeWeaponType { Pistol, Revolver, Shotgun, Rifle, AutoRifle }
 public class Enemy_Visuals : MonoBehaviour
 {
     [Header("Corruption Visuals")]
@@ -18,7 +13,7 @@ public class Enemy_Visuals : MonoBehaviour
     [Header("Weapon Visuals")]
     public GameObject currentWeaponModel { get; private set; }
 
-    [Header("Skin Settings")]   
+    [Header("Skin Settings")]
     [SerializeField] private Texture[] textures;
     private SkinnedMeshRenderer skinnedMesh;
 
@@ -41,8 +36,12 @@ public class Enemy_Visuals : MonoBehaviour
     }
     private void Update()
     {
-        leftHandIK.weight = UpdateIKWeights(leftHandIK.weight, leftHandIKTargetWeight);
-        weaponAimIK.weight = UpdateIKWeights(weaponAimIK.weight, weaponAimIKTargetWeight);
+
+        if (TryGetComponent<Enemy_Range>(out _))
+        {
+            leftHandIK.weight = UpdateIKWeights(leftHandIK.weight, leftHandIKTargetWeight);
+            weaponAimIK.weight = UpdateIKWeights(weaponAimIK.weight, weaponAimIKTargetWeight);
+        }
     }
 
     public void SetupLook()
@@ -144,7 +143,7 @@ public class Enemy_Visuals : MonoBehaviour
                 SetupRigIKConstrains(model.leftHandIKTarget, model.leftHandIKHint);
                 currentWeaponModel = model.gameObject;
             }
-        } 
+        }
 
         return currentWeaponModel;
     }
@@ -200,7 +199,7 @@ public class Enemy_Visuals : MonoBehaviour
     {
         Animator animator = GetComponentInChildren<Animator>();
 
-        for (int i = 0; i < animator.layerCount;  i++)
+        for (int i = 0; i < animator.layerCount; i++)
         {
             animator.SetLayerWeight(i, 0);
 
@@ -209,7 +208,7 @@ public class Enemy_Visuals : MonoBehaviour
         animator.SetLayerWeight(index, 1);
 
     }
-    
+
     private void OverrideAnimatorIfPossible()
     {
         if (!currentWeaponModel.TryGetComponent<Enemy_WeaponModel>(out var weaponComponent))
@@ -238,7 +237,7 @@ public class Enemy_Visuals : MonoBehaviour
         rigChangeRate = changeRate;
         leftHandIKTargetWeight = leftHandIKActive ? 0.8f : 0; // Max weight 0.8f
         weaponAimIKTargetWeight = weaponAimIKActive ? 0.5f : 0; // Max weight 0.5f, or the weapon won't move correctly,
-                                                                            // and the left hand will be off the correct position
+                                                                // and the left hand will be off the correct position
     }
 
     private float UpdateIKWeights(float currentWeight, float targetWeight)

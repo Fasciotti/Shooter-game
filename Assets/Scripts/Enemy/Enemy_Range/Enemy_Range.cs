@@ -17,9 +17,14 @@ public class Enemy_Range : Enemy
     public ThrowGranadePerk throwGranadePerk;
 
     [Header("Throw Granade Settings")]
+    [SerializeField] private GameObject granadePrefab;
+    [SerializeField] private Transform[] granadeStartPoint;
     public float granadeCooldown;
     public float granadeSafeDistance;
+    public float explosionTimer;
+    public float timeToReach = 2.5f;
     private float lastTimeGranadeThrown;
+    [SerializeField] private float explosionForce;
 
     [Header("Advance Settings")]
     public float advanceStateSpeed = 3;
@@ -37,6 +42,7 @@ public class Enemy_Range : Enemy
     [Header("Weapon Settings")]
     public float attackDelay = 0.5f;
     public Enemy_RangeWeaponType weaponType;
+    public Transform weaponHolder;
     public Enemy_RangeWeaponData weaponData;
 
     [Header("Aim Settings")]
@@ -240,10 +246,21 @@ public class Enemy_Range : Enemy
         return true;
     }
 
+    private int HandIndex()
+    {
+        return weaponType == Enemy_RangeWeaponType.Pistol || weaponType == Enemy_RangeWeaponType.Revolver ? 1 : 0;
+    }
+
     public void ThrowGranade()
     {
         lastTimeGranadeThrown = Time.time;
-        Debug.Log("THROWING GRANADE");
+
+        GameObject newGranade = ObjectPool.Instance.GetObject(granadePrefab, granadeStartPoint[HandIndex()].position);
+
+        Enemy_Granade granadeScript = newGranade.GetComponent<Enemy_Granade>();
+
+        granadeScript.SetupGranade(player.transform.position, timeToReach, explosionTimer, explosionForce);
+
     }
 
     private void SetupWeapon()
