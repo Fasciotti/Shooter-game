@@ -49,7 +49,7 @@ public class BattleState_Range : EnemyState
 
         if (enemy.CanThrowGranade())
         {
-            stateMachine.ChangeState(enemy.throwGranadeState);
+            stateMachine.ChangeState(enemy.ThrowGranadeState);
         }
 
         if (MustAdvancePlayer())

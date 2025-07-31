@@ -18,7 +18,7 @@ public class Enemy_Range : Enemy
 
     [Header("Throw Granade Settings")]
     [SerializeField] private GameObject granadePrefab;
-    [SerializeField] private Transform[] granadeStartPoint;
+    public Transform[] granadeStartPoint;
     public float granadeCooldown;
     public float granadeSafeDistance;
     public float explosionTimer;
@@ -64,7 +64,8 @@ public class Enemy_Range : Enemy
     public BattleState_Range BattleState { get; private set; }
     public RunToCoverState_Range RunToCoverState { get; private set; }
     public AdvanceState_Range AdvanceState { get; private set; }
-    public ThrowGranadeState_Range throwGranadeState { get; private set; }
+    public ThrowGranadeState_Range ThrowGranadeState { get; private set; }
+    public DeadState_Range DeadState { get; private set; }
 
     protected override void Awake()
     {
@@ -74,7 +75,9 @@ public class Enemy_Range : Enemy
         BattleState = new BattleState_Range(this, stateMachine, "Battle");
         RunToCoverState = new RunToCoverState_Range(this, stateMachine, "Run");
         AdvanceState = new AdvanceState_Range(this, stateMachine, "Advance");
-        throwGranadeState = new ThrowGranadeState_Range(this, stateMachine, "ThrowGranade");
+        ThrowGranadeState = new ThrowGranadeState_Range(this, stateMachine, "ThrowGranade");
+        DeadState = new DeadState_Range(this, stateMachine, "Idle");
+
 
     }
 
@@ -138,6 +141,16 @@ public class Enemy_Range : Enemy
         newBulletRb.mass = 20 / weaponData.bulletSpeed;
         newBulletRb.linearVelocity = bulletDirection * weaponData.bulletSpeed;
 
+    }
+
+    public override void GetHit()
+    {
+        base.GetHit();
+
+        if (healthPoints <= 0 && stateMachine.currentState != DeadState)
+        {
+            stateMachine.ChangeState(DeadState);
+        }
     }
 
     #region Cover System
@@ -246,18 +259,31 @@ public class Enemy_Range : Enemy
         return true;
     }
 
-    private int HandIndex()
+    public Transform GranadeStartPoint()
     {
-        return weaponType == Enemy_RangeWeaponType.Pistol || weaponType == Enemy_RangeWeaponType.Revolver ? 1 : 0;
+        if (weaponType == Enemy_RangeWeaponType.Pistol || weaponType == Enemy_RangeWeaponType.Revolver)
+        {
+            return granadeStartPoint[1];
+        }
+
+        return granadeStartPoint[0];
     }
 
     public void ThrowGranade()
     {
         lastTimeGranadeThrown = Time.time;
 
-        GameObject newGranade = ObjectPool.Instance.GetObject(granadePrefab, granadeStartPoint[HandIndex()].position);
+        visuals.GranadeModelActive(false);
+
+        GameObject newGranade = ObjectPool.Instance.GetObject(granadePrefab, GranadeStartPoint().position);
 
         Enemy_Granade granadeScript = newGranade.GetComponent<Enemy_Granade>();
+
+        if (stateMachine.currentState == DeadState)
+        {
+            granadeScript.SetupGranade(transform.position, 1, explosionTimer, explosionForce);
+            return;
+        }
 
         granadeScript.SetupGranade(player.transform.position, timeToReach, explosionTimer, explosionForce);
 

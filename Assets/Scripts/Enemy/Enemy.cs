@@ -36,6 +36,7 @@ public class Enemy : MonoBehaviour
     public NavMeshAgent agent { get; private set; }
     public EnemyStateMachine stateMachine { get; private set; }
     public Animator anim {  get; private set; }
+    public Enemy_Ragdoll ragdoll { get; private set; }
 
     public bool inBattleMode { get; private set; }
 
@@ -48,6 +49,8 @@ public class Enemy : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
 
         anim = GetComponentInChildren<Animator>();
+
+        ragdoll = GetComponent<Enemy_Ragdoll>();
 
         player = GameObject.Find("Player").GetComponent<Player>();
     }

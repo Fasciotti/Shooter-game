@@ -13,14 +13,6 @@ public class AbilityState_Melee : EnemyState
     public AbilityState_Melee(Enemy enemyBase, EnemyStateMachine stateMachine, string animBoolName) : base(enemyBase, stateMachine, animBoolName)
     {
         enemy = enemyBase as Enemy_Melee;
-
-        if (enemy.meleeType == EnemyMelee_Type.AxeThrow)
-        {
-            base.animBoolName = "AxeThrow";
-            return;
-        }
-
-        base.animBoolName = "Chase";
     }
 
     public override void Enter()

@@ -147,6 +147,8 @@ public class Enemy_Visuals : MonoBehaviour
 
         return currentWeaponModel;
     }
+
+
     private GameObject FindMeleeWeapon()
     {
         Enemy_WeaponModel[] weaponModels = GetComponentsInChildren<Enemy_WeaponModel>(true);
@@ -195,6 +197,11 @@ public class Enemy_Visuals : MonoBehaviour
         return null;
     }
 
+    public void GranadeModelActive(bool active)
+    {
+        TryGetComponent<Enemy_Range>(out var enemy);
+        enemy?.GranadeStartPoint().gameObject.SetActive(active);
+    }
     private void SwitchLayerAnimation(int index)
     {
         Animator animator = GetComponentInChildren<Animator>();

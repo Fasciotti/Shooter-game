@@ -64,7 +64,7 @@ public class Enemy_Melee : Enemy
         RecoveryState = new RecoveryState_Melee(this, stateMachine, "Recovery");
         ChaseState = new ChaseState_Melee(this, stateMachine, "Chase");
         AttackState = new AttackState_Melee(this, stateMachine, "Attack");
-        AbilityState = new AbilityState_Melee(this, stateMachine, null); //Null is used because the variable is defined inside the class.
+        AbilityState = new AbilityState_Melee(this, stateMachine, "AxeThrow"); //Null is used because the variable is defined inside the class.
         DeadState = new DeadState_Melee(this, stateMachine, "Idle"); //Idle anim is just a place holder. Ragdoll
 
         AttackState.UpdateAttackData();
@@ -100,7 +100,7 @@ public class Enemy_Melee : Enemy
     {
         base.GetHit();
 
-        if (healthPoints <= 0)
+        if (healthPoints <= 0 && stateMachine.currentState != DeadState)
             stateMachine.ChangeState(DeadState);
     }
     protected override void InitializePerk()

@@ -3,6 +3,7 @@ using UnityEngine;
 public class ThrowGranadeState_Range : EnemyState
 {
     private Enemy_Range enemy;
+    public bool IsThrowing = false;
 
     public ThrowGranadeState_Range(Enemy enemyBase, EnemyStateMachine stateMachine, string animBoolName) : base(enemyBase, stateMachine, animBoolName)
     {
@@ -13,8 +14,10 @@ public class ThrowGranadeState_Range : EnemyState
     {
         base.Enter();
 
+        IsThrowing = true;
         enemy.agent.isStopped = true;
         enemy.visuals.IKActive(false, false);
+        enemy.visuals.GranadeModelActive(true);
 
         if (enemy.weaponType == Enemy_RangeWeaponType.Pistol || enemy.weaponType == Enemy_RangeWeaponType.Revolver)
         {
@@ -46,6 +49,8 @@ public class ThrowGranadeState_Range : EnemyState
 
     public override void AbilityTrigger()
     {
+        base.AbilityTrigger();
+        IsThrowing = false;
         enemy.ThrowGranade();
     }
 }
