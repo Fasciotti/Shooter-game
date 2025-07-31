@@ -19,6 +19,10 @@ public class MoveState_Range : EnemyState
         enemy.agent.SetDestination(destination);
 
         enemy.agent.speed = enemy.moveSpeed;
+
+
+        if (enemy.HandHoldIndex() == 1)
+            enemy.visuals.IKActive(false, false);
     }
 
     public override void Exit()

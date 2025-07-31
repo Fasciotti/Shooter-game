@@ -14,6 +14,17 @@ public class IdleState_Range : EnemyState
         base.Enter();
 
         stateTimer = enemy.idleTime;
+
+
+        if (enemy.HandHoldIndex() == 1)
+            enemy.visuals.IKActive(false, false);
+        else
+            enemy.visuals.IKActive(true, false);
+
+        // If bigger than 6, it will include an idle animation that is lower
+        float randomIndex = enemy.idleTime >= 6 ? Random.Range(0, 3) : Random.Range(0, 2);
+
+        enemy.anim.SetFloat("IdleIndex", randomIndex); // Random idle animation
     }
 
     public override void Exit()

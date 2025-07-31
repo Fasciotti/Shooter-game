@@ -28,6 +28,9 @@ public class BattleState_Range : EnemyState
 
         stateTimer = enemy.attackDelay;
 
+        enemy.visuals.WeaponModelActive(true);
+        enemy.visuals.SecondaryWeaponModelActive(false);
+
         ResetWeapon();
     }
 

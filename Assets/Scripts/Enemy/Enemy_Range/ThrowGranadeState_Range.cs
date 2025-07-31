@@ -19,7 +19,7 @@ public class ThrowGranadeState_Range : EnemyState
         enemy.visuals.IKActive(false, false);
         enemy.visuals.GranadeModelActive(true);
 
-        if (enemy.weaponType == Enemy_RangeWeaponType.Pistol || enemy.weaponType == Enemy_RangeWeaponType.Revolver)
+        if (enemy.HandHoldIndex() == 1) // 1 means he is holding a pistol or revolver with left hand
         {
             enemy.anim.SetBool("MirrorThrowGranade", true);
             return;

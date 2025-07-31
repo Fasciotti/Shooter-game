@@ -88,10 +88,10 @@ public class Enemy_Range : Enemy
         playerBody = player.playerBody;
         aim.parent = null;
         
-        stateMachine.Initialize(IdleState);
-        
+        anim.SetFloat("WeaponHoldIndex", HandHoldIndex());
         visuals.SetupLook();
-        visuals.IKActive(false, false);
+        
+        stateMachine.Initialize(IdleState);
 
         SetupWeapon();
     }
@@ -257,6 +257,11 @@ public class Enemy_Range : Enemy
             return false;
 
         return true;
+    }
+
+    public int HandHoldIndex()
+    {
+        return weaponType == Enemy_RangeWeaponType.Pistol || weaponType == Enemy_RangeWeaponType.Revolver ? 1 : 0;
     }
 
     public Transform GranadeStartPoint()

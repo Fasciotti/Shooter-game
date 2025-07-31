@@ -42,6 +42,7 @@ public class Enemy_Visuals : MonoBehaviour
             leftHandIK.weight = UpdateIKWeights(leftHandIK.weight, leftHandIKTargetWeight);
             weaponAimIK.weight = UpdateIKWeights(weaponAimIK.weight, weaponAimIKTargetWeight);
         }
+
     }
 
     public void SetupLook()

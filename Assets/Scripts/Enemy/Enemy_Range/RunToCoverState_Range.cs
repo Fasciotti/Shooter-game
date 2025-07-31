@@ -19,6 +19,12 @@ public class RunToCoverState_Range : EnemyState
 
         enemy.visuals.IKActive(true, false);
 
+        if (enemy.HandHoldIndex() == 1)
+        {
+            enemy.visuals.IKActive(false, false);
+
+        }
+
         enemy.agent.isStopped = false;
         enemy.agent.speed = enemy.runSpeed;
         enemy.agent.destination = destination;

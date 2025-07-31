@@ -24,6 +24,9 @@ public class AdvanceState_Range : EnemyState
             enemy.visuals.IKActive(true, false);
             stateTimer = enemy.minAdvanceDuration;
         }
+
+        if (enemy.HandHoldIndex() == 1)
+            enemy.visuals.IKActive(false, false);
     }
 
     public override void Exit()
