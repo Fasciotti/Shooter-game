@@ -114,6 +114,7 @@ public class BattleState_Range : EnemyState
 
             weaponCooldown = enemy.weaponData.GetRandomWeaponCooldown();
             bulletsPerAttack = enemy.weaponData.GetRandomBulletsPerAttack();
+            enemy.aim.position = enemy.playerBody.position;
         }
     }
 

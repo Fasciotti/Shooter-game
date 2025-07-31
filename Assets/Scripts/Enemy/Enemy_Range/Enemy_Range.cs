@@ -51,7 +51,7 @@ public class Enemy_Range : Enemy
     public LayerMask whatToIgnore;
     public float slowAim = 4;
     public float fastAim = 20;
-    public float aimMaxDistance = 2;
+    public float aimMaxDistance = 1.5f;
 
     [Space]
     
