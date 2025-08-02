@@ -1,4 +1,3 @@
-using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
 public class BattleState_Range : EnemyState
@@ -11,7 +10,7 @@ public class BattleState_Range : EnemyState
     private float bulletsPerAttack;
 
     private float timeInCover;
-    private bool  firstTimeAttacking = true;
+    private bool firstTimeAttacking = true;
 
     public BattleState_Range(Enemy enemyBase, EnemyStateMachine stateMachine, string animBoolName) : base(enemyBase, stateMachine, animBoolName)
     {
@@ -60,7 +59,7 @@ public class BattleState_Range : EnemyState
             stateMachine.ChangeState(enemy.AdvanceState);
         }
 
-        
+
         ChangeCoverIfShould();
 
 
@@ -155,7 +154,7 @@ public class BattleState_Range : EnemyState
         {
             timeInCover = 1; // Check cover status every X second
 
-            if (ReadyToChangeCover())
+            if (ReadyToChangeCover() && ReadyToLeaveCover())
             {
                 if (enemy.CanGetCover())
                     stateMachine.ChangeState(enemy.RunToCoverState);
@@ -188,11 +187,7 @@ public class BattleState_Range : EnemyState
 
         if (Physics.Raycast(enemy.transform.position + yOffset, playerDirection + yOffset, out var hit))
         {
-            Player player = hit.collider.GetComponentInParent<Player>();
-            if (player != null)
-            {
-                return true;
-            }
+            return hit.transform.parent == enemy.player.transform;
         }
 
         return false;

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using static UnityEngine.EventSystems.EventTrigger;
 using Random = UnityEngine.Random;
 using RangeAttribute = UnityEngine.RangeAttribute;
 
@@ -160,6 +161,13 @@ public class Enemy_Melee : Enemy
                        " Check the code that calls this method");
         return 0;
 
+    }
+
+    public void ThrowAxe()
+    {
+        GameObject axePrefabLocal = ObjectPool.Instance.GetObject(axePrefab, axeStartPoint.position);
+
+        axePrefabLocal.GetComponent<Enemy_Axe>().SetupAxe(player.transform, axeFlySpeed, axeAimTimer);
     }
     public bool CanThrowAxe()
     {
