@@ -12,6 +12,7 @@ public class IdleState_Boss : EnemyState
     public override void Enter()
     {
         base.Enter();
+        enemy.agent.isStopped = true;
         stateTimer = enemy.idleTime;
     }
 

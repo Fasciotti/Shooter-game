@@ -16,6 +16,7 @@ public class MoveState_Boss : EnemyState
 
         destination = enemy.GetPatrolDestination();
         enemy.agent.SetDestination(destination);
+        enemy.agent.isStopped = false;
 
         enemy.agent.speed = enemy.moveSpeed;
     }
