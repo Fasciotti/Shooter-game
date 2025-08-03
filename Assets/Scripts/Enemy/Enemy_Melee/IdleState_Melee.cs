@@ -14,6 +14,8 @@ public class IdleState_Melee : EnemyState
         base.Enter();
 
         stateTimer = enemyBase.idleTime;
+        Debug.Log(stateTimer);
+
     }
 
     public override void Exit()
@@ -24,6 +26,7 @@ public class IdleState_Melee : EnemyState
     public override void Update()
     {
         base.Update();
+
 
         if (stateTimer < 0)
         {

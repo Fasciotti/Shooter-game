@@ -4,6 +4,7 @@ using UnityEngine.AI;
 using UnityEngine.InputSystem;
 using System.Collections;
 
+[RequireComponent(typeof(NavMeshAgent))]
 public class Enemy : MonoBehaviour
 {
 
