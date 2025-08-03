@@ -17,7 +17,3 @@ The `Assets` directory contains all game assets and scripts:
 - `Models` – Contains all visual imported assets, excluding animations.
 - `Animations` - It's where all animations are. They are in inside FBXs.
 - `Data` - ScriptableObject scripts that hold specific data.
-
-Other configuration is stored in `Packages` and `ProjectSettings`.
-
-See `Docs/enemy_state_machine.md` for an in depth explanation of the enemy AI. (outdated)
