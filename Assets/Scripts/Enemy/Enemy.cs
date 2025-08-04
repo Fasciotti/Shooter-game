@@ -138,11 +138,16 @@ public class Enemy : MonoBehaviour
         return destination;
     }
 
-    public void FaceTarget(Vector3 target)
+    public void FaceTarget(Vector3 target, float rotationSpeed = 0)
     {
         Quaternion targetRotation = Quaternion.LookRotation(target - transform.position);
 
         Vector3 currentRotation = transform.rotation.eulerAngles;
+
+        if (rotationSpeed == 0)
+        {
+            rotationSpeed = this.rotationSpeed;
+        }
 
         float yRotation = Mathf.LerpAngle(currentRotation.y, targetRotation.eulerAngles.y, rotationSpeed * Time.deltaTime);
 

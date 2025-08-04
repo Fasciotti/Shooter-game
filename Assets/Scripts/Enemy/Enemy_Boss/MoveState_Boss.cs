@@ -32,8 +32,28 @@ public class MoveState_Boss : EnemyState
 
         enemy.FaceTarget(GetNextPathPoint());
 
-        // Stopping distace must not be 0
-        if (enemy.agent.remainingDistance <= enemy.agent.stoppingDistance && enemy.agent.hasPath)
-            stateMachine.ChangeState(enemy.IdleState);
+        if (enemy.inBattleMode)
+        {
+            Vector3 playerPos = enemy.player.transform.position;
+
+            enemy.agent.SetDestination(playerPos);
+
+            if (enemy.CanDoJumpAttack())
+            {
+                stateMachine.ChangeState(enemy.JumpAttackState);
+            }
+            else if (Vector3.Distance(enemy.transform.position, playerPos) < enemy.attackRange)
+            {
+                stateMachine.ChangeState(enemy.AttackState);
+            }
+        }
+        else
+        {
+            // Stopping distace must not be 0
+            if ((Vector3.Distance(enemy.transform.position, destination) <= enemy.agent.stoppingDistance) && enemy.agent.hasPath)
+                stateMachine.ChangeState(enemy.IdleState);
+        }
+
+
     }
 }
