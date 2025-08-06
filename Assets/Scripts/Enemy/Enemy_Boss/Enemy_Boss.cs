@@ -5,6 +5,8 @@ public class Enemy_Boss : Enemy
 
     [Header("Attack Settings")]
     public float attackRange;
+
+
     [Header("Jump Attack Settings")]
     public LayerMask whatToIgnore;
     public float travelTimeToTarget;
@@ -12,10 +14,14 @@ public class Enemy_Boss : Enemy
     public float minJumpAttackDistance;
     private float lastJumpAttack;
 
+    [Header("Flamethrower settings")]
+    public float flameThrowerDuration;
+
     public MoveState_Boss MoveState { get; private set; }
     public IdleState_Boss IdleState { get; private set; }
     public AttackState_Boss AttackState { get; private set; }
     public JumpAttackState_Boss JumpAttackState { get; private set; }
+    public AbilityState_Boss AbilityState { get; private set; }
 
     protected override void Awake()
     {
@@ -25,6 +31,7 @@ public class Enemy_Boss : Enemy
         MoveState = new MoveState_Boss(this, stateMachine, "Move");
         AttackState = new AttackState_Boss(this, stateMachine, "Attack");
         JumpAttackState = new JumpAttackState_Boss(this, stateMachine, "JumpAttack");
+        AbilityState = new AbilityState_Boss(this, stateMachine, "Ability");
     }
 
     protected override void Start()
@@ -42,7 +49,7 @@ public class Enemy_Boss : Enemy
 
         if (Input.GetKeyDown(KeyCode.V))
         {
-            stateMachine.ChangeState(JumpAttackState);
+            stateMachine.ChangeState(AbilityState);
         }
 
         if (ShouldEnterBattleMode())
@@ -95,6 +102,13 @@ public class Enemy_Boss : Enemy
 
         return false;
     }
+    public void ActivateFlameThrower(bool activate)
+    {
+        anim.SetBool("Flamethrower", activate);
+
+
+    }
+
 
     protected override void OnDrawGizmos()
     {
