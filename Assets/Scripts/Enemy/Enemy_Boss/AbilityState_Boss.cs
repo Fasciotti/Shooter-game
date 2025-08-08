@@ -16,7 +16,6 @@ public class AbilityState_Boss : EnemyState
         enemy.agent.isStopped = true;
         enemy.agent.velocity = Vector3.zero;
         stateTimer = enemy.flameThrowerDuration;
-
     }
 
     public override void Exit()
@@ -30,7 +29,7 @@ public class AbilityState_Boss : EnemyState
 
         enemy.FaceTarget(enemy.player.transform.position);
 
-        if (stateTimer < 0)
+        if (stateTimer < 0 && enemy.flameThrowerActive)
         {
             enemy.ActivateFlameThrower(false);
         }
@@ -43,7 +42,6 @@ public class AbilityState_Boss : EnemyState
     public override void AbilityTrigger()
     {
         base.AbilityTrigger();
-
 
         enemy.ActivateFlameThrower(true);
     }

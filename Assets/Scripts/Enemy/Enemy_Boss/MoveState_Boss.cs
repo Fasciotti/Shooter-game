@@ -5,6 +5,9 @@ public class MoveState_Boss : EnemyState
     private Enemy_Boss enemy;
     private Vector3 destination;
 
+    private float actionTimer;
+    private bool speedUpActivated;
+
     public MoveState_Boss(Enemy enemyBase, EnemyStateMachine stateMachine, string animBoolName) : base(enemyBase, stateMachine, animBoolName)
     {
         enemy = enemyBase as Enemy_Boss;
@@ -17,9 +20,12 @@ public class MoveState_Boss : EnemyState
         destination = enemy.GetPatrolDestination();
         enemy.agent.SetDestination(destination);
         enemy.agent.isStopped = false;
+        ResetSpeed();
 
-        enemy.agent.speed = enemy.moveSpeed;
+        actionTimer = enemy.actionCooldown;
+        stateTimer = 0f;
     }
+
 
     public override void Exit()
     {
@@ -30,6 +36,8 @@ public class MoveState_Boss : EnemyState
     {
         base.Update();
 
+        actionTimer -= Time.deltaTime;
+
         enemy.FaceTarget(GetNextPathPoint());
 
         if (enemy.inBattleMode)
@@ -38,9 +46,12 @@ public class MoveState_Boss : EnemyState
 
             enemy.agent.SetDestination(playerPos);
 
-            if (enemy.CanDoJumpAttack())
+            if (CanSpeedUp())
+                SpeedUp();
+
+            if (actionTimer < 0)
             {
-                stateMachine.ChangeState(enemy.JumpAttackState);
+                PerformAction();
             }
             else if (Vector3.Distance(enemy.transform.position, playerPos) < enemy.attackRange)
             {
@@ -55,5 +66,49 @@ public class MoveState_Boss : EnemyState
         }
 
 
+    }
+
+    private void SpeedUp()
+    {
+        speedUpActivated = true;
+        enemy.agent.speed = enemy.runSpeed;
+        enemy.anim.SetFloat("MoveIndex", 1);
+    }
+    private void ResetSpeed()
+    {
+        speedUpActivated = false;
+        enemy.agent.speed = enemy.moveSpeed;
+        enemy.anim.SetFloat("MoveIndex", 0);
+    }
+    private bool CanSpeedUp()
+    {
+        if (speedUpActivated)
+            return false;
+
+        if (Time.time > enemy.AttackState.lastTimeAttacked + enemy.speedUpCooldown)
+            return true;
+
+        return false;
+    }
+
+    // This makes specific cooldown pretty much useless
+    private void PerformAction()
+    {
+        actionTimer = enemy.actionCooldown;
+
+        if (Random.Range(0, 2) == 0) // 0 or 1
+        {
+            if (enemy.CanUseAbility())
+            {
+                stateMachine.ChangeState(enemy.AbilityState);
+            }
+        }
+        else
+        {
+            if (enemy.CanDoJumpAttack())
+            {
+                stateMachine.ChangeState(enemy.JumpAttackState);
+            }
+        }
     }
 }

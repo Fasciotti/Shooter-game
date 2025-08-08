@@ -5,6 +5,8 @@ public class Enemy_Boss : Enemy
 
     [Header("Attack Settings")]
     public float attackRange;
+    public float actionCooldown;
+    public float speedUpCooldown = 15;
 
 
     [Header("Jump Attack Settings")]
@@ -15,7 +17,12 @@ public class Enemy_Boss : Enemy
     private float lastJumpAttack;
 
     [Header("Flamethrower settings")]
+    public ParticleSystem flameSteam;
     public float flameThrowerDuration;
+    public float abilityCooldown;
+    public bool flameThrowerActive { get; private set; }
+    private float lastTimeAbility;
+    private float flameThrowerMaxDistance = 7;
 
     public MoveState_Boss MoveState { get; private set; }
     public IdleState_Boss IdleState { get; private set; }
@@ -47,11 +54,6 @@ public class Enemy_Boss : Enemy
 
         stateMachine.currentState.Update();
 
-        if (Input.GetKeyDown(KeyCode.V))
-        {
-            stateMachine.ChangeState(AbilityState);
-        }
-
         if (ShouldEnterBattleMode())
         {
             EnterBattleMode();
@@ -69,7 +71,7 @@ public class Enemy_Boss : Enemy
 
         if (IsPlayerInClearSight() && Time.time > lastJumpAttack + jumpAttackCooldown)
         {
-            lastJumpAttack = Time.time;
+            lastJumpAttack = Time.time + travelTimeToTarget;
             return true;
         }
 
@@ -93,23 +95,47 @@ public class Enemy_Boss : Enemy
 
         if(Physics.Raycast(currentPos, direction, out var hit, Mathf.Infinity, ~whatToIgnore))
         {
-            if(hit.transform == player.transform || player.transform.parent)
+            if (hit.transform == player.transform || hit.transform.parent == player.transform)
             {
-                Debug.Log(hit.transform);
                 return true;
             }
         }
 
         return false;
     }
-    public void ActivateFlameThrower(bool activate)
+
+    public bool CanUseAbility()
     {
-        anim.SetBool("Flamethrower", activate);
+        if (Vector3.Distance(transform.position, player.transform.position) > flameThrowerMaxDistance)
+        {
+            return false;
+        }
 
+        if (IsPlayerInClearSight() && Time.time > lastTimeAbility + abilityCooldown)
+        {
+            lastTimeAbility = Time.time + flameThrowerDuration;
+            return true;
+        }
 
+        return false;
     }
 
+    public void ActivateFlameThrower(bool activate)
+    {
+        ParticleSystem flameSteamChild = flameSteam.transform.GetChild(0).GetComponent<ParticleSystem>();
+        flameThrowerActive = activate;
 
+        if (!activate)
+        {
+            anim.SetTrigger("StopFlamethrower");
+            flameSteam.Stop();
+            flameSteamChild.Stop();
+            return;
+        }
+
+        flameSteam.Play();
+        flameSteamChild.Play();
+    }
     protected override void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(transform.position, attackRange);
