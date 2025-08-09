@@ -88,6 +88,8 @@ public class Enemy_Range : Enemy
         playerBody = player.playerBody;
         aim.parent = null;
         
+        // Changes pretty much every animation. (Pistol/Revolver or Autorifle, etc...) (Shotgun/Ridle is also handled through layers)
+        // It is supposed to be in Enemy_Visuals.
         anim.SetFloat("WeaponHoldIndex", HandHoldIndex());
         visuals.SetupLook();
         
@@ -266,12 +268,7 @@ public class Enemy_Range : Enemy
 
     public Transform GranadeStartPoint()
     {
-        if (weaponType == Enemy_RangeWeaponType.Pistol || weaponType == Enemy_RangeWeaponType.Revolver)
-        {
-            return granadeStartPoint[1];
-        }
-
-        return granadeStartPoint[0];
+        return granadeStartPoint[HandHoldIndex()];
     }
 
     public void ThrowGranade()
