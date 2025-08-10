@@ -29,6 +29,7 @@ public class Enemy_Boss : Enemy
     public AttackState_Boss AttackState { get; private set; }
     public JumpAttackState_Boss JumpAttackState { get; private set; }
     public AbilityState_Boss AbilityState { get; private set; }
+    public Enemy_BossVisuals bossVisuals { get; private set;}
 
     protected override void Awake()
     {
@@ -39,6 +40,7 @@ public class Enemy_Boss : Enemy
         AttackState = new AttackState_Boss(this, stateMachine, "Attack");
         JumpAttackState = new JumpAttackState_Boss(this, stateMachine, "JumpAttack");
         AbilityState = new AbilityState_Boss(this, stateMachine, "Ability");
+        bossVisuals = GetComponent<Enemy_BossVisuals>();
     }
 
     protected override void Start()
@@ -130,9 +132,11 @@ public class Enemy_Boss : Enemy
             anim.SetTrigger("StopFlamethrower");
             flameSteam.Stop();
             flameSteamChild.Stop();
+            bossVisuals.ResetBatteries();
             return;
         }
 
+        bossVisuals.DischargeBatteries();
         flameSteam.Play();
         flameSteamChild.Play();
     }
