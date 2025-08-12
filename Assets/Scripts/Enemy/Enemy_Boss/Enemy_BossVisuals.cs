@@ -6,7 +6,12 @@ public class Enemy_BossVisuals : MonoBehaviour
 {
     private Enemy_Boss enemy;
 
+
+    [SerializeField] private ParticleSystem landingZone;
+    [SerializeField] private TrailRenderer[] weaponTrails;
+
     // 0 = Right, 1 = Left;
+    [Header("Batteries")]
     [SerializeField] private GameObject[] batteries;
 
     private const float initialBatteryScaleY = 0.15f; // Max battery scale
@@ -25,6 +30,12 @@ public class Enemy_BossVisuals : MonoBehaviour
     private void Start()
     {
         ResetBatteries();
+        landingZone.transform.parent = null;
+    }
+    private void Update()
+    {
+        UpdateBatteryVisuals();
+
     }
     public void ResetBatteries()
     {
@@ -40,10 +51,32 @@ public class Enemy_BossVisuals : MonoBehaviour
         }
 
     }
+    public void PlaceLandingZoneEffect(Vector3 target)
+    {
+        landingZone.transform.position = target;
+        landingZone.Clear();
+
+        var mainModule = landingZone.main;
+
+        mainModule.startLifetime = enemy.jumpTimeToTarget * 2f; // Magic number to give some margin of time.
+        mainModule.startSize = 5f; // Make a impactRadius variable
+
+        landingZone.Play();
+
+    }
+
+    public void WeaponTrailActive(bool active)
+    {
+        foreach(var trail in weaponTrails)
+        {
+            trail.gameObject.SetActive(active);
+        }
+    }
 
     public void DischargeBatteries() => isRecharging = false;
 
-    private void Update()
+
+    private void UpdateBatteryVisuals()
     {
         float speed = isRecharging ? rechargeSpeed : -dischargeSpeed;
 
@@ -63,6 +96,5 @@ public class Enemy_BossVisuals : MonoBehaviour
                 battery.SetActive(false);
             }
         }
-
     }
 }

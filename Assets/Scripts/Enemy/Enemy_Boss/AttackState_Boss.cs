@@ -15,6 +15,7 @@ public class AttackState_Boss : EnemyState
 
         enemy.anim.SetFloat("AttackIndex", Random.Range(0, 2));
         enemy.agent.isStopped = true;
+        enemy.bossVisuals.WeaponTrailActive(true);
 
         stateTimer = 1;
     }
@@ -24,6 +25,7 @@ public class AttackState_Boss : EnemyState
         base.Exit();
 
         lastTimeAttacked = Time.time;
+        enemy.bossVisuals.WeaponTrailActive(false);
     }
 
     public override void Update()

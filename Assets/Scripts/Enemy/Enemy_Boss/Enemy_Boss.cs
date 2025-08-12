@@ -11,7 +11,7 @@ public class Enemy_Boss : Enemy
 
     [Header("Jump Attack Settings")]
     public LayerMask whatToIgnore;
-    public float travelTimeToTarget;
+    public float jumpTimeToTarget;
     public float jumpAttackCooldown;
     public float minJumpAttackDistance;
     private float lastJumpAttack;
@@ -73,7 +73,7 @@ public class Enemy_Boss : Enemy
 
         if (IsPlayerInClearSight() && Time.time > lastJumpAttack + jumpAttackCooldown)
         {
-            lastJumpAttack = Time.time + travelTimeToTarget;
+            lastJumpAttack = Time.time + jumpTimeToTarget;
             return true;
         }
 
@@ -122,23 +122,28 @@ public class Enemy_Boss : Enemy
         return false;
     }
 
+    // Supposed to be in BossVisuals
     public void ActivateFlameThrower(bool activate)
     {
-        ParticleSystem flameSteamChild = flameSteam.transform.GetChild(0).GetComponent<ParticleSystem>();
         flameThrowerActive = activate;
 
         if (!activate)
         {
             anim.SetTrigger("StopFlamethrower");
             flameSteam.Stop();
-            flameSteamChild.Stop();
             bossVisuals.ResetBatteries();
             return;
         }
 
+        var mainModule = flameSteam.main;
+        var childModule = flameSteam.transform.GetChild(0).GetComponent<ParticleSystem>().main;
+
+        mainModule.duration = flameThrowerDuration;
+        childModule.duration = flameThrowerDuration;
+
         bossVisuals.DischargeBatteries();
+        flameSteam.Clear();
         flameSteam.Play();
-        flameSteamChild.Play();
     }
     protected override void OnDrawGizmos()
     {

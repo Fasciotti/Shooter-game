@@ -19,14 +19,18 @@ public class JumpAttackState_Boss : EnemyState
 
         enemy.agent.isStopped = true;
 
-        jumpAttackFlySpeed = Vector3.Distance(lastPlayerPos, enemy.transform.position) / enemy.travelTimeToTarget;
+        jumpAttackFlySpeed = Vector3.Distance(lastPlayerPos, enemy.transform.position) / enemy.jumpTimeToTarget;
 
         enemy.FaceTarget(lastPlayerPos, 1000);
+
+        enemy.bossVisuals.PlaceLandingZoneEffect(lastPlayerPos);
+        enemy.bossVisuals.WeaponTrailActive(true);
     }
 
     public override void Exit()
     {
         base.Exit();
+        enemy.bossVisuals.WeaponTrailActive(false);
     }
 
     public override void Update()
