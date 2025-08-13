@@ -15,6 +15,10 @@ public class Enemy_Boss : Enemy
     public float jumpAttackCooldown;
     public float minJumpAttackDistance;
     private float lastJumpAttack;
+    [Space]
+    public float impactForce;
+    public float impactRadius; // Used also in visuals
+    private float upwardModifier = 7.5f;
 
     [Header("Flamethrower settings")]
     public ParticleSystem flameSteam;
@@ -24,23 +28,26 @@ public class Enemy_Boss : Enemy
     private float lastTimeAbility;
     private float flameThrowerMaxDistance = 7;
 
+    public Enemy_BossVisuals bossVisuals { get; private set;}
+
     public MoveState_Boss MoveState { get; private set; }
     public IdleState_Boss IdleState { get; private set; }
     public AttackState_Boss AttackState { get; private set; }
     public JumpAttackState_Boss JumpAttackState { get; private set; }
     public AbilityState_Boss AbilityState { get; private set; }
-    public Enemy_BossVisuals bossVisuals { get; private set;}
-
+    public DeadState_Boss DeadState { get; private set; }
     protected override void Awake()
     {
         base.Awake();
+
+        bossVisuals = GetComponent<Enemy_BossVisuals>();
 
         IdleState = new IdleState_Boss(this, stateMachine, "Idle");
         MoveState = new MoveState_Boss(this, stateMachine, "Move");
         AttackState = new AttackState_Boss(this, stateMachine, "Attack");
         JumpAttackState = new JumpAttackState_Boss(this, stateMachine, "JumpAttack");
         AbilityState = new AbilityState_Boss(this, stateMachine, "Ability");
-        bossVisuals = GetComponent<Enemy_BossVisuals>();
+        DeadState = new DeadState_Boss(this, stateMachine, "Idle"); // Idle as placeholder
     }
 
     protected override void Start()
@@ -54,12 +61,37 @@ public class Enemy_Boss : Enemy
     {
         base.Update();
 
+        if(Input.GetKeyDown(KeyCode.L))
+        {
+            stateMachine.ChangeState(DeadState);
+        }
+
         stateMachine.currentState.Update();
 
         if (ShouldEnterBattleMode())
         {
             EnterBattleMode();
         }
+    }
+
+    public override void GetHit()
+    {
+        base.GetHit();
+
+        if (healthPoints <= 0 && stateMachine.currentState != DeadState)
+            stateMachine.ChangeState(DeadState);
+
+    }
+
+    public override void EnterBattleMode()
+    {
+        if (inBattleMode)
+            return;
+        
+        base.EnterBattleMode();
+
+        // Go after the player. In the MoveState, when close enough, change to AttackState
+        stateMachine.ChangeState(MoveState);
     }
 
     public bool IsPlayerInAttackRange() => Vector3.Distance(transform.position, player.transform.position) < attackRange;
@@ -79,15 +111,6 @@ public class Enemy_Boss : Enemy
 
         return false;
     }
-
-    public override void EnterBattleMode()
-    {
-        base.EnterBattleMode();
-
-        // Go after the player. In the MoveState, when close enough, change to AttackState
-        stateMachine.ChangeState(MoveState);
-    }
-
     private bool IsPlayerInClearSight()
     {
         Vector3 currentPos = transform.position;
@@ -104,6 +127,19 @@ public class Enemy_Boss : Enemy
         }
 
         return false;
+    }
+
+    public void JumpImpact()
+    {
+        Collider[] colliders = Physics.OverlapSphere(transform.position, impactRadius);
+
+        foreach (Collider collider in colliders)
+        {
+            if (collider.TryGetComponent<Rigidbody>(out var hit))
+            {
+                hit.AddExplosionForce(impactForce, transform.position, impactRadius, upwardModifier, ForceMode.Impulse);
+            }
+        }
     }
 
     public bool CanUseAbility()
@@ -145,6 +181,7 @@ public class Enemy_Boss : Enemy
         flameSteam.Clear();
         flameSteam.Play();
     }
+
     protected override void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(transform.position, attackRange);

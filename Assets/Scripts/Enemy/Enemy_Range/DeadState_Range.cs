@@ -38,7 +38,8 @@ public class DeadState_Range : EnemyState
     {
         base.Update();
 
-        // Uncomment to disable physical interaction after death
+        // Uncomment to disable interaction with the dead enemy. (Recommended, not disabling affects performance)
+
         //DisableInteraction(); 
     }
 

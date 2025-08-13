@@ -45,8 +45,6 @@ public class Enemy_BossVisuals : MonoBehaviour
 
         foreach (var battery in batteries)
         {
-            Debug.Log("tring");
-
             battery.SetActive(true);
         }
 
@@ -59,7 +57,7 @@ public class Enemy_BossVisuals : MonoBehaviour
         var mainModule = landingZone.main;
 
         mainModule.startLifetime = enemy.jumpTimeToTarget * 2f; // Magic number to give some margin of time.
-        mainModule.startSize = 5f; // Make a impactRadius variable
+        mainModule.startSize = enemy.impactRadius * 2;
 
         landingZone.Play();
 
