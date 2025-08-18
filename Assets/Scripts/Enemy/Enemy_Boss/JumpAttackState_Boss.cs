@@ -19,12 +19,20 @@ public class JumpAttackState_Boss : EnemyState
 
         enemy.agent.isStopped = true;
 
+        enemy.FaceTarget(lastPlayerPos, 1000);
+
         jumpAttackFlySpeed = Vector3.Distance(lastPlayerPos, enemy.transform.position) / enemy.jumpTimeToTarget;
 
-        enemy.FaceTarget(lastPlayerPos, 1000);
 
         enemy.bossVisuals.PlaceLandingZoneEffect(lastPlayerPos);
         enemy.bossVisuals.WeaponTrailActive(true);
+
+        if (enemy.bossAttackType == BossAttackType.Hammer)
+        {
+            enemy.agent.isStopped = false;
+            enemy.agent.speed = enemy.runSpeed;
+            enemy.agent.SetDestination(lastPlayerPos);
+        }
     }
 
     public override void Exit()
@@ -39,6 +47,7 @@ public class JumpAttackState_Boss : EnemyState
 
         if (enemy.ManualMovementActive())
         {
+            enemy.agent.isStopped = true;
             enemy.transform.position = Vector3.MoveTowards(enemy.transform.position, lastPlayerPos, Time.deltaTime * jumpAttackFlySpeed);
         }
 

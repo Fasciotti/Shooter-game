@@ -1,12 +1,15 @@
 using UnityEngine;
 
+public enum BossAttackType { Flamethrower, Hammer}
 public class Enemy_Boss : Enemy
 {
 
-    [Header("Attack Settings")]
+    [Header("Boss Settings")]
+    public BossAttackType bossAttackType;
     public float attackRange;
     public float actionCooldown;
     public float speedUpCooldown = 15;
+    public Transform impactPoint;
 
 
     [Header("Jump Attack Settings")]
@@ -20,13 +23,18 @@ public class Enemy_Boss : Enemy
     public float impactRadius; // Used also in visuals
     private float upwardModifier = 7.5f;
 
-    [Header("Flamethrower settings")]
-    public ParticleSystem flameSteam;
-    public float flameThrowerDuration;
+    [Header("Ability settings")]
     public float abilityCooldown;
-    public bool flameThrowerActive { get; private set; }
     private float lastTimeAbility;
+
+    [Header("Flamethrower")]
+    public ParticleSystem flameSteam;
+    public float abilityDuration;
+    public bool flameThrowerActive { get; private set; }
     private float flameThrowerMaxDistance = 7;
+
+    [Header("Hammer")]
+    public GameObject hammerFxPrefab;
 
     public Enemy_BossVisuals bossVisuals { get; private set;}
 
@@ -131,13 +139,20 @@ public class Enemy_Boss : Enemy
 
     public void JumpImpact()
     {
-        Collider[] colliders = Physics.OverlapSphere(transform.position, impactRadius);
+        Transform impactPoint = this.impactPoint;
+
+        if (impactPoint == null)
+        {
+            impactPoint = transform;
+        }
+
+        Collider[] colliders = Physics.OverlapSphere(impactPoint.position, impactRadius);
 
         foreach (Collider collider in colliders)
         {
             if (collider.TryGetComponent<Rigidbody>(out var hit))
             {
-                hit.AddExplosionForce(impactForce, transform.position, impactRadius, upwardModifier, ForceMode.Impulse);
+                hit.AddExplosionForce(impactForce, impactPoint.position, impactRadius, upwardModifier, ForceMode.Impulse);
             }
         }
     }
@@ -151,15 +166,21 @@ public class Enemy_Boss : Enemy
 
         if (IsPlayerInClearSight() && Time.time > lastTimeAbility + abilityCooldown)
         {
-            lastTimeAbility = Time.time + flameThrowerDuration;
+            lastTimeAbility = Time.time + abilityDuration;
             return true;
         }
 
         return false;
     }
 
+    public void HammerActive(bool activate)
+    {
+        GameObject hammerFx = ObjectPool.Instance.GetObject(hammerFxPrefab, impactPoint.position);
+        ObjectPool.Instance.ReturnObject(hammerFx, 0.5f);
+    }
+
     // Supposed to be in BossVisuals
-    public void ActivateFlameThrower(bool activate)
+    public void FlameThrowerActive(bool activate)
     {
         flameThrowerActive = activate;
 
@@ -174,8 +195,8 @@ public class Enemy_Boss : Enemy
         var mainModule = flameSteam.main;
         var childModule = flameSteam.transform.GetChild(0).GetComponent<ParticleSystem>().main;
 
-        mainModule.duration = flameThrowerDuration;
-        childModule.duration = flameThrowerDuration;
+        mainModule.duration = abilityDuration;
+        childModule.duration = abilityDuration;
 
         bossVisuals.DischargeBatteries();
         flameSteam.Clear();

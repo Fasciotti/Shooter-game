@@ -15,7 +15,7 @@ public class AbilityState_Boss : EnemyState
 
         enemy.agent.isStopped = true;
         enemy.agent.velocity = Vector3.zero;
-        stateTimer = enemy.flameThrowerDuration;
+        stateTimer = enemy.abilityDuration;
     }
 
     public override void Exit()
@@ -29,9 +29,9 @@ public class AbilityState_Boss : EnemyState
 
         enemy.FaceTarget(enemy.player.transform.position);
 
-        if (stateTimer < 0 && enemy.flameThrowerActive)
+        if (ShouldDisableFlamethrower())
         {
-            enemy.ActivateFlameThrower(false);
+            enemy.FlameThrowerActive(false);
         }
 
         if (triggerCalled)
@@ -39,10 +39,23 @@ public class AbilityState_Boss : EnemyState
             stateMachine.ChangeState(enemy.MoveState);
         }
     }
+
+    private bool ShouldDisableFlamethrower()
+    {
+        return stateTimer < 0 && enemy.flameThrowerActive;
+    }
+
     public override void AbilityTrigger()
     {
         base.AbilityTrigger();
 
-        enemy.ActivateFlameThrower(true);
+        if (enemy.bossAttackType == BossAttackType.Flamethrower)
+        {
+            enemy.FlameThrowerActive(true);
+        }
+        else if (enemy.bossAttackType == BossAttackType.Hammer)
+        {
+            enemy.HammerActive(true);
+        }
     }
 }

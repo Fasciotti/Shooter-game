@@ -60,11 +60,9 @@ public class MoveState_Boss : EnemyState
         }
         else
         {
-            Debug.Log(Vector3.Distance(enemy.transform.position, destination) <= enemy.agent.stoppingDistance);
             // Stopping distace must not be 0
             if ((Vector3.Distance(enemy.transform.position, destination) <= enemy.agent.stoppingDistance))
             {
-                Debug.Log("hi");
                 stateMachine.ChangeState(enemy.IdleState);
 
             }

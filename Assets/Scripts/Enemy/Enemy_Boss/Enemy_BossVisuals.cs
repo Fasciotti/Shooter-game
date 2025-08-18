@@ -6,7 +6,7 @@ public class Enemy_BossVisuals : MonoBehaviour
 {
     private Enemy_Boss enemy;
 
-
+    public float landingOffset;
     [SerializeField] private ParticleSystem landingZone;
     [SerializeField] private TrailRenderer[] weaponTrails;
 
@@ -41,7 +41,7 @@ public class Enemy_BossVisuals : MonoBehaviour
     {
         isRecharging = true;
         rechargeSpeed = initialBatteryScaleY / enemy.abilityCooldown;
-        dischargeSpeed = initialBatteryScaleY / (enemy.flameThrowerDuration * 0.75f);
+        dischargeSpeed = initialBatteryScaleY / (enemy.abilityDuration * 0.75f);
 
         foreach (var battery in batteries)
         {
@@ -51,7 +51,10 @@ public class Enemy_BossVisuals : MonoBehaviour
     }
     public void PlaceLandingZoneEffect(Vector3 target)
     {
-        landingZone.transform.position = target;
+        Vector3 dir = target - transform.position;
+        Vector3 offset = dir.normalized * landingOffset;
+
+        landingZone.transform.position = target + offset;
         landingZone.Clear();
 
         var mainModule = landingZone.main;

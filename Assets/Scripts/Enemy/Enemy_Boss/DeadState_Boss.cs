@@ -17,7 +17,7 @@ public class DeadState_Boss : EnemyState
         enemy.agent.isStopped = true;
         enemy.anim.enabled = false;
 
-        enemy.ActivateFlameThrower(false);
+        enemy.FlameThrowerActive(false);
 
         enemy.ragdoll.RagdollActive(true);
 
