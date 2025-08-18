@@ -25,18 +25,20 @@ public class Enemy_Boss : Enemy
 
     [Header("Ability settings")]
     public float abilityCooldown;
+    public float abilityMaxDistance = 7;
+    public float abilityDuration;
     private float lastTimeAbility;
 
     [Header("Flamethrower")]
     public ParticleSystem flameSteam;
-    public float abilityDuration;
     public bool flameThrowerActive { get; private set; }
-    private float flameThrowerMaxDistance = 7;
 
     [Header("Hammer")]
     public GameObject hammerFxPrefab;
 
+
     public Enemy_BossVisuals bossVisuals { get; private set;}
+
 
     public MoveState_Boss MoveState { get; private set; }
     public IdleState_Boss IdleState { get; private set; }
@@ -159,7 +161,7 @@ public class Enemy_Boss : Enemy
 
     public bool CanUseAbility()
     {
-        if (Vector3.Distance(transform.position, player.transform.position) > flameThrowerMaxDistance)
+        if (Vector3.Distance(transform.position, player.transform.position) > abilityMaxDistance)
         {
             return false;
         }

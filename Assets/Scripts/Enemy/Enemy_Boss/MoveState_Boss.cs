@@ -7,6 +7,7 @@ public class MoveState_Boss : EnemyState
 
     private float actionTimer;
     private bool speedUpActivated;
+    private float lastTimeAbilityUsed = 0;
 
     public MoveState_Boss(Enemy enemyBase, EnemyStateMachine stateMachine, string animBoolName) : base(enemyBase, stateMachine, animBoolName)
     {
@@ -52,6 +53,17 @@ public class MoveState_Boss : EnemyState
             if (actionTimer < 0)
             {
                 PerformAction();
+            }
+            else if (Time.time > lastTimeAbilityUsed + (enemy.actionCooldown * 2)) // Can be removed with no breaking effect
+            {
+                // This is used to make the boss use the abilities more times.
+                // As it is dependent of more conditions
+                // and could be ignored several times
+                if (enemy.CanUseAbility())
+                {
+                    lastTimeAbilityUsed = Time.time;
+                    stateMachine.ChangeState(enemy.AbilityState);
+                }
             }
             else if (Vector3.Distance(enemy.transform.position, playerPos) < enemy.attackRange)
             {
@@ -103,6 +115,7 @@ public class MoveState_Boss : EnemyState
         {
             if (enemy.CanUseAbility())
             {
+                lastTimeAbilityUsed = Time.time;
                 stateMachine.ChangeState(enemy.AbilityState);
             }
         }
