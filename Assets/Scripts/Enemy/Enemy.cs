@@ -9,7 +9,7 @@ public class Enemy : MonoBehaviour
 {
 
     [Header("Health")]
-    [SerializeField] protected int healthPoints = 20;
+    public int healthPoints = 20;
 
     [Header("Idle Configuration")]
     public float idleTime;
@@ -97,8 +97,6 @@ public class Enemy : MonoBehaviour
     }
     public virtual void GetHit()
     {
-        healthPoints--;
-
         EnterBattleMode();
     }
 
