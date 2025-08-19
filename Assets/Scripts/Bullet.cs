@@ -16,6 +16,7 @@ public class Bullet : MonoBehaviour
     private Vector3 startPosition;
 
     private bool returnCalled = false;
+    private LayerMask allyLayerMask;
 
     private void Awake()
     {
@@ -26,13 +27,15 @@ public class Bullet : MonoBehaviour
     }
 
     // It's called when the bullet is shot. (After the positioning)
-    public void BulletSetup(float flyDistance = 100, float impactForce = 100)
+    public void BulletSetup(LayerMask allyLayerMask ,float flyDistance = 50, float impactForce = 100)
     {
         startPosition = transform.position;
 
         // Both determined when shooting. Different weapons, different ranges.
         this.impactForce = impactForce;
         this.flyDistance = flyDistance;
+
+        this.allyLayerMask = allyLayerMask;
         
         ResetBullet();
     }
@@ -58,8 +61,16 @@ public class Bullet : MonoBehaviour
         CreateImpactFX(collision);
         ReturnBulletToPool();
 
-        Enemy enemy = collision.gameObject.GetComponentInParent<Enemy>();
-        Enemy_Shield shield =  collision.gameObject.GetComponent<Enemy_Shield>();
+        if (!FriendlyFireEnabled())
+        {
+            // Bitwise operation
+            if((allyLayerMask.value & (1 << collision.gameObject.layer)) > 0)
+            {
+                return;
+            }
+        }
+
+        Enemy_Shield shield = collision.gameObject.GetComponent<Enemy_Shield>();
 
         IDamageble hitbox = collision.gameObject.GetComponent<IDamageble>();
         hitbox?.TakeDamage();
@@ -70,17 +81,21 @@ public class Bullet : MonoBehaviour
             return;
         }
 
+        ApplyBulletImpactToEnemy(collision);
+
+    }
+
+    private void ApplyBulletImpactToEnemy(Collision collision)
+    {
+        Enemy enemy = collision.gameObject.GetComponentInParent<Enemy>();
         if (enemy != null)
         {
 
             Vector3 force = rb.linearVelocity.normalized * impactForce;
             Rigidbody targetRigidbody = collision.collider.attachedRigidbody;
-            
-            enemy.DeathImpact(force, collision.contacts[0].point, targetRigidbody);
-            enemy.GetHit();
-        }
 
-            
+            enemy.BulletImpact(force, collision.contacts[0].point, targetRigidbody);
+        }
     }
 
     private void ResetBullet()
@@ -123,4 +138,6 @@ public class Bullet : MonoBehaviour
             ObjectPool.Instance.ReturnObject(newImpactFX, 0.8f);
         }
     }
+
+    private bool FriendlyFireEnabled() => GameManager.Instance.FriendlyFire;
 }

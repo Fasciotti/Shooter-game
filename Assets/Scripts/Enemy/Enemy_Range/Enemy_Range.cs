@@ -132,9 +132,9 @@ public class Enemy_Range : Enemy
         bullet.transform.position = gunPoint.position;
         bullet.transform.rotation = Quaternion.LookRotation(gunPoint.forward);
 
-        Enemy_Bullet newBullet = bullet.GetComponent<Enemy_Bullet>();
+        Bullet newBullet = bullet.GetComponent<Bullet>();
 
-        newBullet.BulletSetup();
+        newBullet.BulletSetup(whatIsAlly);
 
         Rigidbody newBulletRb = newBullet.GetComponent<Rigidbody>();
 
@@ -145,11 +145,11 @@ public class Enemy_Range : Enemy
 
     }
 
-    public override void GetHit()
+    public override void Die()
     {
-        base.GetHit();
+        base.Die();
 
-        if (healthPoints <= 0 && stateMachine.currentState != DeadState)
+        if (stateMachine.currentState != DeadState)
         {
             stateMachine.ChangeState(DeadState);
         }

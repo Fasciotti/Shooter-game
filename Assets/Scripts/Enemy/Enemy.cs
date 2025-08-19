@@ -1,12 +1,12 @@
-using Unity.Mathematics;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.InputSystem;
-using System.Collections;
 
 [RequireComponent(typeof(NavMeshAgent))]
 public class Enemy : MonoBehaviour
 {
+
+    public LayerMask whatIsAlly;
 
     [Header("Health")]
     public int healthPoints = 20;
@@ -36,8 +36,9 @@ public class Enemy : MonoBehaviour
     public Player player { get; private set; }
     public NavMeshAgent agent { get; private set; }
     public EnemyStateMachine stateMachine { get; private set; }
-    public Animator anim {  get; private set; }
+    public Animator anim { get; private set; }
     public Enemy_Ragdoll ragdoll { get; private set; }
+    public Enemy_Health health { get; private set; }
 
     public bool inBattleMode { get; private set; }
 
@@ -52,6 +53,8 @@ public class Enemy : MonoBehaviour
         anim = GetComponentInChildren<Animator>();
 
         ragdoll = GetComponent<Enemy_Ragdoll>();
+
+        health = GetComponent<Enemy_Health>();
 
         player = GameObject.Find("Player").GetComponent<Player>();
     }
@@ -73,7 +76,7 @@ public class Enemy : MonoBehaviour
     {
         patrolPointsPosition = new Vector3[patrolPoints.Length];
 
-        for (int i = 0;  i < patrolPoints.Length; i++)
+        for (int i = 0; i < patrolPoints.Length; i++)
         {
             patrolPointsPosition[i] = patrolPoints[i].position;
             patrolPoints[i].gameObject.SetActive(false);
@@ -97,12 +100,23 @@ public class Enemy : MonoBehaviour
     }
     public virtual void GetHit()
     {
+        health.ReduceHealth();
+
+        if (health.ShouldDie())
+            Die();
+
         EnterBattleMode();
     }
 
-    public virtual void DeathImpact(Vector3 force, Vector3 hitpoint, Rigidbody rb)
+    public virtual void Die()
     {
-        StartCoroutine(DeathImpactCoroutine(force, hitpoint, rb));
+
+    }
+
+    public virtual void BulletImpact(Vector3 force, Vector3 hitpoint, Rigidbody rb)
+    {
+        if (health.ShouldDie())
+            StartCoroutine(DeathImpactCoroutine(force, hitpoint, rb));
     }
 
     protected virtual void InitializePerk()
@@ -113,7 +127,7 @@ public class Enemy : MonoBehaviour
     private IEnumerator DeathImpactCoroutine(Vector3 force, Vector3 hitPoint, Rigidbody rb)
     {
         yield return new WaitForSeconds(0.05f);
-        
+
         rb.AddForceAtPosition(force, hitPoint, ForceMode.Impulse);
     }
     public bool IsPlayerInAggressionRange() => Vector3.Distance(transform.position, player.transform.position) < aggressionRange;
@@ -130,7 +144,7 @@ public class Enemy : MonoBehaviour
 
         currentPatrolIndex++;
 
-        if (currentPatrolIndex >=  patrolPoints.Length)
+        if (currentPatrolIndex >= patrolPoints.Length)
             currentPatrolIndex = 0;
 
         return destination;

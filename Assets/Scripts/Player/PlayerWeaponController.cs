@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerWeaponController : MonoBehaviour
 {
+    [SerializeField] private LayerMask whatIsAlly;
+    [Space]
     private const float REFERENCE_BULLET_SPEED = 20f;       // This is the default speed from which the mass of the bullet is calculated
 
     private Player player;
@@ -233,7 +235,7 @@ public class PlayerWeaponController : MonoBehaviour
         Bullet bullet = newBullet.GetComponent<Bullet>();
 
 
-        bullet.BulletSetup(currentWeapon.weaponMaximumDistance, bulletImpactForce);
+        bullet.BulletSetup(whatIsAlly ,currentWeapon.weaponMaximumDistance, bulletImpactForce);
 
         newBulletRb.mass = REFERENCE_BULLET_SPEED / bulletSpeed; // This makes sure the mass of the bullet is always the same
         newBulletRb.linearVelocity = bulletDirection * bulletSpeed;
