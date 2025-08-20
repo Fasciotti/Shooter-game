@@ -97,11 +97,11 @@ public class Enemy_Melee : Enemy
 
         stateMachine.ChangeState(RecoveryState);
     }
-    public override void GetHit()
+    public override void Die()
     {
-        base.GetHit();
+        base.Die();
 
-        if (healthPoints <= 0 && stateMachine.currentState != DeadState)
+        if(stateMachine.currentState != DeadState)
             stateMachine.ChangeState(DeadState);
     }
     protected override void InitializePerk()
