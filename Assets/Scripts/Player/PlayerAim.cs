@@ -48,6 +48,10 @@ public class PlayerAim : MonoBehaviour
 
     private void Update()
     {
+
+        if (player.health.isDead)
+            return;
+
         UpdateAimPosition();                 // Position the aim helper
         UpdateCameraPosition();              // Move the camera target smoothly
         UpdateAimVisuals();                  // Update the laser LineRenderer

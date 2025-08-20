@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Enemy_Ragdoll : MonoBehaviour
+public class Ragdoll : MonoBehaviour
 {
     private Rigidbody[] rigidbodies;
     private Collider[] colliders;

@@ -1,13 +1,10 @@
-using NUnit.Framework;
 using System.Collections.Generic;
-using System.Xml;
-using Unity.VisualScripting;
+using System.Security.Cryptography;
 using UnityEngine;
-using UnityEngine.UIElements;
 
-public enum CoverPerk { Unavailable, CanCoverOnce, CanCoverAndChange}
-public enum UnstoppablePerk { Unavailable, Unstoppable}
-public enum ThrowGranadePerk { Unavailable, ThrowGranade};
+public enum CoverPerk { Unavailable, CanCoverOnce, CanCoverAndChange }
+public enum UnstoppablePerk { Unavailable, Unstoppable }
+public enum ThrowGranadePerk { Unavailable, ThrowGranade };
 
 public class Enemy_Range : Enemy
 {
@@ -54,7 +51,7 @@ public class Enemy_Range : Enemy
     public float aimMaxDistance = 1.5f;
 
     [Space]
-    
+
     public List<Enemy_RangeWeaponData> availableWeaponPresets;
     public GameObject bulletPrefab;
     private Transform gunPoint;
@@ -87,12 +84,12 @@ public class Enemy_Range : Enemy
 
         playerBody = player.playerBody;
         aim.parent = null;
-        
+
         // Changes pretty much every animation. (Pistol/Revolver or Autorifle, etc...) (Shotgun/Ridle is also handled through layers)
         // It is supposed to be in Enemy_Visuals.
         anim.SetFloat("WeaponHoldIndex", HandHoldIndex());
         visuals.SetupLook();
-        
+
         stateMachine.Initialize(IdleState);
 
         SetupWeapon();
@@ -114,7 +111,8 @@ public class Enemy_Range : Enemy
         if (CanGetCover())
         {
             stateMachine.ChangeState(RunToCoverState);
-        }else
+        }
+        else
         {
             stateMachine.ChangeState(BattleState);
         }
@@ -166,7 +164,7 @@ public class Enemy_Range : Enemy
         {
             return true;
         }
-        
+
         Debug.LogWarning("Cover Not Found: " + gameObject.name);
         return false;
     }
@@ -202,7 +200,7 @@ public class Enemy_Range : Enemy
 
             currentCover = closestCoverPoint;
             currentCover.SetOccupied(true);
-            
+
             return currentCover.transform;
         }
 
@@ -249,6 +247,9 @@ public class Enemy_Range : Enemy
 
     public bool CanThrowGranade()
     {
+        if (!IsSeeingPlayer())
+            return false;
+
         if (throwGranadePerk != ThrowGranadePerk.ThrowGranade)
             return false;
 
@@ -283,13 +284,14 @@ public class Enemy_Range : Enemy
 
         if (stateMachine.currentState == DeadState)
         {
-            granadeScript.SetupGranade(transform.position, 1, explosionTimer, explosionForce);
+            granadeScript.SetupGranade(whatIsAlly, transform.position, 1, explosionTimer, explosionForce);
             return;
         }
 
-        granadeScript.SetupGranade(player.transform.position, timeToReach, explosionTimer, explosionForce);
+        granadeScript.SetupGranade(whatIsAlly, player.transform.position, timeToReach, explosionTimer, explosionForce);
 
     }
+
 
     private void SetupWeapon()
     {
@@ -332,7 +334,7 @@ public class Enemy_Range : Enemy
 
         return distance < aimMaxDistance;
     }
-    
+
     public bool IsSeeingPlayer()
     {
         Vector3 myPosition = transform.position + Vector3.up;
@@ -340,7 +342,7 @@ public class Enemy_Range : Enemy
 
         if (Physics.Raycast(myPosition, directionToPlayer, out var hit, Mathf.Infinity, ~whatToIgnore))
         {
-            if (hit.transform == player.transform)
+            if (hit.transform.gameObject.layer == player.gameObject.layer)
             {
                 UpdateAimPosition();
                 return true;

@@ -85,6 +85,7 @@ public class Bullet : MonoBehaviour
 
     }
 
+    // At death
     private void ApplyBulletImpactToEnemy(Collision collision)
     {
         Enemy enemy = collision.gameObject.GetComponentInParent<Enemy>();
