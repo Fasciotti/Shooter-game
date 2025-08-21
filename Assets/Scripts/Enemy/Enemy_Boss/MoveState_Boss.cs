@@ -54,7 +54,7 @@ public class MoveState_Boss : EnemyState
             {
                 PerformAction();
             }
-            else if (Time.time > lastTimeAbilityUsed + (enemy.actionCooldown * 2)) // Can be removed with no breaking effect
+            else if (Time.time > lastTimeAbilityUsed + (enemy.abilityCooldown * 2)) // Can be removed with no breaking effect
             {
                 // This is used to make the boss use the abilities more times.
                 // As it is dependent of more conditions

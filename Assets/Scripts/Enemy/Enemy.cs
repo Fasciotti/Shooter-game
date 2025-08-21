@@ -22,6 +22,10 @@ public class Enemy : MonoBehaviour
     private bool manualMovement;
     private bool manualRotation;
 
+    //[Header("Attack Configuration")]
+    private bool isMeleeAttackReady;
+
+
     //[System.NonSerialized] public float chaseAcceleration = 15;
     //[System.NonSerialized] public float standardAcceleration = 8;
 
@@ -31,6 +35,7 @@ public class Enemy : MonoBehaviour
     public Transform[] patrolPoints;
     private Vector3[] patrolPointsPosition; // Used to store the locations initialize, no need to null parent.
     private int currentPatrolIndex;
+
 
     public Enemy_Visuals visuals { get; private set; }
     public Player player { get; private set; }
@@ -98,6 +103,36 @@ public class Enemy : MonoBehaviour
 
         return false;
     }
+    protected void MeleeAttackCheck(Transform[] damagePoints, float damageRadius, GameObject fx = null)
+    {
+        if (!isMeleeAttackReady)
+            return;
+
+        foreach (Transform damagePoint in damagePoints)
+        {
+            Collider[] colliders = Physics.OverlapSphere(damagePoint.position, damageRadius, 1 << LayerMask.NameToLayer("Player"));
+
+            foreach (Collider collider in colliders)
+            {
+                if (collider.TryGetComponent<IDamageble>(out var hitbox))
+                {
+                    isMeleeAttackReady = false;
+                    hitbox.TakeDamage();
+
+                    if (fx != null)
+                    {
+                        GameObject impactFx = ObjectPool.Instance.GetObject(fx, collider.transform.position);
+                        ObjectPool.Instance.ReturnObject(impactFx, 1f);
+
+                    }
+
+                    return;
+                }
+            }
+        }
+    }
+
+
     public virtual void GetHit()
     {
         health.ReduceHealth();
@@ -130,6 +165,8 @@ public class Enemy : MonoBehaviour
 
         rb.AddForceAtPosition(force, hitPoint, ForceMode.Impulse);
     }
+
+    #region AnimationTrigger
     public bool IsPlayerInAggressionRange() => Vector3.Distance(transform.position, player.transform.position) < aggressionRange;
     public void AnimationTrigger() => stateMachine.currentState.AnimationTrigger();
     public void SetActiveManualMovement(bool manualMovement) => this.manualMovement = manualMovement;
@@ -137,6 +174,8 @@ public class Enemy : MonoBehaviour
     public void SetActiveManualRotation(bool manualRotation) => this.manualRotation = manualRotation;
     public bool ManualRotationActive() => manualRotation;
     public virtual void AbilityTrigger() => stateMachine.currentState.AbilityTrigger();
+    public void AttackCheckActive(bool active) => isMeleeAttackReady = active;
+    #endregion
 
     public Vector3 GetPatrolDestination()
     {

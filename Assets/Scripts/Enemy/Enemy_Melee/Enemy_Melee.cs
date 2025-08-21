@@ -36,7 +36,6 @@ public class Enemy_Melee : Enemy
     [Header("Attack Data")]
     public AttackData_Enemy_Melee attackData;
     public List<AttackData_Enemy_Melee> attackList;
-    private bool isAttackReady = false;
 
     [Header("Axe Throw Ability")]
     public GameObject axePrefab;
@@ -93,35 +92,8 @@ public class Enemy_Melee : Enemy
 
         stateMachine.currentState.Update();
 
-        AttackCheck();
+        MeleeAttackCheck(weaponModel.damagePoints, weaponModel.damageRadius, MeleeImpactFx);
     }
-
-    private void AttackCheck()
-    {
-        if (!isAttackReady)
-            return;
-
-        foreach(Transform damagePoint in weaponModel.damagePoints)
-        {
-            Collider[] colliders = Physics.OverlapSphere(damagePoint.position, weaponModel.damageRadius, 1 << LayerMask.NameToLayer("Player"));
-
-            foreach(Collider collider in colliders)
-            {
-                if (collider.TryGetComponent<IDamageble>(out var hitbox))
-                {
-                    isAttackReady = false;
-                    hitbox.TakeDamage();
-
-                    GameObject impactFx = ObjectPool.Instance.GetObject(MeleeImpactFx, collider.transform.position);
-                    ObjectPool.Instance.ReturnObject(impactFx, 1f);
-
-                    return;
-                }
-            }
-        }
-    }
-
-    public void AttackCheckActive(bool active) => isAttackReady = active;
 
     public override void EnterBattleMode()
     {

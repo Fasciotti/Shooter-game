@@ -36,9 +36,13 @@ public class Enemy_Boss : Enemy
     [Header("Hammer")]
     public GameObject hammerFxPrefab;
 
+    [Header("Attack")]
+    [SerializeField] private Transform[] damagePoints;
+    [SerializeField] private float damageRadius;
+    [SerializeField] private GameObject meleeImpactFx;
+
 
     public Enemy_BossVisuals bossVisuals { get; private set;}
-
 
     public MoveState_Boss MoveState { get; private set; }
     public IdleState_Boss IdleState { get; private set; }
@@ -82,15 +86,16 @@ public class Enemy_Boss : Enemy
         {
             EnterBattleMode();
         }
+
+        MeleeAttackCheck(damagePoints, damageRadius, meleeImpactFx);
     }
 
-    public override void GetHit()
+    public override void Die()
     {
-        base.GetHit();
+        base.Die();
 
-        if (healthPoints <= 0 && stateMachine.currentState != DeadState)
+        if (stateMachine.currentState != DeadState)
             stateMachine.ChangeState(DeadState);
-
     }
 
     public override void EnterBattleMode()
@@ -218,6 +223,11 @@ public class Enemy_Boss : Enemy
 
             Gizmos.DrawWireSphere(transform.position, minJumpAttackDistance);
             Gizmos.DrawLine(transform.position, playerPos);
+        }
+
+        foreach(Transform point in damagePoints)
+        {
+            Gizmos.DrawWireSphere(point.position, damageRadius);
         }
     }
 }

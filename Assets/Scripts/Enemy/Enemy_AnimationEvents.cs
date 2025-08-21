@@ -37,7 +37,7 @@ public class Enemy_AnimationEvents : MonoBehaviour
     {
         enemyBoss?.JumpImpact();
     }
-    public void EnableAttackCheck() => enemyMelee?.AttackCheckActive(true);
+    public void EnableAttackCheck() => enemy?.AttackCheckActive(true);
 
-    public void DisableAttackCheck() => enemyMelee?.AttackCheckActive(false);
+    public void DisableAttackCheck() => enemy?.AttackCheckActive(false);
 }

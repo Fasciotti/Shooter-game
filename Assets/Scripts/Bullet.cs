@@ -17,6 +17,7 @@ public class Bullet : MonoBehaviour
 
     private bool returnCalled = false;
     private LayerMask allyLayerMask;
+    private bool hasAlreadyCollided;
 
     private void Awake()
     {
@@ -36,6 +37,7 @@ public class Bullet : MonoBehaviour
         this.flyDistance = flyDistance;
 
         this.allyLayerMask = allyLayerMask;
+        hasAlreadyCollided = false;
         
         ResetBullet();
     }
@@ -58,6 +60,14 @@ public class Bullet : MonoBehaviour
 
     protected virtual void OnCollisionEnter(Collision collision)
     {
+
+        if (hasAlreadyCollided)
+            return;
+
+        hasAlreadyCollided = true;
+
+
+
         CreateImpactFX(collision);
         ReturnBulletToPool();
 
