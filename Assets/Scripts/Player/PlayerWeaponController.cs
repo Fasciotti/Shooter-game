@@ -39,7 +39,7 @@ public class PlayerWeaponController : MonoBehaviour
 
     private void Update()
     {
-        if (isShooting)
+        if (isShooting && !player.health.isDead)
             Shoot();
 
     }

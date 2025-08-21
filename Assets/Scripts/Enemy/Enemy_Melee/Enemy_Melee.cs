@@ -36,6 +36,7 @@ public class Enemy_Melee : Enemy
     [Header("Attack Data")]
     public AttackData_Enemy_Melee attackData;
     public List<AttackData_Enemy_Melee> attackList;
+    private bool isAttackReady = false;
 
     [Header("Axe Throw Ability")]
     public GameObject axePrefab;
@@ -49,8 +50,10 @@ public class Enemy_Melee : Enemy
     [Header("Enemy Settings")]
     public EnemyMelee_Type meleeType;
     public Enemy_MeleeWeaponType weaponType;
+    private Enemy_WeaponModel weaponModel;
     [SerializeField] private Transform shieldTransform;
     [SerializeField] private float dodgeCooldown = 5;
+    [SerializeField] private GameObject MeleeImpactFx;
 
     private readonly float dodgeMinimumDistance = 3f;
     private readonly float moveSpeedMultiplierInAbility = 0.5f;
@@ -85,8 +88,36 @@ public class Enemy_Melee : Enemy
         base.Update();
 
         stateMachine.currentState.Update();
+
+        AttackCheck();
     }
 
+    private void AttackCheck()
+    {
+        if (!isAttackReady)
+            return;
+
+        foreach(Transform damagePoint in weaponModel.damagePoints)
+        {
+            Collider[] colliders = Physics.OverlapSphere(damagePoint.position, weaponModel.damageRadius, 1 << LayerMask.NameToLayer("Player"));
+
+            foreach(Collider collider in colliders)
+            {
+                if (collider.TryGetComponent<IDamageble>(out var hitbox))
+                {
+                    isAttackReady = false;
+                    hitbox.TakeDamage();
+
+                    GameObject impactFx = ObjectPool.Instance.GetObject(MeleeImpactFx, collider.transform.position);
+                    ObjectPool.Instance.ReturnObject(impactFx, 1f);
+
+                    return;
+                }
+            }
+        }
+    }
+
+    public void AttackCheckActive(bool active) => isAttackReady = active;
 
     public override void EnterBattleMode()
     {
@@ -188,12 +219,12 @@ public class Enemy_Melee : Enemy
     }
     public void UpdateAttackData()
     {
-        Enemy_WeaponModel enemy_Weapon = GetComponentInChildren<Enemy_WeaponModel>();
+        weaponModel = GetComponentInChildren<Enemy_WeaponModel>();
 
-        if (enemy_Weapon.weaponType == Enemy_MeleeWeaponType.Unarmed)
+        if (weaponModel.weaponType == Enemy_MeleeWeaponType.Unarmed)
         {
-            attackList = new List<AttackData_Enemy_Melee>(enemy_Weapon.weaponData.attackData);
-            rotationSpeed = enemy_Weapon.weaponData.turnSpeed;
+            attackList = new List<AttackData_Enemy_Melee>(weaponModel.weaponData.attackData);
+            rotationSpeed = weaponModel.weaponData.turnSpeed;
         }
     }
     public bool IsPlayerInAttackRange() => Vector3.Distance(transform.position, player.transform.position) < attackData.attackRange;

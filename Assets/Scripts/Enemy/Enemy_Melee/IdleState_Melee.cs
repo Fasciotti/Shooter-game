@@ -14,7 +14,6 @@ public class IdleState_Melee : EnemyState
         base.Enter();
 
         stateTimer = enemyBase.idleTime;
-        Debug.Log(stateTimer);
 
     }
 
