@@ -46,18 +46,22 @@ public class Enemy_Melee : Enemy
     public float axeThrowCooldown;
     private float axeLastThrownTime;
 
+    [Header("Dodge")]
+    [SerializeField] private float dodgeCooldown = 5;
+    private readonly float dodgeMinimumDistance = 3f;
+    private float lastDodge = -10;
+
+    [Header("Shield")]
+    [SerializeField] private Transform shieldTransform;
+    public int shieldDurability;
 
     [Header("Enemy Settings")]
     public EnemyMelee_Type meleeType;
     public Enemy_MeleeWeaponType weaponType;
     private Enemy_WeaponModel weaponModel;
-    [SerializeField] private Transform shieldTransform;
-    [SerializeField] private float dodgeCooldown = 5;
     [SerializeField] private GameObject MeleeImpactFx;
 
-    private readonly float dodgeMinimumDistance = 3f;
-    private readonly float moveSpeedMultiplierInAbility = 0.5f;
-    private float lastDodge = -10;
+    private readonly float moveSpeedMultiplierInAbility = 0.5f; // AxeThrow
 
     protected override void Awake()
     {

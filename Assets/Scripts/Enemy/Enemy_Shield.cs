@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Enemy_Shield : MonoBehaviour
+public class Enemy_Shield : MonoBehaviour, IDamageble
 {
     [SerializeField] private int durability;
 
@@ -13,6 +13,11 @@ public class Enemy_Shield : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         enemy = GetComponentInParent<Enemy_Melee>();
     }
+    private void Start()
+    {
+        durability = enemy.shieldDurability;
+    }
+
     public void ReduceDurability()
     {
         durability--;
@@ -27,5 +32,10 @@ public class Enemy_Shield : MonoBehaviour
             //Don't comment
             enemy.anim.SetFloat("ChaseIndex", 0);
         }
+    }
+
+    public void TakeDamage()
+    {
+        ReduceDurability();
     }
 }
