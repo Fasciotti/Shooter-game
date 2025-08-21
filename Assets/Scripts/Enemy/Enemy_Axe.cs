@@ -13,12 +13,15 @@ public class Enemy_Axe : MonoBehaviour
     private float flySpeed = 2;
     private float rotationSpeed = 1500;
     private float timer = 1;
+    private bool hasAlreadyCollided;
+
 
     public void SetupAxe(Transform player, float flySpeed = 2, float axeAimTimer = 1)
     {
         this.player = player;
         this.flySpeed = flySpeed;
         this.timer = axeAimTimer;
+        hasAlreadyCollided = false;
     }
 
     private void Update()
@@ -31,20 +34,26 @@ public class Enemy_Axe : MonoBehaviour
         {
             direction = (player.position + (Vector3.up)) - transform.position;
         }
+    }
 
+    private void FixedUpdate()
+    {
         rb.linearVelocity = direction.normalized * flySpeed;
         transform.forward = rb.linearVelocity;
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision collision)
     {
-        if (other.TryGetComponent<Player>(out _) || other.TryGetComponent<Bullet>(out _))
-        {
-            CreateImpactFX();
+        if (hasAlreadyCollided)
+            return;
 
-            rb.linearVelocity = Vector3.zero;
-            ObjectPool.Instance.ReturnObject(gameObject);
-        }
+        if (collision.gameObject.TryGetComponent<IDamageble>(out IDamageble hitbox))
+            hitbox?.TakeDamage();
+
+        CreateImpactFX();
+        rb.linearVelocity = Vector3.zero;
+        hasAlreadyCollided = true;
+        ObjectPool.Instance.ReturnObject(gameObject);
     }
 
     private void CreateImpactFX()
