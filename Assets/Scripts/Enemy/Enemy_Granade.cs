@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,7 +19,7 @@ public class Enemy_Granade : MonoBehaviour
         rb = GetComponent<Rigidbody>();
     }
 
-    public void SetupGranade(LayerMask allyLayerMask ,Vector3 target, float timeToReach, float timer, float explosionForce)
+    public void SetupGranade(LayerMask allyLayerMask, Vector3 target, float timeToReach, float timer, float explosionForce)
     {
         canExplode = true;
         rb.linearVelocity = CalculateLaunchDirection(target, timeToReach);
@@ -49,24 +48,29 @@ public class Enemy_Granade : MonoBehaviour
         HashSet<Transform> objects = new HashSet<Transform>();
         foreach (Collider collider in colliders)
         {
-            if (!IsTargetValid(collider))
-                continue;
-
-            // FIXME: There are objects that are inside holders
-            if (!objects.Add(collider.transform.root))
-                continue;
-
-            IDamageble hitbox = collider.GetComponent<IDamageble>();
-            hitbox?.TakeDamage();
-
-            if (collider.TryGetComponent<Rigidbody>(out var hit))
+            if (collider.TryGetComponent<IDamageble>(out IDamageble hitbox))
             {
-                hit.AddExplosionForce(explosionForce, transform.position, impactRadius, upwardModifier, ForceMode.Impulse);
+                if (!IsTargetValid(collider))
+                    continue;
+
+                if (!objects.Add(collider.transform.root))
+                    continue;
+
+                hitbox?.TakeDamage();
             }
+
+            ApplyPhysicalForceTo(collider);
         }
 
-        // Return granade instantly after explosion
         ObjectPool.Instance.ReturnObject(gameObject);
+    }
+
+    private void ApplyPhysicalForceTo(Collider collider)
+    {
+        if (collider.TryGetComponent<Rigidbody>(out var hit))
+        {
+            hit.AddExplosionForce(explosionForce, transform.position, impactRadius, upwardModifier, ForceMode.Impulse);
+        }
     }
 
     private void PlayExplosionFx()
