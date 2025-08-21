@@ -29,15 +29,16 @@ public class Enemy_Boss : Enemy
     public float abilityDuration;
     private float lastTimeAbility;
 
-    [Header("Flamethrower")]
+    [Header("Flamethrower_DamageArea")]
     public ParticleSystem flameSteam;
     public bool flameThrowerActive { get; private set; }
+    public float flameDamageCooldown;
 
     [Header("Hammer")]
     public GameObject hammerFxPrefab;
 
     [Header("Attack")]
-    [SerializeField] private Transform[] damagePoints;
+    public Transform[] damagePoints;
     [SerializeField] private float damageRadius;
     [SerializeField] private GameObject meleeImpactFx;
 
@@ -88,6 +89,8 @@ public class Enemy_Boss : Enemy
         }
 
         MeleeAttackCheck(damagePoints, damageRadius, meleeImpactFx);
+
+        
     }
 
     public override void Die()
