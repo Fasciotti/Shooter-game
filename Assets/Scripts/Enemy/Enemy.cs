@@ -103,7 +103,7 @@ public class Enemy : MonoBehaviour
 
         return false;
     }
-    protected void MeleeAttackCheck(Transform[] damagePoints, float damageRadius, GameObject fx = null)
+    protected void MeleeAttackCheck(Transform[] damagePoints, float damageRadius, int damage, GameObject fx = null)
     {
         if (!isMeleeAttackReady)
             return;
@@ -117,7 +117,7 @@ public class Enemy : MonoBehaviour
                 if (collider.TryGetComponent<IDamageble>(out var hitbox))
                 {
                     isMeleeAttackReady = false;
-                    hitbox.TakeDamage();
+                    hitbox.TakeDamage(damage);
 
                     if (fx != null)
                     {
@@ -133,9 +133,9 @@ public class Enemy : MonoBehaviour
     }
 
 
-    public virtual void GetHit()
+    public virtual void GetHit(int damage)
     {
-        health.ReduceHealth();
+        health.ReduceHealth(damage);
 
         if (health.ShouldDie())
             Die();

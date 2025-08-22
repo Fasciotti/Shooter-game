@@ -23,6 +23,9 @@ public class Weapon
 
     public WeaponType weaponType;
 
+    [Header("Bullet")]
+    public int bulletDamage;
+
 
     [Header("Magazine Details")]
     public int bulletsInMagazine;
@@ -70,11 +73,14 @@ public class Weapon
     public float cameraDistance {  get; private set; }
     #endregion
 
-    public Weapon_Data weaponData { get; } // Default weaponData
+    public Weapon_Data weaponData { get; private set; } // Default weaponData
 
 
     public Weapon(Weapon_Data weaponData)
     {
+        //Bullet
+        bulletDamage = weaponData.bulletDamage;
+
 
         // Magazine Details
         bulletsInMagazine = weaponData.bulletsInMagazine;

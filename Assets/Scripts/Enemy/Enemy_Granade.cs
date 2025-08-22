@@ -7,6 +7,7 @@ public class Enemy_Granade : MonoBehaviour
     private bool canExplode = true;
     private float timer;
     private float explosionForce;
+    private int damage;
 
     [SerializeField] private float impactRadius;
     [SerializeField] private float upwardModifier;
@@ -19,13 +20,14 @@ public class Enemy_Granade : MonoBehaviour
         rb = GetComponent<Rigidbody>();
     }
 
-    public void SetupGranade(LayerMask allyLayerMask, Vector3 target, float timeToReach, float timer, float explosionForce)
+    public void SetupGranade(LayerMask allyLayerMask, Vector3 target, float timeToReach, float timer, float explosionForce, int damage)
     {
         canExplode = true;
         rb.linearVelocity = CalculateLaunchDirection(target, timeToReach);
         this.timer = timer + timeToReach;
         this.explosionForce = explosionForce;
         this.allyLayerMask = allyLayerMask;
+        this.damage = damage;
     }
     private void Update()
     {
@@ -56,7 +58,7 @@ public class Enemy_Granade : MonoBehaviour
                 if (!uniqueEntities.Add(collider.transform.root))
                     continue;
 
-                hitbox?.TakeDamage();
+                hitbox?.TakeDamage(damage);
             }
 
             ApplyPhysicalForceTo(collider);

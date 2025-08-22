@@ -15,6 +15,7 @@ public class Enemy_Boss : Enemy
 
     [Header("Jump Attack Settings")]
     public LayerMask whatToIgnore;
+    [SerializeField] private int jumpDamage;
     public float jumpTimeToTarget;
     public float jumpAttackCooldown;
     public float minJumpAttackDistance;
@@ -34,15 +35,18 @@ public class Enemy_Boss : Enemy
     public ParticleSystem flameSteam;
     public bool flameThrowerActive { get; private set; }
     public float flameDamageCooldown;
+    public int flameDamage;
 
     [Header("Hammer")]
     public GameObject hammerFxPrefab;
     [SerializeField] private float hammerAbilityRange;
+    [SerializeField] private int hammerAbilityDamage;
 
     [Header("Attack")]
     public Transform[] damagePoints;
     [SerializeField] private float damageRadius;
     [SerializeField] private GameObject meleeImpactFx;
+    [SerializeField] private int attackDamage;
 
 
     public Enemy_BossVisuals bossVisuals { get; private set;}
@@ -90,7 +94,7 @@ public class Enemy_Boss : Enemy
             EnterBattleMode();
         }
 
-        MeleeAttackCheck(damagePoints, damageRadius, meleeImpactFx);
+        MeleeAttackCheck(damagePoints, damageRadius, attackDamage, meleeImpactFx);
 
         
     }
@@ -158,10 +162,10 @@ public class Enemy_Boss : Enemy
             impactPoint = transform;
         }
 
-        MassDamage(impactPoint.position, impactRadius);
+        MassDamage(impactPoint.position, impactRadius, jumpDamage);
     }
 
-    private void MassDamage(Vector3 impactPoint, float impactRadius)
+    private void MassDamage(Vector3 impactPoint, float impactRadius, int damage)
     {
         
 
@@ -177,7 +181,7 @@ public class Enemy_Boss : Enemy
                 if (!uniqueEntities.Add(collider.transform.root.gameObject))
                     continue;
 
-                hitbox.TakeDamage();
+                hitbox.TakeDamage(damage);
             }
 
             ApplyPhysicalForceTo(impactPoint, impactRadius, collider);
@@ -213,7 +217,7 @@ public class Enemy_Boss : Enemy
         GameObject hammerFx = ObjectPool.Instance.GetObject(hammerFxPrefab, impactPoint.position);
         ObjectPool.Instance.ReturnObject(hammerFx, 0.5f);
 
-        MassDamage(impactPoint.position, hammerAbilityRange);
+        MassDamage(impactPoint.position, hammerAbilityRange, hammerAbilityDamage);
     }
 
     // Supposed to be in BossVisuals

@@ -1,32 +1,29 @@
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
-using static UnityEngine.EventSystems.EventTrigger;
-using Random = UnityEngine.Random;
 using RangeAttribute = UnityEngine.RangeAttribute;
 
 [System.Serializable]
 public struct AttackData_Enemy_Melee
 {
     public string attackName;
+    public int attackDamage;
     public float attackRange;
     public float moveSpeed;
     public int attackIndex;
     public AttackType_Melee attackType;
-    [Range(1,2)]
+    [Range(1, 2)]
     public float animationSpeed;
 }
 
-public enum AttackType_Melee { CloseAttack, ChargeAttack}
+public enum AttackType_Melee { CloseAttack, ChargeAttack }
 
-public enum EnemyMelee_Type { Regular, Shield, Dodge, AxeThrow};
+public enum EnemyMelee_Type { Regular, Shield, Dodge, AxeThrow };
 
 public class Enemy_Melee : Enemy
 {
-    public MoveState_Melee MoveState {  get; private set; }
-    public IdleState_Melee IdleState {  get; private set; }
+    public MoveState_Melee MoveState { get; private set; }
+    public IdleState_Melee IdleState { get; private set; }
     public RecoveryState_Melee RecoveryState { get; private set; }
     public ChaseState_Melee ChaseState { get; private set; }
     public AttackState_Melee AttackState { get; private set; }
@@ -40,6 +37,7 @@ public class Enemy_Melee : Enemy
     [Header("Axe Throw Ability")]
     public GameObject axePrefab;
     public Transform axeStartPoint;
+    [SerializeField] private int axeDamage;
     public float axeFlySpeed;
     public float axeAimTimer;
     public float axeThrowCooldown;
@@ -57,7 +55,7 @@ public class Enemy_Melee : Enemy
     [Header("Enemy Settings")]
     public EnemyMelee_Type meleeType;
     public Enemy_MeleeWeaponType weaponType;
-    private Enemy_WeaponModel weaponModel;
+    private Enemy_WeaponModel currentWeaponModel;
     [SerializeField] private GameObject MeleeImpactFx;
 
     private readonly float moveSpeedMultiplierInAbility = 0.5f; // AxeThrow
@@ -74,7 +72,6 @@ public class Enemy_Melee : Enemy
         AbilityState = new AbilityState_Melee(this, stateMachine, "AxeThrow"); //Null is used because the variable is defined inside the class.
         DeadState = new DeadState_Melee(this, stateMachine, "Idle"); //Idle anim is just a place holder. Ragdoll
 
-        AttackState.UpdateAttackData();
 
     }
 
@@ -84,7 +81,10 @@ public class Enemy_Melee : Enemy
 
         stateMachine.Initialize(IdleState);
         visuals.SetupLook();
+        UpdateAttackData();
+        attackData = AttackState.UpdateAttackData();
     }
+
 
     protected override void Update()
     {
@@ -92,7 +92,7 @@ public class Enemy_Melee : Enemy
 
         stateMachine.currentState.Update();
 
-        MeleeAttackCheck(weaponModel.damagePoints, weaponModel.damageRadius, MeleeImpactFx);
+        MeleeAttackCheck(currentWeaponModel.damagePoints, currentWeaponModel.damageRadius, attackData.attackDamage, MeleeImpactFx);
     }
 
     public override void EnterBattleMode()
@@ -108,7 +108,7 @@ public class Enemy_Melee : Enemy
     {
         base.Die();
 
-        if(stateMachine.currentState != DeadState)
+        if (stateMachine.currentState != DeadState)
             stateMachine.ChangeState(DeadState);
     }
     protected override void InitializePerk()
@@ -174,7 +174,7 @@ public class Enemy_Melee : Enemy
     {
         GameObject axePrefabLocal = ObjectPool.Instance.GetObject(axePrefab, axeStartPoint.position);
 
-        axePrefabLocal.GetComponent<Enemy_Axe>().SetupAxe(player.transform, axeFlySpeed, axeAimTimer);
+        axePrefabLocal.GetComponent<Enemy_Axe>().SetupAxe(player.transform, axeDamage, axeFlySpeed, axeAimTimer);
     }
     public bool CanThrowAxe()
     {
@@ -195,12 +195,12 @@ public class Enemy_Melee : Enemy
     }
     public void UpdateAttackData()
     {
-        weaponModel = GetComponentInChildren<Enemy_WeaponModel>();
+        currentWeaponModel = GetComponentInChildren<Enemy_WeaponModel>();
 
-        if (weaponModel.weaponType == Enemy_MeleeWeaponType.Unarmed)
+        if (currentWeaponModel.weaponType == Enemy_MeleeWeaponType.Unarmed)
         {
-            attackList = new List<AttackData_Enemy_Melee>(weaponModel.weaponData.attackData);
-            rotationSpeed = weaponModel.weaponData.turnSpeed;
+            attackList = new List<AttackData_Enemy_Melee>(currentWeaponModel.weaponData.attackData);
+            rotationSpeed = currentWeaponModel.weaponData.turnSpeed;
         }
     }
     public bool IsPlayerInAttackRange() => Vector3.Distance(transform.position, player.transform.position) < attackData.attackRange;

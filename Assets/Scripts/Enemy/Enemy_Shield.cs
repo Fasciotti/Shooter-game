@@ -18,9 +18,9 @@ public class Enemy_Shield : MonoBehaviour, IDamageble
         durability = enemy.shieldDurability;
     }
 
-    public void ReduceDurability()
+    public void ReduceDurability(int damage)
     {
-        durability--;
+        durability -= damage;
 
         if (durability < 1)
         {
@@ -34,8 +34,8 @@ public class Enemy_Shield : MonoBehaviour, IDamageble
         }
     }
 
-    public void TakeDamage()
+    public void TakeDamage(int damage)
     {
-        ReduceDurability();
+        ReduceDurability(damage);
     }
 }

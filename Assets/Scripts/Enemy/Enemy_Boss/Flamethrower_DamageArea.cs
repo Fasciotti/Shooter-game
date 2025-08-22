@@ -7,10 +7,13 @@ public class Flamethrower_DamageArea : MonoBehaviour
     private float lastTimeDamaged;
     [SerializeField] private Transform startPoint;
     [SerializeField] private LayerMask whatToIgnore;
+
+    private int flameDamage;
     private void Awake()
     {
         enemy = GetComponentInParent<Enemy_Boss>();
         damageCooldown = enemy.flameDamageCooldown;
+        flameDamage = enemy.flameDamage;
     }
 
     private void OnTriggerStay(Collider other)
@@ -35,7 +38,7 @@ public class Flamethrower_DamageArea : MonoBehaviour
 
             if(other.TryGetComponent<IDamageble>(out IDamageble hitbox))
             {
-                hitbox.TakeDamage();
+                hitbox.TakeDamage(flameDamage);
                 lastTimeDamaged = Time.time;
             }
         }

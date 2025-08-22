@@ -15,12 +15,15 @@ public class Enemy_Axe : MonoBehaviour
     private float timer = 1;
     private bool hasAlreadyCollided;
 
+    private int damage;
 
-    public void SetupAxe(Transform player, float flySpeed = 2, float axeAimTimer = 1)
+
+    public void SetupAxe(Transform player, int damage, float flySpeed = 2, float axeAimTimer = 1)
     {
         this.player = player;
         this.flySpeed = flySpeed;
         this.timer = axeAimTimer;
+        this.damage = damage;
         hasAlreadyCollided = false;
     }
 
@@ -48,7 +51,7 @@ public class Enemy_Axe : MonoBehaviour
             return;
 
         if (collision.gameObject.TryGetComponent<IDamageble>(out IDamageble hitbox))
-            hitbox?.TakeDamage();
+            hitbox?.TakeDamage(damage);
 
         CreateImpactFX();
         rb.linearVelocity = Vector3.zero;

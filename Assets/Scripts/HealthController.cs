@@ -10,9 +10,9 @@ public class HealthController : MonoBehaviour
         currentHealth = maxHealth;
     }
 
-    public virtual void ReduceHealth()
+    public virtual void ReduceHealth(int damage)
     {
-        currentHealth--;
+        currentHealth -= damage;
     }
 
     public virtual void IncreaseHealth()

@@ -14,6 +14,7 @@ public class Bullet : MonoBehaviour
     private float flyDistance;
     private float impactForce;
     private Vector3 startPosition;
+    private int damage;
 
     private bool returnCalled = false;
     private LayerMask allyLayerMask;
@@ -28,13 +29,15 @@ public class Bullet : MonoBehaviour
     }
 
     // It's called when the bullet is shot. (After the positioning)
-    public void BulletSetup(LayerMask allyLayerMask ,float flyDistance = 50, float impactForce = 100)
+    public void BulletSetup(LayerMask allyLayerMask ,float flyDistance = 50, float impactForce = 100, int damage = 1)
     {
         startPosition = transform.position;
 
         // Both determined when shooting. Different weapons, different ranges.
         this.impactForce = impactForce;
         this.flyDistance = flyDistance;
+
+        this.damage = damage;
 
         this.allyLayerMask = allyLayerMask;
         hasAlreadyCollided = false;
@@ -81,7 +84,7 @@ public class Bullet : MonoBehaviour
         }
 
         IDamageble hitbox = collision.gameObject.GetComponent<IDamageble>();
-        hitbox?.TakeDamage();
+        hitbox?.TakeDamage(damage);
 
         ApplyBulletImpactToEnemy(collision);
 

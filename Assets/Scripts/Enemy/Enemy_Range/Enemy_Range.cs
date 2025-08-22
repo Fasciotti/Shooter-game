@@ -13,9 +13,10 @@ public class Enemy_Range : Enemy
     public UnstoppablePerk unstoppablePerk;
     public ThrowGranadePerk throwGranadePerk;
 
-    [Header("Throw Granade Settings")]
+    [Header("Granade Settings")]
     [SerializeField] private GameObject granadePrefab;
     public Transform[] granadeStartPoint;
+    [SerializeField] private int granadeDamage;
     public float granadeCooldown;
     public float granadeSafeDistance;
     public float explosionTimer;
@@ -132,7 +133,7 @@ public class Enemy_Range : Enemy
 
         Bullet newBullet = bullet.GetComponent<Bullet>();
 
-        newBullet.BulletSetup(whatIsAlly);
+        newBullet.BulletSetup(whatIsAlly, damage: weaponData.bulletDamage);
 
         Rigidbody newBulletRb = newBullet.GetComponent<Rigidbody>();
 
@@ -284,11 +285,11 @@ public class Enemy_Range : Enemy
 
         if (stateMachine.currentState == DeadState)
         {
-            granadeScript.SetupGranade(whatIsAlly, transform.position, 1, explosionTimer, explosionForce);
+            granadeScript.SetupGranade(whatIsAlly, transform.position, 1, explosionTimer, explosionForce, granadeDamage);
             return;
         }
 
-        granadeScript.SetupGranade(whatIsAlly, player.transform.position, timeToReach, explosionTimer, explosionForce);
+        granadeScript.SetupGranade(whatIsAlly, player.transform.position, timeToReach, explosionTimer, explosionForce, granadeDamage);
 
     }
 
