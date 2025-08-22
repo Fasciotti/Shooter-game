@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum BossAttackType { Flamethrower, Hammer}
@@ -29,13 +30,14 @@ public class Enemy_Boss : Enemy
     public float abilityDuration;
     private float lastTimeAbility;
 
-    [Header("Flamethrower_DamageArea")]
+    [Header("Flamethrower")]
     public ParticleSystem flameSteam;
     public bool flameThrowerActive { get; private set; }
     public float flameDamageCooldown;
 
     [Header("Hammer")]
     public GameObject hammerFxPrefab;
+    [SerializeField] private float hammerAbilityRange;
 
     [Header("Attack")]
     public Transform[] damagePoints;
@@ -156,14 +158,37 @@ public class Enemy_Boss : Enemy
             impactPoint = transform;
         }
 
-        Collider[] colliders = Physics.OverlapSphere(impactPoint.position, impactRadius);
+        MassDamage(impactPoint.position, impactRadius);
+    }
 
+    private void MassDamage(Vector3 impactPoint, float impactRadius)
+    {
+        
+
+        Collider[] colliders = Physics.OverlapSphere(impactPoint, impactRadius, ~whatIsAlly);
+
+        HashSet<GameObject> uniqueEntities = new HashSet<GameObject>();
         foreach (Collider collider in colliders)
         {
-            if (collider.TryGetComponent<Rigidbody>(out var hit))
+
+            if (collider.TryGetComponent<IDamageble>(out IDamageble hitbox))
             {
-                hit.AddExplosionForce(impactForce, impactPoint.position, impactRadius, upwardModifier, ForceMode.Impulse);
+
+                if (!uniqueEntities.Add(collider.transform.root.gameObject))
+                    continue;
+
+                hitbox.TakeDamage();
             }
+
+            ApplyPhysicalForceTo(impactPoint, impactRadius, collider);
+        }
+    }
+
+    private void ApplyPhysicalForceTo(Vector3 impactPoint, float impactRadius, Collider collider)
+    {
+        if (collider.TryGetComponent<Rigidbody>(out var hit))
+        {
+            hit.AddExplosionForce(impactForce, impactPoint, impactRadius, upwardModifier, ForceMode.Impulse);
         }
     }
 
@@ -187,6 +212,8 @@ public class Enemy_Boss : Enemy
     {
         GameObject hammerFx = ObjectPool.Instance.GetObject(hammerFxPrefab, impactPoint.position);
         ObjectPool.Instance.ReturnObject(hammerFx, 0.5f);
+
+        MassDamage(impactPoint.position, hammerAbilityRange);
     }
 
     // Supposed to be in BossVisuals
@@ -232,5 +259,8 @@ public class Enemy_Boss : Enemy
         {
             Gizmos.DrawWireSphere(point.position, damageRadius);
         }
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(impactPoint.position, hammerAbilityRange);
     }
 }

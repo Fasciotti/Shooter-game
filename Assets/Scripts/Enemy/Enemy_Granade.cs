@@ -45,7 +45,7 @@ public class Enemy_Granade : MonoBehaviour
 
         Collider[] colliders = Physics.OverlapSphere(transform.position, impactRadius);
 
-        HashSet<Transform> objects = new HashSet<Transform>();
+        HashSet<Transform> uniqueEntities = new HashSet<Transform>();
         foreach (Collider collider in colliders)
         {
             if (collider.TryGetComponent<IDamageble>(out IDamageble hitbox))
@@ -53,7 +53,7 @@ public class Enemy_Granade : MonoBehaviour
                 if (!IsTargetValid(collider))
                     continue;
 
-                if (!objects.Add(collider.transform.root))
+                if (!uniqueEntities.Add(collider.transform.root))
                     continue;
 
                 hitbox?.TakeDamage();
