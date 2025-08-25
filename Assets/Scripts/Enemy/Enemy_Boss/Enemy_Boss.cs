@@ -9,7 +9,7 @@ public class Enemy_Boss : Enemy
     public BossAttackType bossAttackType;
     public float attackRange;
     public float actionCooldown;
-    public float speedUpCooldown = 15;
+    public float speedUpCooldown = 6;
     public Transform impactPoint;
 
 

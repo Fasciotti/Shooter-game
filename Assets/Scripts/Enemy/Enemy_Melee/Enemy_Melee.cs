@@ -176,7 +176,7 @@ public class Enemy_Melee : Enemy
 
         axePrefabLocal.GetComponent<Enemy_Axe>().SetupAxe(player.transform, axeDamage, axeFlySpeed, axeAimTimer);
     }
-    public bool CanThrowAxe()
+    public bool CanThrowAxe() 
     {
         if (meleeType != EnemyMelee_Type.AxeThrow)
             return false;

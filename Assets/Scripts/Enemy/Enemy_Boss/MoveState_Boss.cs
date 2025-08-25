@@ -54,7 +54,7 @@ public class MoveState_Boss : EnemyState
             {
                 PerformAction();
             }
-            else if (Time.time > lastTimeAbilityUsed + (enemy.abilityCooldown * 2)) // Can be removed with no breaking effect
+            else if (Time.time > lastTimeAbilityUsed + (enemy.abilityCooldown * 2) && enemy.bossAttackType == BossAttackType.Hammer) // Can be removed with no breaking effect
             {
                 // This is used to make the boss use the abilities more times.
                 // As it is dependent of more conditions
@@ -88,12 +88,14 @@ public class MoveState_Boss : EnemyState
         speedUpActivated = true;
         enemy.agent.speed = enemy.runSpeed;
         enemy.anim.SetFloat("MoveIndex", 1);
+        enemy.anim.SetFloat("MoveSpeedMultiplier", 1.5f);
     }
     private void ResetSpeed()
     {
         speedUpActivated = false;
         enemy.agent.speed = enemy.moveSpeed;
         enemy.anim.SetFloat("MoveIndex", 0);
+        enemy.anim.SetFloat("MoveSpeedMultiplier", 1);
     }
     private bool CanSpeedUp()
     {

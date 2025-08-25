@@ -18,6 +18,7 @@ public class Flamethrower_DamageArea : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
+
         if (!enemy.flameThrowerActive)
             return;
 
