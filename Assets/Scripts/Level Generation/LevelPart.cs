@@ -1,9 +1,44 @@
-using NUnit.Framework;
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class LevelPart : MonoBehaviour
 {
+    [SerializeField] private LayerMask intersectionLayer;
+    public Transform intersectionCheckParent;
+    [SerializeField] private Collider[] intersectionColliders;
+
+    private void Awake()
+    {
+        intersectionColliders = intersectionCheckParent.GetComponentsInChildren<Collider>();
+    }
+
+    public bool IntersectionDetected()
+    {
+
+        Physics.SyncTransforms();
+
+        foreach (Collider ownCollider in intersectionColliders)
+        {
+            Collider[] detectedColliders = Physics.OverlapBox(
+                ownCollider.bounds.center,
+                ownCollider.bounds.extents,
+                Quaternion.identity,
+                intersectionLayer);
+
+            foreach (Collider collider in detectedColliders)
+            {
+                LevelPart intersection = collider.GetComponentInParent<LevelPart>();
+
+                if (intersection != null && intersection.intersectionCheckParent != intersectionCheckParent)
+                    return true;
+            }
+
+        }
+
+        return false;
+    }
+
+
     public void SnapAndAlignLevelPart(SnapPoint targetSnapPoint)
     {
         SnapPoint entrancePoint = GetEnterSnapPoint();
@@ -46,7 +81,7 @@ public class LevelPart : MonoBehaviour
         // Filter snap points by type
         foreach (SnapPoint snapPoint in snapPoints)
         {
-            if(snapPoint.SnapPointType == type)
+            if (snapPoint.SnapPointType == type)
                 filteredSnapPoints.Add(snapPoint);
         }
 
