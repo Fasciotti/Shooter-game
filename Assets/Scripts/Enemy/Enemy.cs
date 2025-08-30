@@ -8,9 +8,6 @@ public class Enemy : MonoBehaviour
 
     public LayerMask whatIsAlly;
 
-    [Header("Health")]
-    public int healthPoints = 20;
-
     [Header("Idle Configuration")]
     public float idleTime;
     public float aggressionRange;

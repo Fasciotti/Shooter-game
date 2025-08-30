@@ -114,6 +114,9 @@ public class BattleState_Range : EnemyState
         {
             firstTimeAttacking = false;
 
+            // This makes the enemy advance all the time during the battle.
+            enemy.aggressionRange = enemy.advanceStoppingDistance + 2;
+
             weaponCooldown = enemy.weaponData.GetRandomWeaponCooldown();
             bulletsPerAttack = enemy.weaponData.GetRandomBulletsPerAttack();
             enemy.aim.position = enemy.playerBody.position;

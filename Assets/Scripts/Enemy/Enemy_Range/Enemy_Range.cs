@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public enum CoverPerk { Unavailable, CanCoverOnce, CanCoverAndChange }
 public enum UnstoppablePerk { Unavailable, Unstoppable }
@@ -9,6 +11,7 @@ public enum ThrowGranadePerk { Unavailable, ThrowGranade };
 public class Enemy_Range : Enemy
 {
     [Header("Enemy Perk")]
+    public Enemy_RangeWeaponType weaponType;
     public CoverPerk coverPerk;
     public UnstoppablePerk unstoppablePerk;
     public ThrowGranadePerk throwGranadePerk;
@@ -39,7 +42,6 @@ public class Enemy_Range : Enemy
 
     [Header("Weapon Settings")]
     public float attackDelay = 0.5f;
-    public Enemy_RangeWeaponType weaponType;
     public Transform weaponHolder;
     public Enemy_RangeWeaponData weaponData;
 
@@ -223,22 +225,39 @@ public class Enemy_Range : Enemy
 
         return covers;
     }
-
     #endregion
 
     protected override void InitializePerk()
     {
         base.InitializePerk();
 
+        if(weaponType == Enemy_RangeWeaponType.Random)
+        {
+            SetRandomWeaponType();
+        }
+
         if (unstoppablePerk == UnstoppablePerk.Unstoppable)
         {
             anim.SetFloat("AdvanceIndex", 1);
-            visuals.corruptionAmount = 10; // High amount
+            visuals.corruptionAmount = 14; // High amount
             advanceStateSpeed = 1;
 
             if (coverPerk != CoverPerk.Unavailable)
                 Debug.LogWarning("An unstoppable enemy should not be able to take cover.");
         }
+    }
+    private void SetRandomWeaponType()
+    {
+        List<Enemy_RangeWeaponType> validTypes = new List<Enemy_RangeWeaponType>();
+
+        foreach (Enemy_RangeWeaponType value in Enum.GetValues(typeof(Enemy_RangeWeaponType)))
+        {
+            if (value != Enemy_RangeWeaponType.Random || value != Enemy_RangeWeaponType.Rifle)
+                validTypes.Add(value);
+        }
+
+        int randomIndex = Random.Range(0, validTypes.Count);
+        weaponType = validTypes[randomIndex];
     }
 
     public bool IsUnstoppable()

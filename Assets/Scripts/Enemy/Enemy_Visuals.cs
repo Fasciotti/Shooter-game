@@ -4,7 +4,7 @@ using UnityEngine.Animations.Rigging;
 using Random = UnityEngine.Random;
 
 public enum Enemy_MeleeWeaponType { Throw, OneHand, Unarmed }
-public enum Enemy_RangeWeaponType { Pistol, Revolver, Shotgun, Rifle, AutoRifle }
+public enum Enemy_RangeWeaponType { Pistol, Revolver, Shotgun, Rifle, AutoRifle, Random }
 public class Enemy_Visuals : MonoBehaviour
 {
     [Header("Corruption Visuals")]
